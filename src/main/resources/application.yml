@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active: prod
+
+  datasource:
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    driver-class-name: ${spring.datasource.driver-class-name}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.sql: debug
+    org.hibernate.type: trace
