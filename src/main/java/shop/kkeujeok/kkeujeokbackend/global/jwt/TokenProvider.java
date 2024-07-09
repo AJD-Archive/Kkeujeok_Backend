@@ -1,8 +1,5 @@
-package com.example.oidc.global.jwt;
+package shop.kkeujeok.kkeujeokbackend.global.jwt;
 
-import com.example.oidc.global.jwt.api.dto.TokenDto;
-import com.example.oidc.member.domain.Member;
-import com.example.oidc.member.domain.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -12,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -102,6 +99,7 @@ public class TokenProvider {
                 .compact();
     }
 
+// 시큐리티 규현 고민 중..
 //    public Authentication getAuthentication(String token) {
 //        Claims claims = Jwts.parserBuilder()
 //                .setSigningKey(key)
