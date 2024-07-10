@@ -1,20 +1,18 @@
 package shop.kkeujeok.kkeujeokbackend.global.jwt;
 
+
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
-
 import java.security.Key;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenProviderTest {
 
     private final String accessTokenExpireTime = "3600";
-    private final String refreshTokenExpireTime = "3600";
     private final String secret = "A".repeat(128);
 
     private TokenProvider tokenProvider;
@@ -77,5 +75,18 @@ public class TokenProviderTest {
 
         //then
         assertThat(actual).isNotNull();
+    }
+
+    @DisplayName("토큰을 검증하여 유효하지 않으면 false를 반환한다.")
+    @Test
+    void 토큰을_검증하여_유효하지_않으면_false를_반환한다() {
+        // given
+        String malformedToken = "malformedToken";
+
+        // when
+        boolean result = tokenProvider.validateToken(malformedToken);
+
+        // then
+        assertThat(result).isFalse();
     }
 }
