@@ -5,9 +5,6 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
 
 import java.security.Key;
@@ -80,13 +77,5 @@ public class TokenProviderTest {
 
         //then
         assertThat(actual).isNotNull();
-    }
-
-    @Test
-    void test() {
-        String token = "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MjA3Nzk5NjN9.JIX5NXPQBR7zFBwe3-8LTXE3r48yjClkUG9_FzGjrawYf8y4a8Qmlsj11_yNImH1uY4a8HihhljswLJTxwp2kg";
-
-
-        assertThat(tokenProvider.validateToken(token)).isTrue();
     }
 }
