@@ -29,6 +29,13 @@ public class TokenProvider {
     private String secret;
     private Key key;
 
+    public TokenProvider(String accessTokenExpireTime, String refreshTokenExpireTime, String secret, Key key) {
+        this.accessTokenExpireTime = accessTokenExpireTime;
+        this.refreshTokenExpireTime = refreshTokenExpireTime;
+        this.secret = secret;
+        this.key = key;
+    }
+
     @PostConstruct
     public void init() {
         byte[] key = Decoders.BASE64URL.decode(secret);
