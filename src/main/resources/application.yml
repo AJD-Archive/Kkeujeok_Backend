@@ -22,6 +22,10 @@ logging:
     org.hibernate.sql: debug
     org.hibernate.type: trace
 
+  discord:
+    webhook-uri: ${logging.discord.webhook-uri}
+  config: ${logging.config}
+
 jwt:
   secret: ${jwt.secret}
 token:
