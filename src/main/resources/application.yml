@@ -25,3 +25,12 @@ logging:
   discord:
     webhook-uri: ${logging.discord.webhook-uri}
   config: ${logging.config}
+
+jwt:
+  secret: ${jwt.secret}
+token:
+  expire:
+    time:
+      access : ${token.expire.time.access}
+      refresh : ${token.expire.time.refresh}
+
