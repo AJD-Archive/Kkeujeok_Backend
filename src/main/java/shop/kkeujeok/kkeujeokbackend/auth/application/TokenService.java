@@ -57,7 +57,7 @@ public class TokenService {
         }
 
         Token token = tokenRepository.findByRefreshToken(refreshTokenReqDto.refreshToken()).orElseThrow();
-        Member member = memberRepository.findById(token.getMember().getMemberId()).orElseThrow();
+        Member member = memberRepository.findById(token.getMember().getId()).orElseThrow();
 
         return tokenProvider.generateAccessTokenByRefreshToken(member.getEmail(), token.getRefreshToken());
     }

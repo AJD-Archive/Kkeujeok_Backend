@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
@@ -54,6 +55,7 @@ public class AuthMemberService {
 
         return memberRepository.save(
                 Member.builder()
+                        .status(Status.A)
                         .email(userInfo.email())
                         .name(name)
                         .picture(userPicture)
