@@ -10,7 +10,7 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
@@ -30,9 +30,7 @@ public class Member extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private SocialType socialType;
 
-    //    @Schema(description = "닉네임", example = "웅이")
     private String nickname;
-
 
     @Builder
     private Member(Status status, Role role, String email, String name, String picture, SocialType socialType, boolean firstLogin, String nickname) {
