@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
+import shop.kkeujeok.kkeujeokbackend.block.exception.BlockNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Service
@@ -26,6 +28,18 @@ public class BlockService {
     }
 
     // 블록 수정 (자동 수정 예정)
+    @Transactional
+    public BlockInfoResDto update(Long blockId, BlockUpdateReqDto blockUpdateReqDto) {
+        // 로그인/회원가입 코드 완성 후 사용자 정보 받아올 예정
+        Member member = Member.builder().nickname("member").build();
+        Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
+
+        block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents());
+
+        return BlockInfoResDto.of(block, member);
+    }
+
+    // 블록 상태 업데이트 (Progress)
 
     // 블록 삭제 (논리 삭제)
 
