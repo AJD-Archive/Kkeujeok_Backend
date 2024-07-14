@@ -24,9 +24,9 @@ public class TokenProviderTest {
         tokenProvider.init();
     }
 
-    @DisplayName("엑세스 토큰을 생성한다.")
+    @DisplayName("엑세스 토큰을 생성합니다.")
     @Test
-    void 엑세스_토큰을_생성한다() {
+    void 엑세스_토큰을_생성합니다() {
         // given
         String email = "inho@gmail.com";
 
@@ -38,9 +38,9 @@ public class TokenProviderTest {
         assertThat(actual.split("\\.")).hasSize(3);
     }
 
-    @DisplayName("리프레시 토큰을 생성한다.")
+    @DisplayName("리프레시 토큰을 생성합니다.")
     @Test
-    void 리프레시_토큰을_생성한다() {
+    void 리프레시_토큰을_생성합니다() {
 
         // given, when
         String actual = tokenProvider.generateRefreshToken();
@@ -50,9 +50,9 @@ public class TokenProviderTest {
         assertThat(actual.split("\\.")).hasSize(3);
     }
 
-    @DisplayName("토큰들을 반환한다.")
+    @DisplayName("토큰들을 반환합니다.")
     @Test
-    void 토큰들을_반환한다() {
+    void 토큰들을_반환합니다() {
         // given
         String email = "inho@gmail.com";
 
@@ -63,9 +63,9 @@ public class TokenProviderTest {
         assertThat(actual).isNotNull(); // 토큰이 null이 아닌지 확인
     }
 
-    @DisplayName("리프레시 토큰으로 엑세스 토큰을 반환한다.")
+    @DisplayName("리프레시 토큰으로 엑세스 토큰을 반환합니다.")
     @Test
-    void 리프레시_토큰으로_엑세스_토큰을_반환한다() {
+    void 리프레시_토큰으로_엑세스_토큰을_반환합니다() {
         // given
         String refreshToken = "refreshToken";
         String email = "inho@gmail.com";
@@ -77,9 +77,9 @@ public class TokenProviderTest {
         assertThat(actual).isNotNull();
     }
 
-    @DisplayName("토큰을 검증하여 유효하지 않으면 false를 반환한다.")
+    @DisplayName("토큰을 검증하여 유효하지 않으면 false를 반환합니다.")
     @Test
-    void 토큰을_검증하여_유효하지_않으면_false를_반환한다() {
+    void 토큰을_검증하여_유효하지_않으면_false를_반환합니다() {
         // given
         String malformedToken = "malformedToken";
 

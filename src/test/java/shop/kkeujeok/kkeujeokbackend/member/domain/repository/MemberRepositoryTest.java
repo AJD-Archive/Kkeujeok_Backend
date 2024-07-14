@@ -20,9 +20,9 @@ class MemberRepositoryTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @DisplayName("email로 member를 찾는다.")
+    @DisplayName("email로 member를 찾습니다.")
     @Test
-    void email로_member를_찾는다() {
+    void email로_member를_찾습니다() {
         // given
         String email = "test@example.com";
         Member member = Member.builder()

@@ -58,9 +58,9 @@ class TokenServiceTest {
         when(tokenDto.refreshToken()).thenReturn("new-refresh-token");
     }
 
-    @DisplayName("accessToken과 refreshToken을 생성한다.")
+    @DisplayName("accessToken과 refreshToken을 생성합니다.")
     @Test
-    void accessToken과_refreshToken을_생성한다() {
+    void accessToken과_refreshToken을_생성합니다() {
         when(tokenRepository.existsByMember(any(Member.class))).thenReturn(false);
 
         TokenDto result = tokenService.getToken(memberLoginResDto);

@@ -33,9 +33,9 @@ class AuthServiceFactoryTest {
         authServiceFactory = new AuthServiceFactory(authServiceList);
     }
 
-    @DisplayName("특정 provider에 맞는 AuthService를 반환한다")
+    @DisplayName("특정 provider에 맞는 AuthService를 반환합니다")
     @Test
-    void 특정_provider에_맞는_AuthService를_반환한다() {
+    void 특정_provider에_맞는_AuthService를_반환합니다() {
         AuthService result = authServiceFactory.getAuthService("provider1");
         assertThat(result).isEqualTo(authService1);
 

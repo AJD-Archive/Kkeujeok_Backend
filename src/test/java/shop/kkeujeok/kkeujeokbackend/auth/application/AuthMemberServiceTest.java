@@ -91,33 +91,33 @@ class AuthMemberServiceTest {
         verify(memberRepository).findByEmail(userInfo.email());
     }
 
-    @DisplayName("이메일이 null인 경우 예외를 던진다.")
+    @DisplayName("이메일이 null인 경우 예외를 던집니다.")
     @Test
-    void 이메일이_null인_경우_예외를_던진다() {
+    void 이메일이_null인_경우_예외를_던집니다() {
         UserInfo invalidUserInfo = new UserInfo(null, "이름", "사진", "닉네임");
 
         assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(invalidUserInfo, provider));
     }
 
-    @DisplayName("이름이 null인 경우 예외를 던진다.")
+    @DisplayName("이름이 null인 경우 예외를 던집니다.")
     @Test
-    void 이름이_null인_경우_예외를_던진다() {
+    void 이름이_null인_경우_예외를_던집니다() {
         UserInfo userInfoWithNullName = new UserInfo("이메일", null, "사진", "닉네임");
 
         assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(userInfoWithNullName, provider));
     }
 
-    @DisplayName("사진이 null인 경우 예외를 던진다.")
+    @DisplayName("사진이 null인 경우 예외를 던집니다.")
     @Test
-    void 사진이_null인_경우_예외를_던진다() {
+    void 사진이_null인_경우_예외를_던집니다() {
         UserInfo userInfoWithNullPicture = new UserInfo("이메일", "이름", null, "닉네임");
 
         assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(userInfoWithNullPicture, provider));
     }
 
-    @DisplayName("닉네임이 null인 경우 예외를 던진다.")
+    @DisplayName("닉네임이 null인 경우 예외를 던집니다.")
     @Test
-    void 닉네임이_null인_경우_예외를_던진다() {
+    void 닉네임이_null인_경우_예외를_던집니다() {
         UserInfo userInfoWithNullNickname = new UserInfo("이메일", "이름", "사진", null);
 
         assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(userInfoWithNullNickname, provider));
