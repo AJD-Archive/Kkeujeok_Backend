@@ -65,6 +65,21 @@ class AuthMemberServiceTest {
         verify(memberRepository).save(any(Member.class));
     }
 
+    @DisplayName("회원 정보가 올바르게 저장되는지 확인합니다.")
+    @Test
+    void 회원_정보가_올바르게_저장되는지_확인합니다() {
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MemberLoginResDto result = authMemberService.saveUserInfo(userInfo, provider);
+
+        assertThat(result).isNotNull();
+        assertThat(result.findMember().getEmail()).isEqualTo(userInfo.email());
+        assertThat(result.findMember().getName()).isEqualTo(userInfo.name());
+        verify(memberRepository).findByEmail(userInfo.email());
+        verify(memberRepository).save(any(Member.class));
+    }
+
     @DisplayName("소셜 타입이 일치하지 않는 경우 예외를 던집니다.")
     @Test
     void 소셜_타입이_일치하지_않는_경우_예외를_던집니다() {
@@ -76,11 +91,35 @@ class AuthMemberServiceTest {
         verify(memberRepository).findByEmail(userInfo.email());
     }
 
+    @DisplayName("이메일이 null인 경우 예외를 던진다.")
     @Test
-    @DisplayName("이메일이 null인 경우 테스트")
-    void testNullEmail() {
-        UserInfo invalidUserInfo = new UserInfo(null, "Test User", "testUser", "testPicture");
+    void 이메일이_null인_경우_예외를_던진다() {
+        UserInfo invalidUserInfo = new UserInfo(null, "이름", "사진", "닉네임");
 
         assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(invalidUserInfo, provider));
+    }
+
+    @DisplayName("이름이 null인 경우 예외를 던진다.")
+    @Test
+    void 이름이_null인_경우_예외를_던진다() {
+        UserInfo userInfoWithNullName = new UserInfo("이메일", null, "사진", "닉네임");
+
+        assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(userInfoWithNullName, provider));
+    }
+
+    @DisplayName("사진이 null인 경우 예외를 던진다.")
+    @Test
+    void 사진이_null인_경우_예외를_던진다() {
+        UserInfo userInfoWithNullPicture = new UserInfo("이메일", "이름", null, "닉네임");
+
+        assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(userInfoWithNullPicture, provider));
+    }
+
+    @DisplayName("닉네임이 null인 경우 예외를 던진다.")
+    @Test
+    void 닉네임이_null인_경우_예외를_던진다() {
+        UserInfo userInfoWithNullNickname = new UserInfo("이메일", "이름", "사진", null);
+
+        assertThrows(RuntimeException.class, () -> authMemberService.saveUserInfo(userInfoWithNullNickname, provider));
     }
 }
