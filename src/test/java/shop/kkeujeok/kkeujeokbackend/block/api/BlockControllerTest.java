@@ -1,7 +1,9 @@
 package shop.kkeujeok.kkeujeokbackend.block.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -18,6 +20,7 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
@@ -39,6 +42,7 @@ class BlockControllerTest {
     private Member member;
     private Block block;
     private BlockSaveReqDto blockSaveReqDto;
+    private BlockUpdateReqDto blockUpdateReqDto;
 
     @BeforeEach
     void setUp() {
@@ -46,6 +50,7 @@ class BlockControllerTest {
                 .nickname("웅이")
                 .build();
         blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED);
+        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents");
         block = blockSaveReqDto.toEntity(member);
     }
 
@@ -71,4 +76,26 @@ class BlockControllerTest {
                 .andExpect(jsonPath("$.data.nickname").value("웅이"));
     }
 
+    @DisplayName("Patch 블록 수정 컨트롤러 로직 확인")
+    @Test
+    void 블록_수정() throws Exception {
+        // given
+        block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents());
+        BlockInfoResDto response = BlockInfoResDto.of(block, member);
+        given(blockService.update(anyLong(), any(BlockUpdateReqDto.class))).willReturn(response);
+
+        // when & then
+        mockMvc.perform(patch("/api/blocks/{blockId}", 1L)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(blockUpdateReqDto))
+                ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode").value(200))
+                .andExpect(jsonPath("$.message").value("블록 수정"))
+                .andExpect(jsonPath("$.data.title").value("UpdateTitle"))
+                .andExpect(jsonPath("$.data.contents").value("UpdateContents"))
+                .andExpect(jsonPath("$.data.progress").value("NOT_STARTED"))
+                .andExpect(jsonPath("$.data.nickname").value("웅이"));
+    }
 }
