@@ -7,7 +7,7 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: dongkyun0713/kkeujeok_repository
-  EC2_HOST: ${{ EC2_HOST }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_SSH_USER: ec2-user
   PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
