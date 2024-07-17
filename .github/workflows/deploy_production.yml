@@ -12,14 +12,8 @@ env:
   PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
   CONTAINER_NAME_BLUE: ${{ secrets.CONTAINER_NAME_BLUE }}
   CONTAINER_NAME_GREEN: ${{ secrets.CONTAINER_NAME_GREEN }}
-  CURRENT_CONTAINER: ${{ secrets.CURRENT_CONTAINER }}
-  CURRENT_PORT: ${{ secrets.CURRENT_PORT }}
   BLUE_PORT: ${{ secrets.BLUE_PORT }}
   GREEN_PORT: ${{ secrets.GREEN_PORT }}
-  NEW_CONTAINER: ${{ secrets.NEW_CONTAINER }}
-  NEW_PORT: ${{ secrets.NEW_PORT }}
-
-
 
 jobs:
   build-and-push-docker:
@@ -55,17 +49,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Determine Active Environment
-      id: determine-env
-      run: |
-        if [ "${{ env.CURRENT_CONTAINER }}" == "${{ env.CONTAINER_NAME_BLUE }}" ]; then
-          echo "NEW_CONTAINER=${{ env.CONTAINER_NAME_GREEN }}" >> $GITHUB_ENV
-          echo "NEW_PORT=${{ env.GREEN_PORT }}" >> $GITHUB_ENV
-        else
-          echo "NEW_CONTAINER=${{ env.CONTAINER_NAME_BLUE }}" >> $GITHUB_ENV
-          echo "NEW_PORT=${{ env.BLUE_PORT }}" >> $GITHUB_ENV
-        fi
-
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
       with:
@@ -73,15 +56,14 @@ jobs:
         username: ${{ env.EC2_SSH_USER }}
         key: ${{ env.PRIVATE_KEY }}
         script: |
-          if [ $(sudo docker ps -q -f name=${{ env.CURRENT_CONTAINER }}) ]; then
-            sudo docker stop ${{ env.CURRENT_CONTAINER }}
-            sudo docker rm ${{ env.CURRENT_CONTAINER }}
+          if [ $(sudo docker ps -q -f name=${{ env.CONTAINER_NAME_BLUE }}) ]; then
+            sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
+            sudo docker run --name ${{ env.CONTAINER_NAME_GREEN }} -d -p ${{ env.GREEN_PORT }}:${{ env.GREEN_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
+            sudo docker stop ${{ env.CONTAINER_NAME_BLUE }}
+            sudo docker rm ${{ env.CONTAINER_NAME_BLUE }}
+          else
+            sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
+            sudo docker run --name ${{ env.CONTAINER_NAME_BLUE }} -d -p ${{ env.BLUE_PORT }}:${{ env.BLUE_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
+            sudo docker stop ${{ env.CONTAINER_NAME_GREEN }}
+            sudo docker rm ${{ env.CONTAINER_NAME_GREEN }}
           fi
-
-          sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
-          sudo docker run --name ${{ env.NEW_CONTAINER }} -d -p ${{ env.NEW_PORT }}:${{ env.NEW_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
-    
-    - name: Modify Current Secrets
-      run: |
-        echo "CURRENT_CONTAINER=${{ env.NEW_CONTAINER }}" >> $GITHUB_ENV
-        echo "CURRENT_PORT=${{ env.NEW_PORT }}" >> $GITHUB_ENV
