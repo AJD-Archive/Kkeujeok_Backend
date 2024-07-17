@@ -71,7 +71,7 @@ jobs:
       with:
         host: ${{ env.EC2_HOST }}
         username: ${{ env.EC2_SSH_USER }}
-        key: ${{ env.EC2_SSH_PRIVATE_KEY }}
+        key: ${{ env.PRIVATE_KEY }}
         script: |
           CURRENT_CONTAINER=${{ env.CURRENT_CONTAINER }}
           NEW_CONTAINER=${{ env.NEW_CONTAINER }}
