@@ -58,24 +58,24 @@ jobs:
     - name: Determine Active Environment
       id: determine-env
       run: |
-        if [ "${{ secrets.CURRENT_CONTAINER }}" == "${{ secrets.CONTAINER_NAME_BLUE }}" ]; then
-          echo "NEW_CONTAINER=${{ secrets.CONTAINER_NAME_GREEN }}" >> $GITHUB_ENV
+        if [ "${{ env.CURRENT_CONTAINER }}" == "${{ env.CONTAINER_NAME_BLUE }}" ]; then
+          echo "NEW_CONTAINER=${{ env.CONTAINER_NAME_GREEN }}" >> $GITHUB_ENV
           echo "NEW_PORT=8088" >> $GITHUB_ENV
         else
-          echo "NEW_CONTAINER=${{ secrets.CONTAINER_NAME_BLUE }}" >> $GITHUB_ENV
+          echo "NEW_CONTAINER=${{ env.CONTAINER_NAME_BLUE }}" >> $GITHUB_ENV
           echo "NEW_PORT=8087" >> $GITHUB_ENV
         fi
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_SSH_USER }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        host: ${{ env.EC2_HOST }}
+        username: ${{ env.EC2_SSH_USER }}
+        key: ${{ env.EC2_SSH_PRIVATE_KEY }}
         script: |
-          CURRENT_CONTAINER=${{ secrets.CURRENT_CONTAINER }}
+          CURRENT_CONTAINER=${{ env.CURRENT_CONTAINER }}
           NEW_CONTAINER=${{ env.NEW_CONTAINER }}
-          CURRENT_PORT=${{ secrets.CURRENT_PORT }}
+          CURRENT_PORT=${{ env.CURRENT_PORT }}
           NEW_PORT=${{ env.NEW_PORT }}
 
           if [ $(sudo docker ps -q -f name=$NEW_CONTAINER) ]; then
@@ -88,3 +88,4 @@ jobs:
 
           echo "CURRENT_CONTAINER=$NEW_CONTAINER" >> $GITHUB_ENV
           echo "CURRENT_PORT=$NEW_PORT" >> $GITHUB_ENV
+          
