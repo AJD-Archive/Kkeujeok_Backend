@@ -60,10 +60,10 @@ jobs:
       run: |
         if [ "${{ env.CURRENT_CONTAINER }}" == "${{ env.CONTAINER_NAME_BLUE }}" ]; then
           echo "NEW_CONTAINER=${{ env.CONTAINER_NAME_GREEN }}" >> $GITHUB_ENV
-          echo "NEW_PORT=8088" >> $GITHUB_ENV
+          echo "NEW_PORT='${{ secrets.BLUE_PORT }}'" >> $GITHUB_ENV
         else
           echo "NEW_CONTAINER=${{ env.CONTAINER_NAME_BLUE }}" >> $GITHUB_ENV
-          echo "NEW_PORT=8087" >> $GITHUB_ENV
+          echo "NEW_PORT='${{ secrets.GREEN_PORT }}'" >> $GITHUB_ENV
         fi
 
     - name: Deploy to EC2
@@ -74,18 +74,15 @@ jobs:
         key: ${{ env.PRIVATE_KEY }}
         script: |
           CURRENT_CONTAINER=${{ env.CURRENT_CONTAINER }}
-          NEW_CONTAINER=${{ env.NEW_CONTAINER }}
           CURRENT_PORT=${{ env.CURRENT_PORT }}
-          NEW_PORT=${{ env.NEW_PORT }}
 
-          if [ $(sudo docker ps -q -f name=$NEW_CONTAINER) ]; then
-            sudo docker stop $NEW_CONTAINER
-            sudo docker rm $NEW_CONTAINER
+          if [ $(sudo docker ps -q -f name=$CURRENT_CONTAINER) ]; then
+            sudo docker stop $CURRENT_CONTAINER
+            sudo docker rm $CURRENT_CONTAINER
           fi
 
           sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
-          sudo docker run --name $NEW_CONTAINER -d -p $NEW_PORT:8087 -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
+          sudo docker run --name ${{ env.NEW_CONTAINER }} -d -p ${{ env.NEW_PORT }}:${{ env.NEW_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
 
-          echo "{CURRENT_CONTAINER}={$NEW_CONTAINER}" >> "$GITHUB_ENV"
-          echo "{CURRENT_PORT}={$NEW_PORT}" >> "$GITHUB_ENV"
-          
+					echo "CURRENT_CONTAINER=${{ env.NEW_CONTAINER }}" >> "$GITHUB_ENV"
+          echo "CURRENT_PORT=${{ env.NEW_PORT }}" >> "$GITHUB_ENV"
