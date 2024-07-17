@@ -10,6 +10,7 @@ env:
   EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_SSH_USER: ec2-user
   PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  CONTAINER_NAME: kkeujeok-container
 
 jobs:
   build-and-push-docker:
@@ -62,5 +63,5 @@ jobs:
             sudo docker rm $CONTAINER_ID
           fi
 
-          sudo docker pull ${{ env.DOCKER_HUB }}
-          sudo docker run --name ${{ env.CONTAINER_NAME }} -d -p 8089:8089 -e TZ=Asia/Seoul ${{ env.DOCKER_HUB }}
+          sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
+          sudo docker run --name ${{ env.CONTAINER_NAME }} -d -p 8089:8089 -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
