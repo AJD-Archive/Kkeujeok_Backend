@@ -6,11 +6,11 @@ on:
       - develop
 
 env:
-  DOCKER_IMAGE_NAME: dongkyun0713/kkeujeok_repository
+  DOCKER_IMAGE_NAME: ${{ secrets.DEV_DOCKER_IMAGE_NAME }}
   EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_SSH_USER: ec2-user
   PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-  CONTAINER_NAME: kkeujeok-container
+  CONTAINER_NAME: ${{ secrets.DEV_CONTAINER_NAME }}
 
 jobs:
   build-and-push-docker:
