@@ -16,6 +16,10 @@ env:
   CURRENT_PORT: ${{ secrets.CURRENT_PORT }}
   BLUE_PORT: ${{ secrets.BLUE_PORT }}
   GREEN_PORT: ${{ secrets.GREEN_PORT }}
+  NEW_CONTAINER: ${{ secrets.NEW_CONTAINER }}
+  NEW_PORT: ${{ secrets.NEW_PORT }}
+
+
 
 jobs:
   build-and-push-docker:
@@ -77,5 +81,5 @@ jobs:
           sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
           sudo docker run --name ${{ env.NEW_CONTAINER }} -d -p ${{ env.NEW_PORT }}:${{ env.NEW_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
 
-          echo "${{ env.CURRENT_CONTAINER }}=${{ env.NEW_CONTAINER }}" >> "$GITHUB_ENV"
-          echo "${{ env.CURRENT_PORT }}=${{ env.NEW_PORT }}" >> "$GITHUB_ENV"
+          echo "CURRENT_CONTAINER=${{ env.NEW_CONTAINER }}" >> "$GITHUB_ENV"
+          echo "CURRENT_PORT=${{ env.NEW_PORT }}" >> "$GITHUB_ENV"
