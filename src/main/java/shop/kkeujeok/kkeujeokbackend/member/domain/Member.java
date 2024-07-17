@@ -5,16 +5,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+@NoArgsConstructor
+public class Member extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Long memberId;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     private boolean firstLogin;
 
@@ -30,13 +30,11 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private SocialType socialType;
 
-    //    @Schema(description = "닉네임", example = "웅이")
     private String nickname;
 
-
-
     @Builder
-    private Member(Role role, String email, String name, String picture, SocialType socialType, boolean firstLogin, String nickname) {
+    private Member(Status status, Role role, String email, String name, String picture, SocialType socialType, boolean firstLogin, String nickname) {
+        this.status = status;
         this.role = role;
         this.email = email;
         this.name = name;
