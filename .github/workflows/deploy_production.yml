@@ -86,6 +86,5 @@ jobs:
           sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
           sudo docker run --name $NEW_CONTAINER -d -p $NEW_PORT:"${{ secrets.GREEN_PORT }}" -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
 
-          echo "CURRENT_CONTAINER='${NEW_CONTAINER}'" >> "$GITHUB_ENV"
-          echo "CURRENT_PORT='${NEW_PORT}'" >> "$GITHUB_ENV"
-          
+          echo "CURRENT_CONTAINER='${{ env.CURRENT_CONTAINER }}'" >> "$GITHUB_ENV"
+          echo "CURRENT_PORT='${{ env.NEW_PORT }}'" >> "$GITHUB_ENV"
