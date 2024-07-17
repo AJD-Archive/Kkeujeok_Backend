@@ -78,13 +78,13 @@ jobs:
           CURRENT_PORT=${{ env.CURRENT_PORT }}
           NEW_PORT=${{ env.NEW_PORT }}
 
-          if [ $(sudo docker ps -q -f name=$NEW_CONTAINER) ]; then
-            sudo docker stop $NEW_CONTAINER
-            sudo docker rm $NEW_CONTAINER
+          if [ $(sudo docker ps -q -f name="$NEW_CONTAINER") ]; then
+            sudo docker stop "$NEW_CONTAINER"
+            sudo docker rm "$NEW_CONTAINER"
           fi
 
           sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
-          sudo docker run --name $NEW_CONTAINER -d -p $NEW_PORT:8087 -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
+          sudo docker run --name "$NEW_CONTAINER" -d -p "$NEW_PORT":8087 -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
 
           echo "CURRENT_CONTAINER="$NEW_CONTAINER"" >> "$GITHUB_ENV"
           echo "CURRENT_PORT="$NEW_PORT"" >> "$GITHUB_ENV"
