@@ -6,10 +6,11 @@ on:
       - develop
 
 env:
-  DOCKER_IMAGE_NAME:dongkyun0713/kkeujeok_repository
-  EC2_HOST:${{ EC2_HOST }}
-  EC2_SSH_USER:ec2-user
-  PRIVATE_KEY:${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  DOCKER_IMAGE_NAME: ${{ secrets.DEV_DOCKER_IMAGE_NAME }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_SSH_USER: ec2-user
+  PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  CONTAINER_NAME: ${{ secrets.DEV_CONTAINER_NAME }}
 
 jobs:
   build-and-push-docker:
@@ -30,7 +31,7 @@ jobs:
       run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
 
     - name: Build with Gradle
-      run: ./gradlew build -x tesst
+      run: ./gradlew build -x test
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag ${{ env.DOCKER_IMAGE_NAME }}:latest
@@ -55,12 +56,12 @@ jobs:
         username: ${{ env.EC2_SSH_USER }}
         key: ${{ env.PRIVATE_KEY }}
         script: |
-          CONTAINER_ID=$(sudo docker ps -q --filter "publish=80-8080")
+          CONTAINER_ID=$(sudo docker ps -q --filter "publish=8089-8089")
 
           if [ ! -z "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
             sudo docker rm $CONTAINER_ID
           fi
 
-          sudo docker pull ${{ env.DOCKER_HUB }}
-          sudo docker run --name ${{ env.CONTAINER_NAME }} -d -p 80:8080 -e TZ=Asia/Seoul ${{ env.DOCKER_HUB }}
+          sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
+          sudo docker run --name ${{ env.CONTAINER_NAME }} -d -p 8089:8089 -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
