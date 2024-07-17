@@ -80,7 +80,8 @@ jobs:
 
           sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
           sudo docker run --name ${{ env.NEW_CONTAINER }} -d -p ${{ env.NEW_PORT }}:${{ env.NEW_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
-          
-        run: |
-          echo "CURRENT_CONTAINER=${{ env.NEW_CONTAINER }}" >> "$GITHUB_ENV"
-          echo "CURRENT_PORT=${{ env.NEW_PORT }}" >> "$GITHUB_ENV"
+    
+    - name: Modify Current Secrets
+      run: |
+        echo "CURRENT_CONTAINER=${{ env.NEW_CONTAINER }}" >> $GITHUB_ENV
+        echo "CURRENT_PORT=${{ env.NEW_PORT }}" >> $GITHUB_ENV
