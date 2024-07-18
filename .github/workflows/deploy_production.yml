@@ -58,13 +58,13 @@ jobs:
           script: |
             if [ $(sudo docker ps -q -f name=${{ env.CONTAINER_NAME_BLUE }}) ]; then
               sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
-              sudo docker run --name ${{ env.CONTAINER_NAME_GREEN }} -d -p ${{ env.GREEN_PORT }}:${{ env.GREEN_PORT }} -e SPRING_PROFILES_ACTIVE=green -e SERVER_PORT=${{ env.GREEN_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}:latest
+              sudo docker run --name ${{ env.CONTAINER_NAME_GREEN }} -d -p ${{ env.GREEN_PORT }}:${{ env.GREEN_PORT }} -e SPRING_PROFILES_ACTIVE=green -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}:latest
               sleep 30
               sudo docker stop ${{ env.CONTAINER_NAME_BLUE }}
               sudo docker rm ${{ env.CONTAINER_NAME_BLUE }}
             else
               sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
-              sudo docker run --name ${{ env.CONTAINER_NAME_BLUE }} -d -p ${{ env.BLUE_PORT }}:${{ env.BLUE_PORT }} -e SPRING_PROFILES_ACTIVE=blue -e SERVER_PORT=${{ env.BLUE_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}:latest
+              sudo docker run --name ${{ env.CONTAINER_NAME_BLUE }} -d -p ${{ env.BLUE_PORT }}:${{ env.BLUE_PORT }} -e SPRING_PROFILES_ACTIVE=blue -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}:latest
               sleep 30
               sudo docker stop ${{ env.CONTAINER_NAME_GREEN }}
               sudo docker rm ${{ env.CONTAINER_NAME_GREEN }}
