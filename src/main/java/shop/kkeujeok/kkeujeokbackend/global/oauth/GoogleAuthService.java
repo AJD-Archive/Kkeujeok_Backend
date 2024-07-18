@@ -22,12 +22,11 @@ import java.util.Map;
 public class GoogleAuthService implements AuthService {
 
     private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-    @Value("${client_id}")
+    @Value("${google.client.id}")
     private String google_client_id;
-    @Value("${client_secret}")
+    @Value("${google.client.secret}")
     private String google_client_secret;
-
-    @Value("${GOOGLE_REDIRECT_URI}")
+    @Value("${google.redirect.uri}")
     private String GOOGLE_REDIRECT_URI;
     private static final String JWT_DELIMITER = "\\.";
 
