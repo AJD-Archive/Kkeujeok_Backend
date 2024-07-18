@@ -59,14 +59,14 @@ jobs:
           if [ $(sudo docker ps -q -f name=${{ env.CONTAINER_NAME_BLUE }}) ]; then
             sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
             sudo docker run --name ${{ env.CONTAINER_NAME_GREEN }} -d -p ${{ env.GREEN_PORT }}:${{ env.GREEN_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
-            sleep 10
+            sleep 30
             sudo docker stop ${{ env.CONTAINER_NAME_BLUE }}
             sudo docker rm ${{ env.CONTAINER_NAME_BLUE }}
             sudo systemctl reload nginx
           else
             sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
             sudo docker run --name ${{ env.CONTAINER_NAME_BLUE }} -d -p ${{ env.BLUE_PORT }}:${{ env.BLUE_PORT }} -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
-            sleep 10
+            sleep 30
             sudo docker stop ${{ env.CONTAINER_NAME_GREEN }}
             sudo docker rm ${{ env.CONTAINER_NAME_GREEN }}
             sudo systemctl reload nginx
