@@ -56,7 +56,7 @@ jobs:
           username: ${{ env.EC2_SSH_USER }}
           key: ${{ env.PRIVATE_KEY }}
           script: |
-            if [ sudo docker ps -a -f name=${{ env.CONTAINER_NAME_BLUE }} | grep -q "${{ env.CONTAINER_NAME_BLUE }}" ]; then
+            if [ -e sudo docker ps -a -f name=${{ env.CONTAINER_NAME_BLUE }} ]; then
               sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
               sudo docker run --name ${{ env.CONTAINER_NAME_GREEN }} -d -p ${{ env.GREEN_PORT }}:${{ env.GREEN_PORT }} -e SPRING_PROFILES_ACTIVE=green -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}:latest
               sleep 30
