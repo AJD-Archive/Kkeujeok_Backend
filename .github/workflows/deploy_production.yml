@@ -69,4 +69,5 @@ jobs:
               sudo docker stop ${{ env.CONTAINER_NAME_GREEN }}
               sudo docker rm ${{ env.CONTAINER_NAME_GREEN }}
             fi
+            sleep 20
             sudo systemctl reload nginx
