@@ -28,6 +28,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          
+      - name: Set up application-prod.yml
+        run: echo "${{ secrets.PRODUCTION_APPLICATION }}" > ./src/main/resources/application-prod.yml
 
       - name: Set up application-blue.yml
         run: echo "${{ secrets.BLUE_APPLICATION }}" > ./src/main/resources/application-blue.yml
