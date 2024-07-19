@@ -29,8 +29,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up application-prod.yml
-        run: echo "${{ secrets.PRODUCTION_APPLICATION }}" > ./src/main/resources/application-prod.yml
+      - name: Set up application-blue.yml
+        run: echo "${{ secrets.BLUE_APPLICATION }}" > ./src/main/resources/application-blue.yml
+
+      - name: Set up application-green.yml
+        run: echo "${{ secrets.GREEN_APPLICATION }}" > ./src/main/resources/application-green.yml
 
       - name: Build with Gradle
         run: ./gradlew build -x test
