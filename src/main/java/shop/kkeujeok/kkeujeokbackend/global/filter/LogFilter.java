@@ -7,13 +7,10 @@ import java.util.UUID;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.filter.GenericFilterBean;
 
 @Slf4j
-public class LogFilter implements Filter {
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        log.info("log filter init");
-    }
+public class LogFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -36,10 +33,4 @@ public class LogFilter implements Filter {
             log.info("REQUEST [{}][{}]", uuid, requestURI);
         }
     }
-
-    @Override
-    public void destroy() {
-        log.info("log filter des");
-    }
-
 }
