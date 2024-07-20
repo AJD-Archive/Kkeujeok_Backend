@@ -1,8 +1,10 @@
-package shop.kkeujeok.kkeujeokbackend.global.filter;
+package shop.kkeujeok.kkeujeokbackend.global.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import shop.kkeujeok.kkeujeokbackend.global.filter.LogFilter;
+import shop.kkeujeok.kkeujeokbackend.global.filter.LoginCheckFilter;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 
 @Configuration
