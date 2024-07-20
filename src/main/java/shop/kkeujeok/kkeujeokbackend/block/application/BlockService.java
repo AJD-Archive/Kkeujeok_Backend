@@ -37,7 +37,7 @@ public class BlockService {
         // 로그인/회원가입 코드 완성 후 사용자 정보 받아올 예정
         Member member = Member.builder().nickname("member").build();
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
-        
+
         if (!block.getTitle().equals(blockUpdateReqDto.title()) ||
                 !block.getContents().equals(blockUpdateReqDto.contents())) {
             block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents());
@@ -63,7 +63,7 @@ public class BlockService {
     private Progress parseProgress(String progressString) {
         try {
             return Progress.valueOf(progressString);
-        } catch (InvalidProgressException e) {
+        } catch (IllegalArgumentException e) {
             throw new InvalidProgressException();
         }
     }
