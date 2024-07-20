@@ -47,4 +47,8 @@ public class Block extends BaseEntity {
         this.title = title;
         this.contents = contents;
     }
+
+    public void progressUpdate(Progress progress) {
+        this.progress = progress;
+    }
 }
