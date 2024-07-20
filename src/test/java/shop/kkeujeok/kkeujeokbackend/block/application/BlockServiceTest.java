@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.block.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,6 +21,7 @@ import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
+import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
@@ -81,5 +83,53 @@ class BlockServiceTest {
         });
     }
 
+    @DisplayName("블록 제목과 내용이 기존과 동일하면 수정 하지 않습니다.")
+    @Test
+    void 블록_수정_X() {
+        // given
+        Long blockId = 1L;
+        BlockUpdateReqDto originBlockUpdateReqDto = new BlockUpdateReqDto("Title", "Contents");
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+
+        // when
+        BlockInfoResDto result = blockService.update(blockId, originBlockUpdateReqDto);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.title()).isEqualTo("Title");
+            assertThat(result.contents()).isEqualTo("Contents");
+            assertThat(block.getUpdatedAt()).isNull();
+        });
+    }
+
+    @DisplayName("블록의 상태를 수정합니다.")
+    @Test
+    void 블록_상태_수정() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+
+        // when
+        BlockInfoResDto result = blockService.progressUpdate(blockId, "IN_PROGRESS");
+
+        // then
+        assertAll(() -> {
+            assertThat(result.title()).isEqualTo("Title");
+            assertThat(result.contents()).isEqualTo("Contents");
+            assertThat(result.progress()).isEqualTo(Progress.IN_PROGRESS);
+        });
+    }
+
+    @DisplayName("블록의 상태를 수정하는데 실패합니다.(Progress 문자열 파싱 실패)")
+    @Test
+    void 블록_상태_수정_실패() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+
+        // when & then
+        assertThatThrownBy(() -> blockService.progressUpdate(blockId, "String"))
+                .isInstanceOf(InvalidProgressException.class);
+    }
 
 }

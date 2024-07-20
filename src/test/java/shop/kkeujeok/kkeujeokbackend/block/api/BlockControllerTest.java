@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.block.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,6 +26,7 @@ import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @WebMvcTest(BlockController.class)
@@ -97,5 +99,43 @@ class BlockControllerTest {
                 .andExpect(jsonPath("$.data.contents").value("UpdateContents"))
                 .andExpect(jsonPath("$.data.progress").value("NOT_STARTED"))
                 .andExpect(jsonPath("$.data.nickname").value("웅이"));
+    }
+
+    @DisplayName("Patch 블록 상태 수정 컨트롤러 로직 확인")
+    @Test
+    void 블록_상태_수정() throws Exception {
+        // given
+        Long blockId = 1L;
+        String progressString = "IN_PROGRESS";
+        BlockInfoResDto response = BlockInfoResDto.of(block, member);
+
+        given(blockService.progressUpdate(anyLong(), anyString())).willReturn(response);
+
+        // when & then
+        mockMvc.perform(patch("/api/blocks/{blockId}/progress", blockId)
+                        .param("progress", progressString)
+                        .accept(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode").value(200))
+                .andExpect(jsonPath("$.message").value("블록 상태 수정"))
+                .andExpect(jsonPath("$.data").exists());
+    }
+
+    @DisplayName("Patch 블록 상태 수정 실패 컨트롤러 로직 확인(400 Bad Request가 발생한다)")
+    @Test
+    void 블록_상태_수정_실패() throws Exception {
+        // given
+        Long blockId = 1L;
+        String progressString = "STATUS_PROGRESS";
+
+        given(blockService.progressUpdate(anyLong(), anyString())).willThrow(new InvalidProgressException());
+
+        // when & then
+        mockMvc.perform(patch("/api/blocks/{blockId}/progress", blockId)
+                        .param("progress", progressString)
+                        .accept(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
