@@ -34,7 +34,7 @@ public class AuthMemberService {
 
     private void validateNotFoundEmail(String email) {
         if (email == null) {
-            throw new RuntimeException();
+            throw new RuntimeException("유저의 이메일을 찾을 수 없습니다.");
         }
     }
 
