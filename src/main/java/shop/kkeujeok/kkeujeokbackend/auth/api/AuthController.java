@@ -27,17 +27,17 @@ public class AuthController {
     private final AuthServiceFactory authServiceFactory;
     private final AuthMemberService memberService;
     private final TokenService tokenService;
-    private final GoogleAuthService getGoogleAccessToken;
-    private final KakaoAuthService kakaoAuthService;
 
     @GetMapping("oauth2/callback/google")
     public JsonNode googleCallback(@RequestParam(name = "code") String code) {
-        return getGoogleAccessToken.getGoogleIdToken(code);
+        AuthService googleAuthService = authServiceFactory.getAuthService("google");
+        return googleAuthService.getIdToken(code);
     }
 
     @GetMapping("oauth2/callback/kakao")
     public JsonNode kakaoCallback(@RequestParam(name = "code") String code) {
-        return kakaoAuthService.getKakaoAccessToken(code);
+        AuthService kakaoAuthService = authServiceFactory.getAuthService("kakao");
+        return kakaoAuthService.getIdToken(code);
     }
 
 //    @Operation(summary = "로그인 후 토큰 발급", description = "액세스, 리프레쉬 토큰을 발급합니다.")

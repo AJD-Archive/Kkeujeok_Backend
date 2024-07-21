@@ -36,8 +36,8 @@ public class GoogleAuthService implements AuthService {
         this.objectMapper = objectMapper;
     }
 
-
-    public JsonNode getGoogleIdToken(String code) {
+    @Override
+    public JsonNode getIdToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, String> params = Map.of(
                 "code", code,

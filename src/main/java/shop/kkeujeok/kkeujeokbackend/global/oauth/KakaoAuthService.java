@@ -41,8 +41,8 @@ public class KakaoAuthService implements AuthService {
         this.objectMapper = objectMapper;
     }
 
-
-    public JsonNode getKakaoAccessToken(String code) {
+    @Override
+    public JsonNode getIdToken(String code) {
         RestTemplate rt = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
