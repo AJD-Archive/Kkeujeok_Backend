@@ -1,13 +1,11 @@
 package shop.kkeujeok.kkeujeokbackend.global.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -47,7 +45,7 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String getUserIdFromToken(TokenReqDto tokenReqDto) {
+    public String getUserEmailFromToken(TokenReqDto tokenReqDto) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
