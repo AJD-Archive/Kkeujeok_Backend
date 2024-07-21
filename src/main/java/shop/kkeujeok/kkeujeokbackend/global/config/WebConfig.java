@@ -9,7 +9,6 @@ import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 
 @Configuration
 public class WebConfig {
-
     private final TokenProvider tokenProvider;
 
     public WebConfig(TokenProvider tokenProvider) {
