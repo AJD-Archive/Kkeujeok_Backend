@@ -69,7 +69,8 @@ public class AuthMemberService {
 
     private String getUserPicture(String picture) {
         return Optional.ofNullable(picture)
-                .map(this::convertToHighRes).orElseThrow();
+                .map(this::convertToHighRes)
+                .orElseThrow();
     }
 
     private String convertToHighRes(String url){
