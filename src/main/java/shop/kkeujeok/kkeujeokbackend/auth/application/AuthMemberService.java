@@ -44,14 +44,8 @@ public class AuthMemberService {
 
     private Member createMember(UserInfo userInfo, SocialType provider) {
         String userPicture = getUserPicture(userInfo.picture());
-        String name = userInfo.name();
-        String nickname = userInfo.nickname();
-
-        if (name == null && nickname != null) {
-            name = nickname;
-        } else if (nickname == null && name != null) {
-            nickname = name;
-        }
+        String name = unionName(userInfo.name(), userInfo.nickname());
+        String nickname = unionNickname(userInfo.name(), userInfo.nickname());
 
         return memberRepository.save(
                 Member.builder()
@@ -67,6 +61,21 @@ public class AuthMemberService {
         );
     }
 
+    private String unionName(String name, String nickname) {
+        if (name == null && nickname != null) {
+            return nickname;
+        } else if (nickname == null && name != null) {
+            return name;
+        }
+        return name;
+    }
+
+    private String unionNickname(String name, String nickname) {
+        if (nickname == null) {
+            return name;
+        }
+        return nickname;
+    }
     private String getUserPicture(String picture) {
         return Optional.ofNullable(picture)
                 .map(this::convertToHighRes)
