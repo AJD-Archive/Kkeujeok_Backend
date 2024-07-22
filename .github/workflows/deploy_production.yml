@@ -36,8 +36,8 @@ jobs:
         run: echo "${{ secrets.GREEN_APPLICATION }}" > ./src/main/resources/application-green.yml
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
-
+        run: ./gradlew build
+        
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag ${{ env.DOCKER_IMAGE_NAME }}:latest
 
