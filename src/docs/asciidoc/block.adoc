@@ -1,0 +1,12 @@
+= 블록 API 문서
+
+== 블록 생성 API
+
+=== 요청
+include::{snippets}/block/save/http-request.adoc[]
+include::{snippets}/block/save/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/block/save/http-response.adoc[]
+include::{snippets}/block/save/response-fields.adoc[]

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
@@ -30,4 +31,11 @@ public class BlockController {
                                                @RequestBody BlockUpdateReqDto blockUpdateReqDto) {
         return new RspTemplate<>(HttpStatus.OK, "블록 수정", blockService.update(blockId, blockUpdateReqDto));
     }
+
+    @PatchMapping("/{blockId}/progress")
+    public RspTemplate<BlockInfoResDto> progressUpdate(@PathVariable(name = "blockId") Long blockId,
+                                                       @RequestParam(name = "progress") String progress) {
+        return new RspTemplate<>(HttpStatus.OK, "블록 상태 수정", blockService.progressUpdate(blockId, progress));
+    }
+    
 }
