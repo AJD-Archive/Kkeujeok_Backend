@@ -52,7 +52,7 @@ public class TokenService {
 
     @Transactional
     public TokenDto generateAccessToken(RefreshTokenReqDto refreshTokenReqDto) {
-        if (!tokenRepository.existsByRefreshToken(refreshTokenReqDto.refreshToken()) || !tokenProvider.validateToken(refreshTokenReqDto.refreshToken())) {
+        if (isInvalidRefreshToken(refreshTokenReqDto.refreshToken())) {
             throw new RuntimeException();
         }
 
@@ -62,4 +62,7 @@ public class TokenService {
         return tokenProvider.generateAccessTokenByRefreshToken(member.getEmail(), token.getRefreshToken());
     }
 
+    private boolean isInvalidRefreshToken(String refreshToken) {
+        return !tokenRepository.existsByRefreshToken(refreshToken) || !tokenProvider.validateToken(refreshToken);
+    }
 }
