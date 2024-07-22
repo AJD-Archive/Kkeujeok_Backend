@@ -28,14 +28,12 @@ import java.util.Base64;
 public class KakaoAuthService implements AuthService {
 
     private final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
+    private static final String JWT_DELIMITER = "\\.";
+    private final ObjectMapper objectMapper;
     @Value("${oauth.kakao.rest-api-key}")
     private String restApiKey;
     @Value("${oauth.kakao.redirect-url}")
     private String redirectUri;
-
-    private static final String JWT_DELIMITER = "\\.";
-
-    private final ObjectMapper objectMapper;
 
     public KakaoAuthService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -56,25 +54,23 @@ public class KakaoAuthService implements AuthService {
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
-            ResponseEntity<String> response = rt.exchange(
-                    KAKAO_TOKEN_URL,
-                    HttpMethod.POST,
-                    kakaoTokenRequest,
-                    String.class
-            );
+        ResponseEntity<String> response = rt.exchange(
+                KAKAO_TOKEN_URL,
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );
 
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                String responseBody = response.getBody();
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(responseBody);
-                    return jsonNode.get("id_token");
-                } catch (Exception e) {
-                    throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
-                }
+        if (response.getStatusCode().is2xxSuccessful()) {
+            String responseBody = response.getBody();
+            try {
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+                return jsonNode.get("id_token");
+            } catch (Exception e) {
+                throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
             }
-            throw new RuntimeException("구글 엑세스 토큰을 가져오는데 실패했습니다.");
-
+        }
+        throw new RuntimeException("구글 엑세스 토큰을 가져오는데 실패했습니다.");
     }
 
     @Override

@@ -22,15 +22,14 @@ import java.util.Map;
 public class GoogleAuthService implements AuthService {
 
     private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private static final String JWT_DELIMITER = "\\.";
+    private final ObjectMapper objectMapper;
     @Value("${google.client.id}")
     private String google_client_id;
     @Value("${google.client.secret}")
     private String google_client_secret;
     @Value("${google.redirect.uri}")
-    private String GOOGLE_REDIRECT_URI;
-    private static final String JWT_DELIMITER = "\\.";
-
-    private final ObjectMapper objectMapper;
+    private String google_redirect_uri;
 
     public GoogleAuthService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -45,7 +44,7 @@ public class GoogleAuthService implements AuthService {
                         "https://www.googleapis.com/auth/userinfo.email",
                 "client_id", google_client_id,
                 "client_secret", google_client_secret,
-                "redirect_uri", GOOGLE_REDIRECT_URI,
+                "redirect_uri", google_redirect_uri,
                 "grant_type", "authorization_code"
         );
 
