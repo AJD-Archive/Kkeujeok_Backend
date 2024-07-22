@@ -27,7 +27,7 @@ import java.util.Base64;
 @Slf4j
 public class KakaoAuthService implements AuthService {
 
-    private final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
+    private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private static final String JWT_DELIMITER = "\\.";
     private final ObjectMapper objectMapper;
     @Value("${oauth.kakao.rest-api-key}")

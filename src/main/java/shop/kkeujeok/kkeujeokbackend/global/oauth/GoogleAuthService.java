@@ -21,7 +21,7 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class GoogleAuthService implements AuthService {
 
-    private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String JWT_DELIMITER = "\\.";
     private final ObjectMapper objectMapper;
     @Value("${google.client.id}")
