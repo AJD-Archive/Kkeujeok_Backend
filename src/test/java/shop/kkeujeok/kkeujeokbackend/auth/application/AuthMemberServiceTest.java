@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class AuthMemberServiceTest {
 
