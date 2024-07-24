@@ -1,12 +1,51 @@
-= 블록 API 문서
+== 블록 API 문서
 
-== 블록 생성 API
+=== 블록 생성 API
 
-=== 요청
+==== 요청
+
 include::{snippets}/block/save/http-request.adoc[]
 include::{snippets}/block/save/request-fields.adoc[]
 
-=== 응답
+==== 응답
 
 include::{snippets}/block/save/http-response.adoc[]
 include::{snippets}/block/save/response-fields.adoc[]
+
+=== 블록 수정 API
+
+==== 요청
+
+include::{snippets}/block/update/http-request.adoc[]
+include::{snippets}/block/update/path-parameters.adoc[]
+include::{snippets}/block/update/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/block/update/http-response.adoc[]
+include::{snippets}/block/update/response-fields.adoc[]
+
+=== 블록 상태 수정 API
+
+==== 요청
+
+include::{snippets}/block/progress/update/http-request.adoc[]
+include::{snippets}/block/progress/update/path-parameters.adoc[]
+include::{snippets}/block/progress/update/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/progress/update/http-response.adoc[]
+include::{snippets}/block/progress/update/response-fields.adoc[]
+
+=== 블록 상태 수정 실패 API (400 Bad Request)
+
+==== 요청
+
+include::{snippets}/block/progress/update/failure/http-request.adoc[]
+include::{snippets}/block/progress/update/failure/path-parameters.adoc[]
+include::{snippets}/block/progress/update/failure/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/progress/update/failure/http-response.adoc[]
