@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
+import shop.kkeujeok.kkeujeokbackend.auth.exception.EmailNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.auth.exception.ExistsMemberEmailException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
@@ -34,7 +36,7 @@ public class AuthMemberService {
 
     private void validateNotFoundEmail(String email) {
         if (email == null) {
-            throw new RuntimeException("유저의 이메일을 찾을 수 없습니다.");
+            throw new EmailNotFoundException();
         }
     }
 
@@ -88,7 +90,7 @@ public class AuthMemberService {
 
     private void validateSocialType(Member member, SocialType provider) {
         if (!provider.equals(member.getSocialType())) {
-            throw new RuntimeException();
+            throw new ExistsMemberEmailException();
         }
     }
 
