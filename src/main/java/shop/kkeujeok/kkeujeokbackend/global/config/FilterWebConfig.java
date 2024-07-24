@@ -8,10 +8,10 @@ import shop.kkeujeok.kkeujeokbackend.global.filter.LoginCheckFilter;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 
 @Configuration
-public class WebConfig {
+public class FilterWebConfig {
     private final TokenProvider tokenProvider;
 
-    public WebConfig(TokenProvider tokenProvider) {
+    public FilterWebConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
 

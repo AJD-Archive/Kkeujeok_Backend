@@ -8,11 +8,11 @@ import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailA
 import java.util.List;
 
 @Configuration
-public class annotationWebConfig implements WebMvcConfigurer {
+public class AnnotationWebConfig implements WebMvcConfigurer {
 
     private final CurrentUserEmailArgumentResolver currentUserEmailArgumentResolver;
 
-    public annotationWebConfig(CurrentUserEmailArgumentResolver currentUserEmailArgumentResolver) {
+    public AnnotationWebConfig(CurrentUserEmailArgumentResolver currentUserEmailArgumentResolver) {
         this.currentUserEmailArgumentResolver = currentUserEmailArgumentResolver;
     }
 
