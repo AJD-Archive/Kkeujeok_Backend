@@ -30,6 +30,8 @@ public class GoogleAuthServiceTest {
         googleAuthService = new GoogleAuthService(objectMapper);
     }
 
+    // getIdToken 테스트코드..
+
     @DisplayName("올바르게 구글 소셜 정보가 넘어가는지 확인합니다.")
     @Test
     void 올바르게_구글_소셜_정보가_넘어가는지_확인합니다() {
