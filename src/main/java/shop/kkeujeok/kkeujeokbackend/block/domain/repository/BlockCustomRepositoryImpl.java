@@ -4,8 +4,6 @@ import static shop.kkeujeok.kkeujeokbackend.block.domain.QBlock.block;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +15,6 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 @Repository
 @Transactional(readOnly = true)
 public class BlockCustomRepositoryImpl implements BlockCustomRepository {
-    private static final Logger log = LoggerFactory.getLogger(BlockCustomRepositoryImpl.class);
     private final JPAQueryFactory queryFactory;
 
     public BlockCustomRepositoryImpl(JPAQueryFactory queryFactory) {
