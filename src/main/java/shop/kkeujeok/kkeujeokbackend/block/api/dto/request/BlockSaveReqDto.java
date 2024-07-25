@@ -7,13 +7,15 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 public record BlockSaveReqDto(
         String title,
         String contents,
-        Progress progress
+        Progress progress,
+        String deadLine
 ) {
     public Block toEntity(Member member) {
         return Block.builder()
                 .title(title)
                 .contents(contents)
                 .progress(progress)
+                .deadLine(deadLine)
                 .member(member)
                 .build();
     }
