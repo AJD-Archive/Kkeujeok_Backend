@@ -49,3 +49,27 @@ include::{snippets}/block/progress/update/failure/query-parameters.adoc[]
 ==== 응답
 
 include::{snippets}/block/progress/update/failure/http-response.adoc[]
+
+=== 블록 상태별 전체 조회
+
+==== 요청
+
+include::{snippets}/block/findByBlockWithProgress/http-request.adoc[]
+include::{snippets}/block/findByBlockWithProgress/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/findByBlockWithProgress/http-response.adoc[]
+include::{snippets}/block/findByBlockWithProgress/response-fields.adoc[]
+
+=== 블록 상세 조회
+
+==== 요청
+
+include::{snippets}/block/findById/http-request.adoc[]
+include::{snippets}/block/findById/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/findById/http-response.adoc[]
+include::{snippets}/block/findById/response-fields.adoc[]
