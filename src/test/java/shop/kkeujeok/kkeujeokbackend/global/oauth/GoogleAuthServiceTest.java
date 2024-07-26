@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
+@ActiveProfiles("test")
 public class GoogleAuthServiceTest {
 
     @Mock
