@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LoginCheckFilterTest {
 
     @Mock(lenient = true)
-    private TokenProvider tokenProvider; // Mock으로 TokenProvider 주입
+    private TokenProvider tokenProvider; // Mock으로 TokenProvider 주입 lenient = ture는 불필요한 스터빙에 대한 경고를 하지 않게 한다
 
     @InjectMocks
     private LoginCheckFilter loginCheckFilter; // InjectMocks로 필터 주입
