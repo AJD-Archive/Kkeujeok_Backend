@@ -38,12 +38,13 @@ class BlockServiceTest {
 
     @BeforeEach
     void setUp() {
-        blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED);
-        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents");
+        blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED, "2024.07.25 13:23");
+        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
         block = Block.builder()
                 .title(blockSaveReqDto.title())
                 .contents(blockSaveReqDto.contents())
                 .progress(blockSaveReqDto.progress())
+                .deadLine(blockSaveReqDto.deadLine())
                 .build();
     }
 
@@ -61,6 +62,7 @@ class BlockServiceTest {
             assertThat(result.title()).isEqualTo("Title");
             assertThat(result.contents()).isEqualTo("Contents");
             assertThat(result.progress()).isEqualTo(Progress.NOT_STARTED);
+            assertThat(result.deadLine()).isEqualTo("2024.07.25 13:23");
             assertNotNull(result.nickname());
         });
 
@@ -80,6 +82,7 @@ class BlockServiceTest {
         assertAll(() -> {
             assertThat(result.title()).isEqualTo("UpdateTitle");
             assertThat(result.contents()).isEqualTo("UpdateContents");
+            assertThat(result.deadLine()).isEqualTo("2024.07.28 16:40");
         });
     }
 
@@ -88,7 +91,7 @@ class BlockServiceTest {
     void 블록_수정_X() {
         // given
         Long blockId = 1L;
-        BlockUpdateReqDto originBlockUpdateReqDto = new BlockUpdateReqDto("Title", "Contents");
+        BlockUpdateReqDto originBlockUpdateReqDto = new BlockUpdateReqDto("Title", "Contents", "2024.07.25 13:23");
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
@@ -130,6 +133,26 @@ class BlockServiceTest {
         // when & then
         assertThatThrownBy(() -> blockService.progressUpdate(blockId, "String"))
                 .isInstanceOf(InvalidProgressException.class);
+    }
+
+    @DisplayName("블록을 상세 봅니다.")
+    @Test
+    void 블록_상세보기() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+
+        // when
+        BlockInfoResDto result = blockService.findById(blockId);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.title()).isEqualTo("Title");
+            assertThat(result.contents()).isEqualTo("Contents");
+            assertThat(result.progress()).isEqualTo(Progress.NOT_STARTED);
+            assertThat(result.deadLine()).isEqualTo("2024.07.25 13:23");
+            assertNotNull(result.nickname());
+        });
     }
 
 }

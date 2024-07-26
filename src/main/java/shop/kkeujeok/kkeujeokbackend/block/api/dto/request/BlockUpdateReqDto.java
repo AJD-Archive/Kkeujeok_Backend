@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.block.api.dto.request;
 
 public record BlockUpdateReqDto(
         String title,
-        String contents
+        String contents,
+        String deadLine
 ) {
 }
