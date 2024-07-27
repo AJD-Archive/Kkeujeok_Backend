@@ -73,3 +73,14 @@ include::{snippets}/block/findById/path-parameters.adoc[]
 
 include::{snippets}/block/findById/http-response.adoc[]
 include::{snippets}/block/findById/response-fields.adoc[]
+
+=== 블록 삭제
+
+==== 요청
+
+include::{snippets}/block/delete/http-request.adoc[]
+include::{snippets}/block/delete/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/delete/http-response.adoc[]
