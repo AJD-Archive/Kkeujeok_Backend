@@ -4,7 +4,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -194,6 +196,27 @@ class BlockControllerTest extends ControllerTest {
                         )
                 ))
                 .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Delete 블록을 논리적으로 삭제합니다.")
+    @Test
+    void 블록_삭제() throws Exception {
+        // given
+        Long blockId = 1L;
+        doNothing().when(blockService).delete(anyLong());
+
+        // when & then
+        mockMvc.perform(delete("/api/blocks/{blockId}", blockId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("block/delete",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("blockId").description("블록 ID")
+                        )
+                ))
+                .andExpect(status().isOk());
     }
 
     @DisplayName("GET 블록을 상태별로 전체 조회합니다.")

@@ -22,6 +22,7 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
@@ -33,6 +34,7 @@ class BlockServiceTest {
     private BlockService blockService;
 
     private Block block;
+    private Block deleteBlock;
     private BlockSaveReqDto blockSaveReqDto;
     private BlockUpdateReqDto blockUpdateReqDto;
 
@@ -46,6 +48,14 @@ class BlockServiceTest {
                 .progress(blockSaveReqDto.progress())
                 .deadLine(blockSaveReqDto.deadLine())
                 .build();
+
+        deleteBlock = Block.builder()
+                .title(blockSaveReqDto.title())
+                .contents(blockSaveReqDto.contents())
+                .progress(blockSaveReqDto.progress())
+                .deadLine(blockSaveReqDto.deadLine())
+                .build();
+        deleteBlock.statusUpdate();
     }
 
     @DisplayName("블록을 저장합니다.")
@@ -133,6 +143,38 @@ class BlockServiceTest {
         // when & then
         assertThatThrownBy(() -> blockService.progressUpdate(blockId, "String"))
                 .isInstanceOf(InvalidProgressException.class);
+    }
+
+    @DisplayName("블록을 삭제 합니다.")
+    @Test
+    void 블록_삭제() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+
+        // when
+        blockService.delete(blockId);
+
+        // then
+        assertAll(() -> {
+            assertThat(block.getStatus()).isEqualTo(Status.D);
+        });
+    }
+
+    @DisplayName("삭제되었던 블록을 복구합니다.")
+    @Test
+    void 블록_복구() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(deleteBlock));
+
+        // when
+        blockService.delete(blockId);
+
+        // then
+        assertAll(() -> {
+            assertThat(deleteBlock.getStatus()).isEqualTo(Status.A);
+        });
     }
 
     @DisplayName("블록을 상세 봅니다.")
