@@ -86,8 +86,15 @@ public class BlockService {
         return BlockInfoResDto.of(block, member);
     }
 
-    // 블록 삭제 (논리 삭제)
+    // 블록 삭제 유무 업데이트 (논리 삭제)
+    @Transactional
+    public void delete(Long blockId) {
+        // 로그인/회원가입 코드 완성 후 사용자 정보 받아올 예정
+        Member member = Member.builder().nickname("member").build();
+        Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
+        block.statusUpdate();
+    }
 
     private Progress parseProgress(String progressString) {
         try {
