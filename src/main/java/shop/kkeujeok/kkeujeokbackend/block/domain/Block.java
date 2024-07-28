@@ -30,25 +30,38 @@ public class Block extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Progress progress;
 
+    private String deadLine;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    private Block(String title, String contents, Progress progress, Member member) {
+    private Block(String title, String contents, Progress progress, Member member, String deadLine) {
         this.status = Status.A;
         this.title = title;
         this.contents = contents;
         this.progress = progress;
+        this.deadLine = deadLine;
         this.member = member;
     }
 
-    public void update(String title, String contents) {
-        this.title = title;
-        this.contents = contents;
+    public void update(String updateTitle, String updateContents, String updateDeadLine) {
+        if (isUpdateRequired(updateTitle, updateContents, updateDeadLine)) {
+            this.title = updateTitle;
+            this.contents = updateContents;
+            this.deadLine = updateDeadLine;
+        }
+    }
+
+    private boolean isUpdateRequired(String updateTitle, String updateContents, String updateDeadLine) {
+        return !this.title.equals(updateTitle) ||
+                !this.contents.equals(updateContents) ||
+                !this.deadLine.equals(updateDeadLine);
     }
 
     public void progressUpdate(Progress progress) {
         this.progress = progress;
     }
+
 }
