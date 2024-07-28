@@ -1,28 +1,16 @@
 package shop.kkeujeok.kkeujeokbackend.auth.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import shop.kkeujeok.kkeujeokbackend.auth.api.AuthController;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
-import shop.kkeujeok.kkeujeokbackend.auth.application.AuthMemberService;
-import shop.kkeujeok.kkeujeokbackend.auth.application.AuthService;
-import shop.kkeujeok.kkeujeokbackend.auth.application.AuthServiceFactory;
-import shop.kkeujeok.kkeujeokbackend.auth.application.TokenService;
+import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
@@ -34,27 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
-@WebMvcTest(AuthController.class)
-public class AuthControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private AuthServiceFactory authServiceFactory;
-
-    @MockBean
-    private AuthMemberService authMemberService;
-
-    @MockBean
-    private TokenService tokenService;
-
-    @Mock
-    private AuthService authService;
+public class AuthControllerTest extends ControllerTest {
 
     private Member member;
 
@@ -69,9 +37,9 @@ public class AuthControllerTest {
                 .build();
     }
 
-
+    @DisplayName("로그인하면 accessToken과 refreshToken을 반환합니다.")
     @Test
-    public void generateAccessAndRefreshToken_ShouldReturnToken() throws Exception {
+    public void 로그인하면_accessToken과_refreshToken을_반환합니다() throws Exception {
         String provider = "google";
         TokenReqDto tokenReqDto = new TokenReqDto("auth-code");
         UserInfo userInfo = new UserInfo("email", "name", "picture", "nickname");
