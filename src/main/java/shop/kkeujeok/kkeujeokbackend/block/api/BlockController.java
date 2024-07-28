@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.block.api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,12 @@ public class BlockController {
         return new RspTemplate<>(HttpStatus.OK,
                 "블록 상태별 전체 조회",
                 blockService.findByBlockWithProgress(progress, PageRequest.of(page, size)));
+    }
+
+    @DeleteMapping("/{blockId}")
+    public RspTemplate<Void> delete(@PathVariable(name = "blockId") Long blockId) {
+        blockService.delete(blockId);
+        return new RspTemplate<>(HttpStatus.OK, "블록 삭제");
     }
 
     @GetMapping("/{blockId}")

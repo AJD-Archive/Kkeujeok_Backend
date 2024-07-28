@@ -64,4 +64,8 @@ public class Block extends BaseEntity {
         this.progress = progress;
     }
 
+    public void statusUpdate() {
+        this.status = (this.status == Status.A) ? Status.D : Status.A;
+    }
+
 }
