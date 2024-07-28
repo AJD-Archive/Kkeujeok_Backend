@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
+import shop.kkeujeok.kkeujeokbackend.auth.exception.InvalidTokenException;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.domain.Token;
@@ -52,8 +53,8 @@ public class TokenService {
 
     @Transactional
     public TokenDto generateAccessToken(RefreshTokenReqDto refreshTokenReqDto) {
-        if (!tokenRepository.existsByRefreshToken(refreshTokenReqDto.refreshToken()) || !tokenProvider.validateToken(refreshTokenReqDto.refreshToken())) {
-            throw new RuntimeException();
+        if (isInvalidRefreshToken(refreshTokenReqDto.refreshToken())) {
+            throw new InvalidTokenException();
         }
 
         Token token = tokenRepository.findByRefreshToken(refreshTokenReqDto.refreshToken()).orElseThrow();
@@ -62,4 +63,7 @@ public class TokenService {
         return tokenProvider.generateAccessTokenByRefreshToken(member.getEmail(), token.getRefreshToken());
     }
 
+    private boolean isInvalidRefreshToken(String refreshToken) {
+        return !tokenRepository.existsByRefreshToken(refreshToken) || !tokenProvider.validateToken(refreshToken);
+    }
 }

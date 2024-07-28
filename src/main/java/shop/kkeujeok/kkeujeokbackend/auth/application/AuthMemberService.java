@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
+import shop.kkeujeok.kkeujeokbackend.auth.exception.EmailNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.auth.exception.ExistsMemberEmailException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
@@ -34,7 +36,7 @@ public class AuthMemberService {
 
     private void validateNotFoundEmail(String email) {
         if (email == null) {
-            throw new RuntimeException();
+            throw new EmailNotFoundException();
         }
     }
 
@@ -44,14 +46,8 @@ public class AuthMemberService {
 
     private Member createMember(UserInfo userInfo, SocialType provider) {
         String userPicture = getUserPicture(userInfo.picture());
-        String name = userInfo.name();
-        String nickname = userInfo.nickname();
-
-        if (name == null && nickname != null) {
-            name = nickname;
-        } else if (nickname == null && name != null) {
-            nickname = name;
-        }
+        String name = unionName(userInfo.name(), userInfo.nickname());
+        String nickname = unionNickname(userInfo.name(), userInfo.nickname());
 
         return memberRepository.save(
                 Member.builder()
@@ -67,9 +63,25 @@ public class AuthMemberService {
         );
     }
 
+    private String unionName(String name, String nickname) {
+        if (name == null && nickname != null) {
+            return nickname;
+        } else if (nickname == null && name != null) {
+            return name;
+        }
+        return name;
+    }
+
+    private String unionNickname(String name, String nickname) {
+        if (nickname == null) {
+            return name;
+        }
+        return nickname;
+    }
     private String getUserPicture(String picture) {
         return Optional.ofNullable(picture)
-                .map(this::convertToHighRes).orElseThrow();
+                .map(this::convertToHighRes)
+                .orElseThrow();
     }
 
     private String convertToHighRes(String url){
@@ -78,7 +90,7 @@ public class AuthMemberService {
 
     private void validateSocialType(Member member, SocialType provider) {
         if (!provider.equals(member.getSocialType())) {
-            throw new RuntimeException();
+            throw new ExistsMemberEmailException();
         }
     }
 
