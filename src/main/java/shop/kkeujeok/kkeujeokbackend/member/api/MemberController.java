@@ -1,4 +1,4 @@
-package shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto;
+package shop.kkeujeok.kkeujeokbackend.member.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +10,12 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyProfileInf
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 
 @RestController
-@RequestMapping("/api")
-public class MyPageController {
+@RequestMapping("/api/members")
+public class MemberController {
 
     private final MyPageService myPageService;
 
-    public MyPageController(MyPageService myPageService) {
+    public MemberController(MyPageService myPageService) {
         this.myPageService = myPageService;
     }
 
