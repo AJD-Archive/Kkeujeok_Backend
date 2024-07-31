@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 
 @Entity
 @Getter
@@ -46,4 +47,17 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
         this.introduction = introduction;
     }
+
+    public void update(String nickname, String introduction) {
+        if(isUpdateRequired(nickname, introduction)) {
+            this.nickname = nickname;
+            this.introduction = introduction;
+        }
+    }
+
+    private boolean isUpdateRequired(String updateNickname, String updateIntroduction) {
+        return !this.nickname.equals(updateNickname) ||
+                !this.introduction.equals(updateIntroduction);
+    }
+
 }

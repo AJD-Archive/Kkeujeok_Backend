@@ -5,7 +5,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
 @Builder
-public record MyProfileInfoResDto(
+public record MyPageInfoResDto(
         String picture,
         String email,
         String name,
@@ -14,8 +14,8 @@ public record MyProfileInfoResDto(
         String introduce
 
 ) {
-    public static MyProfileInfoResDto myProfileInfoFrom(Member member) {
-        return MyProfileInfoResDto.builder()
+    public static MyPageInfoResDto From(Member member) {
+        return MyPageInfoResDto.builder()
                 .picture(member.getPicture())
                 .email(member.getEmail())
                 .name(member.getName())
