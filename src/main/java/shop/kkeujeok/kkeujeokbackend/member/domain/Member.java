@@ -32,8 +32,10 @@ public class Member extends BaseEntity {
 
     private String nickname;
 
+    private String introduction;
+
     @Builder
-    private Member(Status status, Role role, String email, String name, String picture, SocialType socialType, boolean firstLogin, String nickname) {
+    private Member(Status status, Role role, String email, String name, String picture, SocialType socialType, boolean firstLogin, String nickname, String introduction) {
         this.status = status;
         this.role = role;
         this.email = email;
@@ -42,5 +44,6 @@ public class Member extends BaseEntity {
         this.socialType = socialType;
         this.firstLogin = firstLogin;
         this.nickname = nickname;
+        this.introduction = introduction;
     }
 }
