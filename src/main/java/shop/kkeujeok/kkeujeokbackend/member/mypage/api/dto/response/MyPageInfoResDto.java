@@ -11,7 +11,7 @@ public record MyPageInfoResDto(
         String name,
         String nickName,
         SocialType socialType,
-        String introduce
+        String introduction
 
 ) {
     public static MyPageInfoResDto From(Member member) {
@@ -21,7 +21,7 @@ public record MyPageInfoResDto(
                 .name(member.getName())
                 .nickName(member.getNickname())
                 .socialType(member.getSocialType())
-                .introduce(member.getIntroduction())
+                .introduction(member.getIntroduction())
                 .build();
     }
 }
