@@ -15,6 +15,8 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoRe
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,6 +68,21 @@ public class MyPageServiceTest {
     }
 
     // 프로필 정보 수정
+    @DisplayName("프로필 정보를 수정합니다.")
+    @Test
+    void 프로필_정보를_수정합니다() {
+        // Given
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
+        MyPageUpdateReqDto newMyPageUpdateReqDto = new MyPageUpdateReqDto("newNickname", "newIntroduction");
+        // When
+        MyPageInfoResDto result = myPageService.update("email", newMyPageUpdateReqDto);
+
+        // Then
+        assertEquals("newNickname", result.nickName());
+        assertEquals("newIntroduction", result.introduction());
+
+        verify(memberRepository, times(1)).findByEmail("email");
+    }
 
     // 팀 대시보드 정보 조회
 
