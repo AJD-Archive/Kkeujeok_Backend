@@ -18,13 +18,13 @@ public class MemberController {
         this.myPageService = myPageService;
     }
 
-    @GetMapping("/myPage")
+    @GetMapping("/mypage")
     public RspTemplate<MyPageInfoResDto> myProfileInfo(@CurrentUserEmail String email) {
         MyPageInfoResDto memberResDto = myPageService.findMyProfileByEmail(email);
         return new RspTemplate<>(HttpStatus.OK, "내 프로필 정보", memberResDto);
     }
 
-    @PatchMapping("/myPage")
+    @PatchMapping("/mypage")
     public RspTemplate<MyPageInfoResDto> update(@CurrentUserEmail String email,
                                                 @RequestBody MyPageUpdateReqDto myPageUpdateReqDto) {
         return new RspTemplate<>(HttpStatus.OK, "내 프로필 정보 수정", myPageService.update(email,myPageUpdateReqDto));
