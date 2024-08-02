@@ -23,6 +23,7 @@ public class GoogleAuthService implements AuthService {
 
     private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String JWT_DELIMITER = "\\.";
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     @Value("${google.client.id}")
     private String google_client_id;
@@ -31,13 +32,13 @@ public class GoogleAuthService implements AuthService {
     @Value("${google.redirect.uri}")
     private String google_redirect_uri;
 
-    public GoogleAuthService(ObjectMapper objectMapper) {
+    public GoogleAuthService(ObjectMapper objectMapper, RestTemplate restTemplate) {
         this.objectMapper = objectMapper;
+        this.restTemplate = restTemplate;
     }
 
     @Override
     public JsonNode getIdToken(String code) {
-        RestTemplate restTemplate = new RestTemplate();
         Map<String, String> params = Map.of(
                 "code", code,
                 "scope", "https://www.googleapis.com/auth/userinfo.profile " +
