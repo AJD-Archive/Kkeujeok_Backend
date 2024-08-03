@@ -1,31 +1,26 @@
 package shop.kkeujeok.kkeujeokbackend.member.nickname.application;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class NicknameService {
-    private final List<String> adjectives = List.of(
-            "귀여운 ", "행복한 ", "깜찍한 ", "명랑한 ", "재미있는 ",
-            "용감한 ", "사려깊은 ", "활기찬 ", "사랑스러운 ", "친절한 ",
-            "밝은 ", "기분좋은 ", "즐거운 ", "신나는 ", "멋진 "
-    );
+    private static final Set<String> usedNicknames = ConcurrentHashMap.newKeySet();
+    private final List<String> adjectives;
+    private final List<String> nouns;
+    private final Random random;
 
-    private final List<String> nouns = List.of(
-            "고양이", "강아지", "토끼", "곰", "여우",
-            "판다", "호랑이", "사자", "다람쥐", "고슴도치",
-            "햄스터", "펭귄", "수달", "부엉이", "돌고래"
-    );
-    private final Random random = new Random();
-    private final Set<String> usedNicknames = new HashSet<>();
+    public NicknameService(List<String> adjectives, List<String> nouns, Random random) {
+        this.adjectives = adjectives;
+        this.nouns = nouns;
+        this.random = random;
+    }
 
     public String getRandomNickname() {
         int maxAttempts = adjectives.size() * nouns.size();
