@@ -44,7 +44,7 @@ public class Challenge extends BaseEntity {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "challenge_image")
+    @Column(name = "represent_image")
     private String representImage;
 
     @ManyToOne
@@ -52,13 +52,15 @@ public class Challenge extends BaseEntity {
     private Member member;
 
     @Builder
-    private Challenge(String title,
+    private Challenge(Status status,
+                      String title,
                       String contents,
                       List<CycleDetail> cycleDetails,
                       LocalDate startDate,
                       LocalDate endDate,
                       String representImage,
                       Member member) {
+        this.status = status;
         this.title = title;
         this.contents = contents;
         this.cycleDetails = cycleDetails;
