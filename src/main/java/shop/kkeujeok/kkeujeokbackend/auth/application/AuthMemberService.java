@@ -11,6 +11,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 
 import java.util.Optional;
 
@@ -18,9 +19,11 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class AuthMemberService {
     private final MemberRepository memberRepository;
+    private final NicknameService nicknameService;
 
-    public AuthMemberService(MemberRepository memberRepository) {
+    public AuthMemberService(MemberRepository memberRepository, NicknameService nicknameService) {
         this.memberRepository = memberRepository;
+        this.nicknameService = nicknameService;
     }
 
     @Transactional
@@ -47,7 +50,7 @@ public class AuthMemberService {
     private Member createMember(UserInfo userInfo, SocialType provider) {
         String userPicture = getUserPicture(userInfo.picture());
         String name = unionName(userInfo.name(), userInfo.nickname());
-        String nickname = unionNickname(userInfo.name(), userInfo.nickname());
+        String nickname = nicknameService.getRandomNickname(); // 랜덤 닉네임 생성
 
         return memberRepository.save(
                 Member.builder()
@@ -72,13 +75,7 @@ public class AuthMemberService {
         }
         return name;
     }
-
-    private String unionNickname(String name, String nickname) {
-        if (nickname == null) {
-            return name;
-        }
-        return nickname;
-    }
+    
     private String getUserPicture(String picture) {
         return Optional.ofNullable(picture)
                 .map(this::convertToHighRes)
