@@ -30,19 +30,19 @@ public class KakaoAuthService implements AuthService {
     private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private static final String JWT_DELIMITER = "\\.";
     private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
     @Value("${oauth.kakao.rest-api-key}")
     private String restApiKey;
     @Value("${oauth.kakao.redirect-url}")
     private String redirectUri;
 
-    public KakaoAuthService(ObjectMapper objectMapper) {
+    public KakaoAuthService(ObjectMapper objectMapper, RestTemplate restTemplate) {
         this.objectMapper = objectMapper;
+        this.restTemplate = restTemplate;
     }
 
     @Override
     public JsonNode getIdToken(String code) {
-        RestTemplate rt = new RestTemplate();
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -54,7 +54,7 @@ public class KakaoAuthService implements AuthService {
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
-        ResponseEntity<String> response = rt.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 KAKAO_TOKEN_URL,
                 HttpMethod.POST,
                 kakaoTokenRequest,

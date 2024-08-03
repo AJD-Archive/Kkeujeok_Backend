@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestTemplate;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 
 import java.nio.charset.StandardCharsets;
@@ -22,13 +23,16 @@ public class KakaoAuthServiceTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private RestTemplate restTemplate;
+
     @InjectMocks
     private KakaoAuthService kakaoAuthService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        kakaoAuthService = new KakaoAuthService(objectMapper);
+        kakaoAuthService = new KakaoAuthService(objectMapper, restTemplate);
     }
 
     // getIdToken 테스트코드..
