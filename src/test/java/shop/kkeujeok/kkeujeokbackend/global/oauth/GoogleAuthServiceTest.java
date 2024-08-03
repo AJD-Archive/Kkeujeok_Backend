@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestTemplate;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 
 import java.nio.charset.StandardCharsets;
@@ -23,13 +24,16 @@ public class GoogleAuthServiceTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private RestTemplate restTemplate;
+
     @InjectMocks
     private GoogleAuthService googleAuthService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        googleAuthService = new GoogleAuthService(objectMapper);
+        googleAuthService = new GoogleAuthService(objectMapper, restTemplate);
     }
 
     // getIdToken 테스트코드..
@@ -49,7 +53,7 @@ public class GoogleAuthServiceTest {
         String token = "test.test.test";
 
         String decodePayload = new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), StandardCharsets.UTF_8);
-        UserInfo userInfo = new UserInfo("email", "name", "picture","nickname");
+        UserInfo userInfo = new UserInfo("email", "name", "picture", "nickname");
 
         when(objectMapper.readValue(decodePayload, UserInfo.class)).thenReturn(userInfo);
 
