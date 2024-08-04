@@ -33,7 +33,7 @@ public class BlockCustomRepositoryImpl implements BlockCustomRepository {
         List<Block> blocks = queryFactory
                 .selectFrom(block)
                 .where(block.progress.eq(progress)
-                        .and(block.status.eq(Status.A)))
+                        .and(block.status.eq(Status.ACTIVE)))
                 .orderBy(block.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
