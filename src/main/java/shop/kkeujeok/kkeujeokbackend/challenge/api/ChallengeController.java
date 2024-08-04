@@ -16,11 +16,12 @@ import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 @RequiredArgsConstructor
 @RequestMapping("/api/challenges")
 public class ChallengeController {
+
     private final ChallengeService challengeService;
 
     @PostMapping("/")
-    public RspTemplate<ChallengeInfoResDto> create(@CurrentUserEmail String email,
-                                                   @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
-        return new RspTemplate<>(HttpStatus.CREATED, "챌린지 생성", challengeService.create(email, challengeSaveReqDto));
+    public RspTemplate<ChallengeInfoResDto> save(@CurrentUserEmail String email,
+                                                 @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
+        return new RspTemplate<>(HttpStatus.CREATED, "챌린지 생성", challengeService.save(email, challengeSaveReqDto));
     }
 }
