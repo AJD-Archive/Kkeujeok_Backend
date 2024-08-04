@@ -44,8 +44,8 @@ public class BlockController {
 
     @GetMapping("")
     public RspTemplate<BlockListResDto> findByBlockWithProgress(@RequestParam(name = "progress") String progress,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "10") int size) {
+                                                                @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                @RequestParam(name = "size", defaultValue = "10") int size) {
         return new RspTemplate<>(HttpStatus.OK,
                 "블록 상태별 전체 조회",
                 blockService.findByBlockWithProgress(progress, PageRequest.of(page, size)));
