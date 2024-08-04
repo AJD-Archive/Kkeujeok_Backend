@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import shop.kkeujeok.kkeujeokbackend.auth.exception.EmailNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
@@ -28,6 +27,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 
 class ChallengeServiceTest {
 
@@ -57,7 +57,7 @@ class ChallengeServiceTest {
 
     private void setUpMember() {
         member = Member.builder()
-                .status(Status.A)
+                .status(Status.ACTIVE)
                 .email("kkeujeok@gmail.com")
                 .name("김동균")
                 .picture("기본 프로필")
@@ -80,7 +80,7 @@ class ChallengeServiceTest {
         setChallengeSaveReqDto(Cycle.WEEKLY, List.of(CycleDetail.MON, CycleDetail.TUE));
 
         // when
-        ChallengeInfoResDto result = challengeService.create(member.getEmail(), challengeSaveReqDto);
+        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto);
 
         // then
         assertChallengeInfo(result, List.of(CycleDetail.MON, CycleDetail.TUE));
@@ -93,7 +93,7 @@ class ChallengeServiceTest {
         setChallengeSaveReqDto(Cycle.MONTHLY, List.of(CycleDetail.MON, CycleDetail.TUE));
 
         // when & then
-        assertThatThrownBy(() -> challengeService.create(member.getEmail(), challengeSaveReqDto))
+        assertThatThrownBy(() -> challengeService.save(member.getEmail(), challengeSaveReqDto))
                 .isInstanceOf(InvalidCycleException.class);
     }
 
@@ -106,8 +106,8 @@ class ChallengeServiceTest {
         when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> challengeService.create(email, challengeSaveReqDto))
-                .isInstanceOf(EmailNotFoundException.class);
+        assertThatThrownBy(() -> challengeService.save(email, challengeSaveReqDto))
+                .isInstanceOf(MemberNotFoundException.class);
     }
 
     private void setChallengeSaveReqDto(Cycle cycle, List<CycleDetail> cycleDetails) {
