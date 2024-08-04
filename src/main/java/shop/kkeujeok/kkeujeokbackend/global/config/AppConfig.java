@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.global.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +21,7 @@ public class AppConfig {
     }
 
     @Bean
+    @Qualifier("adjectives")
     public List<String> adjectives() {
         return List.of(
                 "귀여운", "행복한", "깜찍한", "명랑한", "재미있는",
@@ -29,6 +31,7 @@ public class AppConfig {
     }
 
     @Bean
+    @Qualifier("nouns")
     public List<String> nouns() {
         return List.of(
                 "고양이", "강아지", "토끼", "곰", "여우",
