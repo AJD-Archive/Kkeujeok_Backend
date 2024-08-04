@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.3.2'
 
     // logback
     implementation 'com.github.napstr:logback-discord-appender:1.0.0'
