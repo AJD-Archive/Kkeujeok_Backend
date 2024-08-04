@@ -51,7 +51,7 @@ public class AuthMemberService {
 
         return memberRepository.save(
                 Member.builder()
-                        .status(Status.A)
+                        .status(Status.ACTIVE)
                         .email(userInfo.email())
                         .name(name)
                         .picture(userPicture)
