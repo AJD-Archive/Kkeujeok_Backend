@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.member.nickname.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.exception.TimeOutException;
 
 import java.util.List;
 import java.util.Random;
@@ -37,7 +38,7 @@ public class NicknameService {
 
         do {
             if (attempts >= maxAttempts) {
-                throw new RuntimeException("고유한 닉네임을 생성할 수 없습니다.");
+                throw new TimeOutException();
             }
             nickname = generateNickname();
             attempts++;
@@ -59,4 +60,6 @@ public class NicknameService {
     private boolean isNicknameUsed(String nickname) {
         return memberRepository.existsByNickname(nickname);
     }
+
+    // 닉네임은 중복 가능하고, 새로운 컬럼을 만들어서 고유 숫자태그를 부여. 이 값은 마이페이지에서 확인 가능.
 }
