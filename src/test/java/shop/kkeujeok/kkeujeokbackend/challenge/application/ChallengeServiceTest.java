@@ -116,8 +116,8 @@ class ChallengeServiceTest {
                 "1일 1커밋하기",
                 cycle,
                 cycleDetails,
-                startDate.toString(),
-                endDate.toString(),
+                startDate,
+                endDate,
                 "대표 이미지"
         );
     }
