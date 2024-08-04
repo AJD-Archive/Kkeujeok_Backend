@@ -18,6 +18,7 @@ import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
@@ -55,4 +56,6 @@ public abstract class ControllerTest {
     @MockBean
     protected ChallengeService challengeService;
 
+    @MockBean
+    protected NicknameService nicknameService;
 }

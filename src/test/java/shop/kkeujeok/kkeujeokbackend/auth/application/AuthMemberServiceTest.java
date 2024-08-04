@@ -15,6 +15,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 
 import java.util.Optional;
 
@@ -30,6 +31,9 @@ class AuthMemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private NicknameService nicknameService;
 
     @InjectMocks
     private AuthMemberService authMemberService;
@@ -77,7 +81,7 @@ class AuthMemberServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.findMember().getEmail()).isEqualTo(userInfo.email());
-        assertThat(result.findMember().getName()).isEqualTo(userInfo.name());
+        assertThat(result.findMember().getName()).isEqualTo(userInfo.nickname());
         verify(memberRepository).findByEmail(userInfo.email());
         verify(memberRepository).save(any(Member.class));
     }
