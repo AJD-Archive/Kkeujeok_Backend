@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.auth.application;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
@@ -16,15 +17,12 @@ import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthMemberService {
+
     private final MemberRepository memberRepository;
     private final NicknameService nicknameService;
-
-    public AuthMemberService(MemberRepository memberRepository, NicknameService nicknameService) {
-        this.memberRepository = memberRepository;
-        this.nicknameService = nicknameService;
-    }
 
     @Transactional
     public MemberLoginResDto saveUserInfo(UserInfo userInfo, SocialType provider) {
@@ -68,12 +66,7 @@ public class AuthMemberService {
     }
 
     private String unionName(String name, String nickname) {
-        if (name == null && nickname != null) {
-            return nickname;
-        } else if (nickname == null && name != null) {
-            return name;
-        }
-        return name;
+        return nickname != null ? nickname : name;
     }
     
     private String getUserPicture(String picture) {
@@ -91,5 +84,4 @@ public class AuthMemberService {
             throw new ExistsMemberEmailException();
         }
     }
-
 }
