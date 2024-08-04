@@ -16,6 +16,7 @@ import shop.kkeujeok.kkeujeokbackend.auth.application.TokenService;
 import shop.kkeujeok.kkeujeokbackend.block.api.BlockController;
 import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
+import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 
 @AutoConfigureRestDocs
@@ -50,5 +51,8 @@ public abstract class ControllerTest {
 
     @Mock
     protected AuthService authService;
+
+    @Mock
+    protected ChallengeService challengeService;
 
 }
