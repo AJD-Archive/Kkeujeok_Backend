@@ -157,7 +157,7 @@ class BlockServiceTest {
 
         // then
         assertAll(() -> {
-            assertThat(block.getStatus()).isEqualTo(Status.D);
+            assertThat(block.getStatus()).isEqualTo(Status.DELETED);
         });
     }
 
@@ -173,7 +173,7 @@ class BlockServiceTest {
 
         // then
         assertAll(() -> {
-            assertThat(deleteBlock.getStatus()).isEqualTo(Status.A);
+            assertThat(deleteBlock.getStatus()).isEqualTo(Status.ACTIVE);
         });
     }
 

@@ -116,19 +116,19 @@ class BlockTest {
     @Test
     void 블록_논리_삭제_수정() {
         // given
-        assertThat(block.getStatus()).isEqualTo(Status.A);
+        assertThat(block.getStatus()).isEqualTo(Status.ACTIVE);
 
         // when
         block.statusUpdate();
 
         // then
-        assertThat(block.getStatus()).isEqualTo(Status.D);
+        assertThat(block.getStatus()).isEqualTo(Status.DELETED);
 
         // when
         block.statusUpdate();
 
         // then
-        assertThat(block.getStatus()).isEqualTo(Status.A);
+        assertThat(block.getStatus()).isEqualTo(Status.ACTIVE);
     }
 
 }
