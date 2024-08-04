@@ -1,6 +1,9 @@
 package shop.kkeujeok.kkeujeokbackend.global.entity;
 
 public enum Status {
-    // A : 활성화, D : 비활성화
-    A, D
+    ACTIVE("활성화"),
+    DELETED("삭제");
+
+    Status(String description) {
+    }
 }

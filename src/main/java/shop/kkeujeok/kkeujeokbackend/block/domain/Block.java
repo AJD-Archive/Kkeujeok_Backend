@@ -38,7 +38,7 @@ public class Block extends BaseEntity {
 
     @Builder
     private Block(String title, String contents, Progress progress, Member member, String deadLine) {
-        this.status = Status.A;
+        this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
         this.progress = progress;
@@ -65,7 +65,7 @@ public class Block extends BaseEntity {
     }
 
     public void statusUpdate() {
-        this.status = (this.status == Status.A) ? Status.D : Status.A;
+        this.status = (this.status == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE;
     }
 
 }

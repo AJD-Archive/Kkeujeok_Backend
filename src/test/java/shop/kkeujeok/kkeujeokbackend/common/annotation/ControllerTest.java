@@ -15,12 +15,15 @@ import shop.kkeujeok.kkeujeokbackend.auth.application.AuthServiceFactory;
 import shop.kkeujeok.kkeujeokbackend.auth.application.TokenService;
 import shop.kkeujeok.kkeujeokbackend.block.api.BlockController;
 import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
+import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
         BlockController.class,
-        AuthController.class
+        AuthController.class,
+        ChallengeController.class
 })
 @ActiveProfiles("test")
 public abstract class ControllerTest {
@@ -48,5 +51,8 @@ public abstract class ControllerTest {
 
     @Mock
     protected AuthService authService;
+
+    @MockBean
+    protected ChallengeService challengeService;
 
 }
