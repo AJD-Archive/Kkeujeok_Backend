@@ -27,7 +27,7 @@ public record ChallengeSaveReqDto(
 ) {
     public Challenge toEntity(Member member) {
         return Challenge.builder()
-                .status(Status.A)
+                .status(Status.ACTIVE)
                 .title(title)
                 .contents(contents)
                 .cycleDetails(cycleDetails)
