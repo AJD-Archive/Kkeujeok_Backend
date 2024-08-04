@@ -43,7 +43,7 @@ class AuthMemberServiceTest {
         userInfo = new UserInfo("이메일", "이름", "사진", "닉네임");
         provider = SocialType.GOOGLE;
         member = Member.builder()
-                .status(Status.A)
+                .status(Status.ACTIVE)
                 .email(userInfo.email())
                 .name(userInfo.name())
                 .picture(userInfo.picture())
