@@ -52,7 +52,7 @@ public abstract class ControllerTest {
     @Mock
     protected AuthService authService;
 
-    @Mock
+    @MockBean
     protected ChallengeService challengeService;
 
 }
