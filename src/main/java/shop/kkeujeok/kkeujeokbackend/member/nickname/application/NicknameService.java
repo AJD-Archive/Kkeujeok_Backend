@@ -3,8 +3,6 @@ package shop.kkeujeok.kkeujeokbackend.member.nickname.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
-import shop.kkeujeok.kkeujeokbackend.member.nickname.exception.TimeOutException;
 
 import java.util.List;
 import java.util.Random;
