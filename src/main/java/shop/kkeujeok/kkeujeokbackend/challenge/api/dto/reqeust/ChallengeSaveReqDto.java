@@ -20,9 +20,9 @@ public record ChallengeSaveReqDto(
         @NotNull(message = "주기 상세정보는 필수 입력값입니다.")
         List<CycleDetail> cycleDetails,
         @NotBlank(message = "시작 날짜는 필수 입력값입니다.")
-        String startDate,
+        LocalDate startDate,
         @NotBlank(message = "종료 날짜는 필수 입력값입니다.")
-        String endDate,
+        LocalDate endDate,
         String representImage
 ) {
     public Challenge toEntity(Member member) {
@@ -31,8 +31,8 @@ public record ChallengeSaveReqDto(
                 .title(title)
                 .contents(contents)
                 .cycleDetails(cycleDetails)
-                .startDate(LocalDate.parse(startDate))
-                .endDate(LocalDate.parse(endDate))
+                .startDate(startDate)
+                .endDate(endDate)
                 .representImage(representImage)
                 .member(member)
                 .build();
