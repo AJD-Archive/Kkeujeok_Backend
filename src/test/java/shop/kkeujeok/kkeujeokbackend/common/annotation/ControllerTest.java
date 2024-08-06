@@ -18,13 +18,16 @@ import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
+import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
         BlockController.class,
         AuthController.class,
-        ChallengeController.class
+        ChallengeController.class,
+        MemberControllerTest.class
 })
 @ActiveProfiles("test")
 public abstract class ControllerTest {
@@ -50,7 +53,7 @@ public abstract class ControllerTest {
     @MockBean
     protected TokenService tokenService;
 
-    @Mock
+    @MockBean
     protected AuthService authService;
 
     @MockBean
@@ -58,4 +61,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected NicknameService nicknameService;
+
+    @MockBean
+    protected MyPageService myPageService;
 }
