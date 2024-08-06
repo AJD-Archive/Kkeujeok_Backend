@@ -16,6 +16,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
+import shop.kkeujeok.kkeujeokbackend.member.tag.application.TagService;
 
 import java.util.Optional;
 
@@ -34,6 +35,9 @@ class AuthMemberServiceTest {
 
     @Mock
     private NicknameService nicknameService;
+
+    @Mock
+    private TagService tagService;
 
     @InjectMocks
     private AuthMemberService authMemberService;
@@ -55,6 +59,7 @@ class AuthMemberServiceTest {
                 .role(Role.ROLE_USER)
                 .firstLogin(true)
                 .nickname(userInfo.nickname())
+                .tag("#0000")
                 .build();
     }
 
