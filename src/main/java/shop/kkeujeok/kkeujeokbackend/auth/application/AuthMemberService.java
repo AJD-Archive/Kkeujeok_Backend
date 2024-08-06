@@ -13,6 +13,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
+import shop.kkeujeok.kkeujeokbackend.member.tag.application.TagService;
 
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class AuthMemberService {
 
     private final MemberRepository memberRepository;
     private final NicknameService nicknameService;
+    private final TagService tagService;
 
     @Transactional
     public MemberLoginResDto saveUserInfo(UserInfo userInfo, SocialType provider) {
@@ -48,7 +50,8 @@ public class AuthMemberService {
     private Member createMember(UserInfo userInfo, SocialType provider) {
         String userPicture = getUserPicture(userInfo.picture());
         String name = unionName(userInfo.name(), userInfo.nickname());
-        String nickname = nicknameService.getRandomNickname(); // 랜덤 닉네임 생성
+        String nickname = nicknameService.getRandomNickname();
+        String tag = tagService.getRandomTag();
 
         return memberRepository.save(
                 Member.builder()
@@ -61,6 +64,7 @@ public class AuthMemberService {
                         .firstLogin(true)
                         .nickname(nickname)
                         .introduction("자기 소개를 입력해 주세요.")
+                        .tag(tag)
                         .build()
         );
     }
