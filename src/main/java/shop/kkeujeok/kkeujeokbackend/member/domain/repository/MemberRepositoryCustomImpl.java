@@ -12,6 +12,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     @Override
     public boolean existsByNicknameAndTag(String nickname, String tag) {
         QMember member = QMember.member;
+
         return queryFactory.selectFrom(member)
                 .where(member.nickname.eq(nickname)
                         .and(member.tag.eq(tag)))
