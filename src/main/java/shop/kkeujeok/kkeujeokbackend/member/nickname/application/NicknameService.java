@@ -31,6 +31,7 @@ public class NicknameService {
     private String generateNickname() {
         String adjective = getRandomElement(adjectives);
         String noun = getRandomElement(nouns);
+
         return adjective + noun;
     }
 

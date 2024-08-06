@@ -21,14 +21,17 @@ public class TagService {
 
     private String generateUniqueTag(String nickname) {
         String tag = generateTag();
+
         if (memberRepository.existsByNicknameAndTag(nickname, tag)) {
             return generateUniqueTag(nickname);
         }
+
         return tag;
     }
 
     private String generateTag() {
         int randomNumber = 1000 + random.nextInt(9000);
+
         return "#" + randomNumber;
     }
 }
