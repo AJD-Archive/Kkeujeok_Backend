@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.member.tag.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 
 import java.util.Random;
 
@@ -12,9 +13,18 @@ import java.util.Random;
 public class TagService {
 
     private final Random random;
+    private final MemberRepository memberRepository;
 
-    public String getRandomTag() {
-        return generateTag();
+    public String getRandomTag(String nickname) {
+        return generateUniqueTag(nickname);
+    }
+
+    private String generateUniqueTag(String nickname) {
+        String tag = generateTag();
+        if (memberRepository.existsByNicknameAndTag(nickname, tag)) {
+            return generateUniqueTag(nickname);
+        }
+        return tag;
     }
 
     private String generateTag() {

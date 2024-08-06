@@ -51,7 +51,7 @@ public class AuthMemberService {
         String userPicture = getUserPicture(userInfo.picture());
         String name = unionName(userInfo.name(), userInfo.nickname());
         String nickname = nicknameService.getRandomNickname();
-        String tag = tagService.getRandomTag();
+        String tag = tagService.getRandomTag(nickname);
 
         return memberRepository.save(
                 Member.builder()
