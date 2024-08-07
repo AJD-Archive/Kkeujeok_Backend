@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.member.domain.QMember;
 
 @RequiredArgsConstructor
-public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
+public class MemberRepositoryCustomImpl implements MemberCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 

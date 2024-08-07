@@ -1,5 +1,5 @@
 package shop.kkeujeok.kkeujeokbackend.member.domain.repository;
 
-public interface MemberRepositoryCustom {
+public interface MemberCustomRepository {
     boolean existsByNicknameAndTag(String nickname, String tag);
 }
