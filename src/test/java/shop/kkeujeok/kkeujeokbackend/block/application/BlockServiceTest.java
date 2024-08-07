@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -23,6 +24,9 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
+import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
@@ -30,9 +34,13 @@ class BlockServiceTest {
     @Mock
     private BlockRepository blockRepository;
 
+    @Mock
+    private MemberRepository memberRepository;
+
     @InjectMocks
     private BlockService blockService;
 
+    private Member member;
     private Block block;
     private Block deleteBlock;
     private BlockSaveReqDto blockSaveReqDto;
@@ -40,6 +48,17 @@ class BlockServiceTest {
 
     @BeforeEach
     void setUp() {
+        member = Member.builder()
+                .email("email")
+                .name("name")
+                .nickname("nickname")
+                .socialType(SocialType.GOOGLE)
+                .introduction("introduction")
+                .picture("picture")
+                .build();
+
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
+        
         blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED, "2024.07.25 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
         block = Block.builder()
@@ -47,6 +66,7 @@ class BlockServiceTest {
                 .contents(blockSaveReqDto.contents())
                 .progress(blockSaveReqDto.progress())
                 .deadLine(blockSaveReqDto.deadLine())
+                .member(member)
                 .build();
 
         deleteBlock = Block.builder()
@@ -54,6 +74,7 @@ class BlockServiceTest {
                 .contents(blockSaveReqDto.contents())
                 .progress(blockSaveReqDto.progress())
                 .deadLine(blockSaveReqDto.deadLine())
+                .member(member)
                 .build();
         deleteBlock.statusUpdate();
     }
@@ -65,7 +86,7 @@ class BlockServiceTest {
         when(blockRepository.save(any(Block.class))).thenReturn(block);
 
         // when
-        BlockInfoResDto result = blockService.save(blockSaveReqDto);
+        BlockInfoResDto result = blockService.save("email", blockSaveReqDto);
 
         // then
         assertAll(() -> {
@@ -75,7 +96,6 @@ class BlockServiceTest {
             assertThat(result.deadLine()).isEqualTo("2024.07.25 13:23");
             assertNotNull(result.nickname());
         });
-
     }
 
     @DisplayName("블록을 수정합니다.")
@@ -86,7 +106,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
-        BlockInfoResDto result = blockService.update(blockId, blockUpdateReqDto);
+        BlockInfoResDto result = blockService.update("email", blockId, blockUpdateReqDto);
 
         // then
         assertAll(() -> {
@@ -105,7 +125,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
-        BlockInfoResDto result = blockService.update(blockId, originBlockUpdateReqDto);
+        BlockInfoResDto result = blockService.update("email", blockId, originBlockUpdateReqDto);
 
         // then
         assertAll(() -> {
@@ -123,7 +143,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
-        BlockInfoResDto result = blockService.progressUpdate(blockId, "IN_PROGRESS");
+        BlockInfoResDto result = blockService.progressUpdate("email", blockId, "IN_PROGRESS");
 
         // then
         assertAll(() -> {
@@ -141,7 +161,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when & then
-        assertThatThrownBy(() -> blockService.progressUpdate(blockId, "String"))
+        assertThatThrownBy(() -> blockService.progressUpdate("email", blockId, "String"))
                 .isInstanceOf(InvalidProgressException.class);
     }
 
@@ -153,7 +173,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
-        blockService.delete(blockId);
+        blockService.delete("email", blockId);
 
         // then
         assertAll(() -> {
@@ -169,7 +189,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(deleteBlock));
 
         // when
-        blockService.delete(blockId);
+        blockService.delete("email", blockId);
 
         // then
         assertAll(() -> {
@@ -185,7 +205,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
-        BlockInfoResDto result = blockService.findById(blockId);
+        BlockInfoResDto result = blockService.findById("email", blockId);
 
         // then
         assertAll(() -> {

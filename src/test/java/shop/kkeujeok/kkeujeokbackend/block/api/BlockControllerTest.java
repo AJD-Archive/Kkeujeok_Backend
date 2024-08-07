@@ -5,11 +5,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -17,9 +20,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.createRestDocsHandlerWithFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.requestFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
@@ -28,10 +31,16 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
@@ -40,40 +49,69 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
+import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
+@ExtendWith(RestDocumentationExtension.class)
 class BlockControllerTest extends ControllerTest {
+
     private Member member;
     private Block block;
     private BlockSaveReqDto blockSaveReqDto;
     private BlockUpdateReqDto blockUpdateReqDto;
 
+    @InjectMocks
+    BlockController blockController;
+
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         member = Member.builder()
-                .nickname("웅이")
+                .email("email")
+                .name("name")
+                .nickname("nickname")
+                .socialType(SocialType.GOOGLE)
+                .introduction("introduction")
+                .picture("picture")
                 .build();
+
         blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED, "2024.08.03 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
         block = blockSaveReqDto.toEntity(member);
+
+        blockController = new BlockController(blockService);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(blockController)
+                .apply(documentationConfiguration(restDocumentation))
+                .setCustomArgumentResolvers(new CurrentUserEmailArgumentResolver(tokenProvider))
+                .setControllerAdvice(new ControllerAdvice())
+                .build();
+
+        when(tokenProvider.getUserEmailFromToken(any(TokenReqDto.class))).thenReturn("email");
     }
 
     @DisplayName("POST 블록 저장 컨트롤러 로직 확인")
     @Test
     void 블록_저장() throws Exception {
         // given
-        BlockInfoResDto response = BlockInfoResDto.of(block, member);
-        given(blockService.save(any(BlockSaveReqDto.class))).willReturn(response);
+        BlockInfoResDto response = BlockInfoResDto.from(block);
+        given(blockService.save(anyString(), any(BlockSaveReqDto.class))).willReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/blocks/")
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(blockSaveReqDto)))
                 .andDo(print())
-                .andDo(createRestDocsHandlerWithFields(
-                        "block/save",
+                .andDo(document("block/save",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
                         requestFields(
                                 fieldWithPath("title").description("블록 제목"),
                                 fieldWithPath("contents").description("블록 내용"),
@@ -99,11 +137,12 @@ class BlockControllerTest extends ControllerTest {
     void 블록_수정() throws Exception {
         // given
         block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents(), blockUpdateReqDto.deadLine());
-        BlockInfoResDto response = BlockInfoResDto.of(block, member);
-        given(blockService.update(anyLong(), any(BlockUpdateReqDto.class))).willReturn(response);
+        BlockInfoResDto response = BlockInfoResDto.from(block);
+        given(blockService.update(anyString(), anyLong(), any(BlockUpdateReqDto.class))).willReturn(response);
 
         // when & then
         mockMvc.perform(patch("/api/blocks/{blockId}", 1L)
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(blockUpdateReqDto)))
@@ -139,12 +178,13 @@ class BlockControllerTest extends ControllerTest {
         // given
         Long blockId = 1L;
         String progressString = "IN_PROGRESS";
-        BlockInfoResDto response = BlockInfoResDto.of(block, member);
+        BlockInfoResDto response = BlockInfoResDto.from(block);
 
-        given(blockService.progressUpdate(anyLong(), anyString())).willReturn(response);
+        given(blockService.progressUpdate(anyString(), anyLong(), anyString())).willReturn(response);
 
         // when & then
         mockMvc.perform(patch(String.format("/api/blocks/{blockId}/progress?progress=%s", progressString), blockId)
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/progress/update",
@@ -178,10 +218,12 @@ class BlockControllerTest extends ControllerTest {
         Long blockId = 1L;
         String progressString = "STATUS_PROGRESS";
 
-        given(blockService.progressUpdate(anyLong(), anyString())).willThrow(new InvalidProgressException());
+        given(blockService.progressUpdate(anyString(), anyLong(), anyString())).willThrow(
+                new InvalidProgressException());
 
         // when & then
         mockMvc.perform(patch(String.format("/api/blocks/{blockId}/progress?progress=%s", progressString), blockId)
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/progress/update/failure",
@@ -203,10 +245,11 @@ class BlockControllerTest extends ControllerTest {
     void 블록_삭제() throws Exception {
         // given
         Long blockId = 1L;
-        doNothing().when(blockService).delete(anyLong());
+        doNothing().when(blockService).delete(anyString(), anyLong());
 
         // when & then
         mockMvc.perform(delete("/api/blocks/{blockId}", blockId)
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/delete",
@@ -226,13 +269,14 @@ class BlockControllerTest extends ControllerTest {
         String progressString = "NOT_STARTED";
         Page<Block> blockPage = new PageImpl<>(List.of(block), PageRequest.of(0, 10), 1);
         BlockListResDto response = BlockListResDto.from(
-                Collections.singletonList(BlockInfoResDto.of(block, member)),
+                Collections.singletonList(BlockInfoResDto.from(block)),
                 PageInfoResDto.from(blockPage));
 
-        given(blockService.findByBlockWithProgress(anyString(), any())).willReturn(response);
+        given(blockService.findForBlockByProgress(anyString(), anyString(), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(get(String.format("/api/blocks?progress=%s", progressString))
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/findByBlockWithProgress",
@@ -263,12 +307,13 @@ class BlockControllerTest extends ControllerTest {
     @Test
     void 블록_상세보기() throws Exception {
         // given
-        BlockInfoResDto response = BlockInfoResDto.of(block, member);
+        BlockInfoResDto response = BlockInfoResDto.from(block);
 
-        given(blockService.findById(anyLong())).willReturn(response);
+        given(blockService.findById(anyString(), anyLong())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/api/blocks/{blockId}", 1L)
+                        .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/findById",
