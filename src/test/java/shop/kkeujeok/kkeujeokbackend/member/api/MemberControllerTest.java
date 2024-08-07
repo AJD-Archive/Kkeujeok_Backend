@@ -51,9 +51,7 @@ public class MemberControllerTest extends ControllerTest {
 
         mockMvc.perform(get("/api/members/mypage").header("Authorization", "Bearer valid-token"))
                 .andExpect(status().isOk())
-
                 .andExpect(jsonPath("$.message", is("내 프로필 정보")))
-
                 .andExpect(jsonPath("$.data").exists());
     }
 }
