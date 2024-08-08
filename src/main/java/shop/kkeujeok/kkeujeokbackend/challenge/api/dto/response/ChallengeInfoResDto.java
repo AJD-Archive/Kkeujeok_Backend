@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Builder;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
-import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Builder
 public record ChallengeInfoResDto(
@@ -18,7 +17,7 @@ public record ChallengeInfoResDto(
         String authorName,
         String authorProfileImage
 ) {
-    public static ChallengeInfoResDto of(Challenge challenge, Member member) {
+    public static ChallengeInfoResDto from(Challenge challenge) {
         return ChallengeInfoResDto.builder()
                 .title(challenge.getTitle())
                 .contents(challenge.getContents())
@@ -26,8 +25,8 @@ public record ChallengeInfoResDto(
                 .startDate(challenge.getStartDate())
                 .endDate(challenge.getEndDate())
                 .representImage(challenge.getRepresentImage())
-                .authorName(member.getNickname())
-                .authorProfileImage(member.getPicture())
+                .authorName(challenge.getMember().getNickname())
+                .authorProfileImage(challenge.getMember().getPicture())
                 .build();
     }
 }
