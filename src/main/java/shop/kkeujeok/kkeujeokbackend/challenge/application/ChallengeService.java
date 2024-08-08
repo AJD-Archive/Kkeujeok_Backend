@@ -40,7 +40,7 @@ public class ChallengeService {
     public ChallengeInfoResDto update(String email, Long challengeId, ChallengeSaveReqDto challengeSaveReqDto) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
-        verifyUserIsAuthor(challenge, member);
+        verifyMemberIsAuthor(challenge, member);
 
         challenge.update(challengeSaveReqDto.title(),
                 challengeSaveReqDto.contents(),
@@ -86,7 +86,7 @@ public class ChallengeService {
     public void delete(String email, Long challengeId) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
-        verifyUserIsAuthor(challenge, member);
+        verifyMemberIsAuthor(challenge, member);
 
         challenge.updateStatus();
     }
@@ -102,7 +102,7 @@ public class ChallengeService {
     }
 
 
-    private void verifyUserIsAuthor(Challenge challenge, Member currentUser) {
+    private void verifyMemberIsAuthor(Challenge challenge, Member currentUser) {
         if (!challenge.getMember().equals(currentUser)) {
             throw new ChallengeAccessDeniedException();
         }
