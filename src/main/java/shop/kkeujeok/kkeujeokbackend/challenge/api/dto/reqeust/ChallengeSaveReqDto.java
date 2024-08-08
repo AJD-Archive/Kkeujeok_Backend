@@ -1,6 +1,5 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -26,10 +25,10 @@ public record ChallengeSaveReqDto(
         @NotNull(message = "주기 상세정보는 필수 입력값입니다.")
         List<CycleDetail> cycleDetails,
 
-        @NotBlank(message = "시작 날짜는 필수 입력값입니다.")
+        @NotNull(message = "시작 날짜는 필수 입력값입니다.")
         LocalDate startDate,
 
-        @NotBlank(message = "종료 날짜는 필수 입력값입니다.")
+        @NotNull(message = "종료 날짜는 필수 입력값입니다.")
         LocalDate endDate,
 
         String representImage

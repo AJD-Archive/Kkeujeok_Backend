@@ -186,7 +186,7 @@ class ChallengeControllerTest extends ControllerTest {
         given(challengeService.update(anyString(), anyLong(), any(ChallengeSaveReqDto.class))).willReturn(response);
 
         // when & then
-        mockMvc.perform(patch("/api/challenges/{challenge-id}", 1L)
+        mockMvc.perform(patch("/api/challenges/{challengeId}", 1L)
                         .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -314,7 +314,7 @@ class ChallengeControllerTest extends ControllerTest {
         given(challengeService.findById(anyLong())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get("/api/challenges/{challenge-id}", 1L)
+        mockMvc.perform(get("/api/challenges/{challengeId}", 1L)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -349,7 +349,7 @@ class ChallengeControllerTest extends ControllerTest {
                 .delete(anyString(), anyLong());
 
         // when & then
-        mockMvc.perform(delete("/api/challenges/{challenge-id}", 1L)
+        mockMvc.perform(delete("/api/challenges/{challengeId}", 1L)
                         .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -34,9 +34,9 @@ public class ChallengeController {
         return new RspTemplate<>(HttpStatus.CREATED, "챌린지 생성 성공", challengeService.save(email, challengeSaveReqDto));
     }
 
-    @PatchMapping("/{challenge-id}")
+    @PatchMapping("/{challengeId}")
     public RspTemplate<ChallengeInfoResDto> update(@CurrentUserEmail String email,
-                                                   @PathVariable(name = "challenge-id") Long challengeId,
+                                                   @PathVariable(name = "challengeId") Long challengeId,
                                                    @Valid @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
         return new RspTemplate<>(HttpStatus.OK, "챌린지 수정 성공",
                 challengeService.update(email, challengeId, challengeSaveReqDto));
@@ -60,14 +60,14 @@ public class ChallengeController {
                 challengeService.findChallengesByKeyWord(searchReqDto, PageRequest.of(page, size)));
     }
 
-    @GetMapping("/{challenge-id}")
-    public RspTemplate<ChallengeInfoResDto> findById(@PathVariable(name = "challenge-id") Long challengeId) {
+    @GetMapping("/{challengeId}")
+    public RspTemplate<ChallengeInfoResDto> findById(@PathVariable(name = "challengeId") Long challengeId) {
         return new RspTemplate<>(HttpStatus.OK, "챌린지 상세보기", challengeService.findById(challengeId));
     }
 
-    @DeleteMapping("/{challenge-id}")
+    @DeleteMapping("/{challengeId}")
     public RspTemplate<Void> delete(@CurrentUserEmail String email,
-                                    @PathVariable(name = "challenge-id") Long challengeId) {
+                                    @PathVariable(name = "challengeId") Long challengeId) {
         challengeService.delete(email, challengeId);
         return new RspTemplate<>(HttpStatus.OK, "챌린지 삭제 성공");
     }
