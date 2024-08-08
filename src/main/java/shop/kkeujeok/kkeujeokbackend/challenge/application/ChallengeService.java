@@ -75,7 +75,7 @@ public class ChallengeService {
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ChallengeInfoResDto findById(Long challengeId) {
         Challenge challenge = findChallengeById(challengeId);
 
