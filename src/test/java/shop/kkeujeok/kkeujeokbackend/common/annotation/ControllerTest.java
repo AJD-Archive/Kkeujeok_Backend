@@ -54,5 +54,4 @@ public abstract class ControllerTest {
 
     @MockBean
     protected ChallengeService challengeService;
-
 }

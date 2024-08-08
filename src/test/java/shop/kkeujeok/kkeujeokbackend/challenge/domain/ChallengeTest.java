@@ -1,100 +1,152 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.domain;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
+import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
 class ChallengeTest {
-
     private Challenge challenge;
 
     @BeforeEach
     void setUp() {
+        Member member = Member.builder()
+                .status(Status.ACTIVE)
+                .email("kkeujeok@gmail.com")
+                .name("김동균")
+                .picture("프로필 사진")
+                .socialType(SocialType.GOOGLE)
+                .role(Role.ROLE_USER)
+                .firstLogin(true)
+                .nickname("동동")
+                .build();
+
         challenge = Challenge.builder()
-                .title("테스트 챌린지")
-                .contents("테스트")
-                .cycleDetails(Arrays.asList(CycleDetail.MON, CycleDetail.TUE, CycleDetail.WED))
+                .status(Status.ACTIVE)
+                .title("제목")
+                .contents("내용")
+                .cycleDetails(List.of(CycleDetail.MON, CycleDetail.TUE))
                 .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(1))
-                .representImage("대표이미지")
-                .member(null)
+                .endDate(LocalDate.now().plusDays(30))
+                .representImage("대표 사진")
+                .member(member)
                 .build();
     }
 
     @Test
-    @DisplayName("중복된 CycleDetail이 있으면 예외가 발생한다")
-    void 중복된_CycleDetail이_있으면_예외가_발생한다() {
+    @DisplayName("챌린지의 모든 필드를 수정합니다.")
+    void 챌린지_수정() {
         // given
-        List<CycleDetail> cycleDetails = Arrays.asList(
-                CycleDetail.MON,
-                CycleDetail.MON
-        );
-        challenge = Challenge.builder()
-                .title("테스트 챌린지")
-                .contents("테스트")
-                .cycleDetails(cycleDetails)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(1))
-                .representImage("대표이미지")
-                .member(null)
-                .build();
+        String updateTitle = "수정된 제목";
+        String updateContents = "수정된 내용";
+        List<CycleDetail> updateCycleDetails = List.of(CycleDetail.WED, CycleDetail.THU);
+        LocalDate updateStartDate = LocalDate.now().plusDays(1);
+        LocalDate updateEndDate = LocalDate.now().plusDays(31);
+        String updateRepresentImage = "수정된 대표 사진";
 
-        // when & then
-        assertThatThrownBy(() -> challenge.validateCycleDetails(Cycle.WEEKLY))
-                .isInstanceOf(InvalidCycleException.class)
-                .hasMessageContaining("중복된 주기 세부 항목이 발견되었습니다");
+        // when
+        challenge.update(updateTitle, updateContents, updateCycleDetails, updateStartDate, updateEndDate,
+                updateRepresentImage);
+
+        // then
+        assertAll(() -> {
+            assertThat(challenge.getTitle()).isEqualTo(updateTitle);
+            assertThat(challenge.getContents()).isEqualTo(updateContents);
+            assertThat(challenge.getCycleDetails()).isEqualTo(updateCycleDetails);
+            assertThat(challenge.getStartDate()).isEqualTo(updateStartDate);
+            assertThat(challenge.getEndDate()).isEqualTo(updateEndDate);
+            assertThat(challenge.getRepresentImage()).isEqualTo(updateRepresentImage);
+        });
     }
 
     @Test
-    @DisplayName("주기와 일치하지 않는 CycleDetail이 있으면 예외가 발생한다")
-    void 주기와_일치하지_않는_CycleDetail이_있으면_예외가_발생한다() {
+    @DisplayName("챌린지의 제목만 수정합니다.")
+    void 챌린지_제목_수정() {
         // given
-        List<CycleDetail> cycleDetails = Arrays.asList(
-                CycleDetail.MON,
-                CycleDetail.FIRST // 주기와 일치하지 않음
-        );
-        challenge = Challenge.builder()
-                .title("테스트 챌린지")
-                .contents("테스트")
-                .cycleDetails(cycleDetails)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(1))
-                .representImage("대표이미지")
-                .member(null) // Member는 null로 설정
-                .build();
+        String updateTitle = "수정된 제목";
 
-        // when & then
-        assertThatThrownBy(() -> challenge.validateCycleDetails(Cycle.WEEKLY))
-                .isInstanceOf(InvalidCycleException.class)
-                .hasMessageContaining("주기와 일치하지 않는 세부 항목이 있습니다");
+        // when
+        challenge.update(updateTitle, challenge.getContents(), challenge.getCycleDetails(), challenge.getStartDate(),
+                challenge.getEndDate(), challenge.getRepresentImage());
+
+        // then
+        assertAll(() -> {
+            assertThat(challenge.getTitle()).isEqualTo(updateTitle);
+            assertThat(challenge.getContents()).isEqualTo("내용");
+            assertThat(challenge.getCycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
+            assertThat(challenge.getStartDate()).isEqualTo(LocalDate.now());
+            assertThat(challenge.getEndDate()).isEqualTo(LocalDate.now().plusDays(30));
+            assertThat(challenge.getRepresentImage()).isEqualTo("대표 사진");
+        });
     }
 
     @Test
-    @DisplayName("모든 CycleDetail이 유효한 경우 예외가 발생하지 않는다")
-    void 모든_CycleDetail이_유효한_경우_예외가_발생하지_않는다() {
+    @DisplayName("챌린지의 내용만 수정합니다.")
+    void 챌린지_내용_수정() {
         // given
-        List<CycleDetail> cycleDetails = Arrays.asList(
-                CycleDetail.MON,
-                CycleDetail.TUE,
-                CycleDetail.WED
-        );
-        challenge = Challenge.builder()
-                .title("테스트 챌린지")
-                .contents("테스트")
-                .cycleDetails(cycleDetails)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(1))
-                .representImage("대표이미지")
-                .member(null)
-                .build();
+        String updateContents = "수정된 내용";
 
-        // when & then
-        challenge.validateCycleDetails(Cycle.WEEKLY);
+        // when
+        challenge.update(challenge.getTitle(), updateContents, challenge.getCycleDetails(), challenge.getStartDate(),
+                challenge.getEndDate(), challenge.getRepresentImage());
+
+        // then
+        assertAll(() -> {
+            assertThat(challenge.getTitle()).isEqualTo("제목");
+            assertThat(challenge.getContents()).isEqualTo(updateContents);
+            assertThat(challenge.getCycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
+            assertThat(challenge.getStartDate()).isEqualTo(LocalDate.now());
+            assertThat(challenge.getEndDate()).isEqualTo(LocalDate.now().plusDays(30));
+            assertThat(challenge.getRepresentImage()).isEqualTo("대표 사진");
+        });
+    }
+
+    @Test
+    @DisplayName("챌린지의 마감일만 수정합니다.")
+    void 챌린지_마감일_수정() {
+        // given
+        LocalDate updateEndDate = LocalDate.now().plusDays(40);
+
+        // when
+        challenge.update(challenge.getTitle(), challenge.getContents(), challenge.getCycleDetails(),
+                challenge.getStartDate(), updateEndDate, challenge.getRepresentImage());
+
+        // then
+        assertAll(() -> {
+            assertThat(challenge.getTitle()).isEqualTo("제목");
+            assertThat(challenge.getContents()).isEqualTo("내용");
+            assertThat(challenge.getCycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
+            assertThat(challenge.getStartDate()).isEqualTo(LocalDate.now());
+            assertThat(challenge.getEndDate()).isEqualTo(updateEndDate);
+            assertThat(challenge.getRepresentImage()).isEqualTo("대표 사진");
+        });
+    }
+
+    @Test
+    @DisplayName("챌지의 상태를 수정합니다.")
+    void 챌린지_상태_수정() {
+        // given
+        assertThat(challenge.getStatus()).isEqualTo(Status.ACTIVE);
+
+        // when
+        challenge.updateStatus();
+
+        // then
+        assertThat(challenge.getStatus()).isEqualTo(Status.DELETED);
+
+        // when
+        challenge.updateStatus();
+
+        // then
+        assertThat(challenge.getStatus()).isEqualTo(Status.ACTIVE);
     }
 }
+

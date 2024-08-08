@@ -1,13 +1,19 @@
 package shop.kkeujeok.kkeujeokbackend.member.domain;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
-import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 
 @Entity
 @Getter
@@ -35,8 +41,12 @@ public class Member extends BaseEntity {
 
     private String introduction;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<Challenge> challenges = new ArrayList<>();
+
     @Builder
-    private Member(Status status, Role role, String email, String name, String picture, SocialType socialType, boolean firstLogin, String nickname, String introduction) {
+    private Member(Status status, Role role, String email, String name, String picture, SocialType socialType,
+                   boolean firstLogin, String nickname, String introduction) {
         this.status = status;
         this.role = role;
         this.email = email;
@@ -49,7 +59,7 @@ public class Member extends BaseEntity {
     }
 
     public void update(String nickname, String introduction) {
-        if(isUpdateRequired(nickname, introduction)) {
+        if (isUpdateRequired(nickname, introduction)) {
             this.nickname = nickname;
             this.introduction = introduction;
         }
