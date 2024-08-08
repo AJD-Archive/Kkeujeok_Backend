@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -29,14 +30,14 @@ public class ChallengeController {
 
     @PostMapping
     public RspTemplate<ChallengeInfoResDto> save(@CurrentUserEmail String email,
-                                                 @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
+                                                 @Valid @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
         return new RspTemplate<>(HttpStatus.CREATED, "챌린지 생성 성공", challengeService.save(email, challengeSaveReqDto));
     }
 
     @PatchMapping("/{challenge-id}")
     public RspTemplate<ChallengeInfoResDto> update(@CurrentUserEmail String email,
                                                    @PathVariable(name = "challenge-id") Long challengeId,
-                                                   @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
+                                                   @Valid @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
         return new RspTemplate<>(HttpStatus.OK, "챌린지 수정 성공",
                 challengeService.update(email, challengeId, challengeSaveReqDto));
     }
