@@ -102,8 +102,8 @@ public class ChallengeService {
     }
 
 
-    private void verifyMemberIsAuthor(Challenge challenge, Member currentUser) {
-        if (!challenge.getMember().equals(currentUser)) {
+    private void verifyMemberIsAuthor(Challenge challenge, Member member) {
+        if (!challenge.getMember().equals(member)) {
             throw new ChallengeAccessDeniedException();
         }
     }
