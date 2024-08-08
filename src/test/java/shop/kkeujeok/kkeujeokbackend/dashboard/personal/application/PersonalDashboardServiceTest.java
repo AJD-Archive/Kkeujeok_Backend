@@ -56,7 +56,10 @@ class PersonalDashboardServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
 
         personalDashboardSaveReqDto = new PersonalDashboardSaveReqDto("title", "description", false, "category");
-        personalDashboardUpdateReqDto = new PersonalDashboardUpdateReqDto("updateTitle", "updateDescription",
+        personalDashboardUpdateReqDto = new PersonalDashboardUpdateReqDto(
+                "updateTitle",
+                "updateDescription",
+                true,
                 "updateCategory");
         personalDashboard = PersonalDashboard.builder()
                 .title(personalDashboardSaveReqDto.title())
@@ -104,7 +107,7 @@ class PersonalDashboardServiceTest {
         assertAll(() -> {
             assertThat(result.title()).isEqualTo("updateTitle");
             assertThat(result.description()).isEqualTo("updateDescription");
-            assertThat(result.isPublic()).isEqualTo(false);
+            assertThat(result.isPublic()).isEqualTo(true);
             assertThat(result.category()).isEqualTo("updateCategory");
         });
     }
@@ -130,8 +133,8 @@ class PersonalDashboardServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> personalDashboardService.update(unauthorizedEmail, dashboardId, personalDashboardUpdateReqDto))
-                .isInstanceOf(DashboardAccessDeniedException.class);
+                () -> personalDashboardService.update(unauthorizedEmail, dashboardId, personalDashboardUpdateReqDto)
+        ).isInstanceOf(DashboardAccessDeniedException.class);
     }
 
 }

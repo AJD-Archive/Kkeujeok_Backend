@@ -24,8 +24,9 @@ public class PersonalDashboard extends Dashboard {
         this.isPublic = isPublic;
     }
 
-    public void update(String updateTitle, String updateDescription, String updateCategory) {
+    public void update(String updateTitle, String updateDescription, boolean updateIsPublic, String updateCategory) {
         super.update(updateTitle, updateDescription);
+        this.isPublic = updateIsPublic;
         this.category = updateCategory;
     }
 

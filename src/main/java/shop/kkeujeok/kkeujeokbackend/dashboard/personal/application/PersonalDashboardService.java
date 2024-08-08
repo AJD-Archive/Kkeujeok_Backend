@@ -46,6 +46,7 @@ public class PersonalDashboardService {
 
         dashboard.update(personalDashboardUpdateReqDto.title(),
                 personalDashboardUpdateReqDto.description(),
+                personalDashboardUpdateReqDto.isPublic(),
                 personalDashboardUpdateReqDto.category());
 
         return PersonalDashboardInfoResDto.from(dashboard);
