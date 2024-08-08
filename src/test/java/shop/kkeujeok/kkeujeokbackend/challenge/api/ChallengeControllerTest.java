@@ -199,7 +199,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")
                         ),
                         pathParameters(
-                                parameterWithName("challenge-id").description("챌린지 ID")
+                                parameterWithName("challengeId").description("챌린지 ID")
                         ),
                         requestFields(
                                 fieldWithPath("title").description("챌린지 제목"),
@@ -322,7 +322,7 @@ class ChallengeControllerTest extends ControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
-                                parameterWithName("challenge-id").description("챌린지 ID")
+                                parameterWithName("challengeId").description("챌린지 ID")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -362,7 +362,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")
                         ),
                         pathParameters(
-                                parameterWithName("challenge-id").description("챌린지 ID")
+                                parameterWithName("challengeId").description("챌린지 ID")
                         )
                 ))
                 .andExpect(status().isOk());
