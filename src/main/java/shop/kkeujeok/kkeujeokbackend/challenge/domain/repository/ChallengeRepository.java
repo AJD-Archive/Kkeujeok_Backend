@@ -1,7 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.domain.repository;
 
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import org.springframework.data.jpa.repository.JpaRepository;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 
-public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
+public interface ChallengeRepository extends JpaRepository<Challenge, Long>, ChallengeCustomRepository {
 }
