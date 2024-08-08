@@ -3,8 +3,6 @@ package shop.kkeujeok.kkeujeokbackend.challenge.exception;
 import shop.kkeujeok.kkeujeokbackend.global.error.exception.InvalidGroupException;
 
 public class InvalidCycleDetailsConversionException extends InvalidGroupException {
-
-    // 메시지 상수 정의
     private static final String CONVERSION_TO_DATABASE_COLUMN_MESSAGE =
             "List<CycleDetail>를 JSON 문자열로 변환하는 중 오류가 발생했습니다.";
     private static final String CONVERSION_TO_ENTITY_ATTRIBUTE_MESSAGE =
