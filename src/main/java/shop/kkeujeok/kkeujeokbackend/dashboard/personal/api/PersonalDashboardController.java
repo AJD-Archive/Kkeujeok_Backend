@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.personal.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,7 +25,7 @@ public class PersonalDashboardController {
 
     @PostMapping("/")
     public RspTemplate<PersonalDashboardInfoResDto> save(@CurrentUserEmail String email,
-                                                         @RequestBody PersonalDashboardSaveReqDto personalDashboardSaveReqDto) {
+                                                         @RequestBody @Valid PersonalDashboardSaveReqDto personalDashboardSaveReqDto) {
         return new RspTemplate<>(HttpStatus.OK,
                 "개인 대시보드 생성",
                 personalDashboardService.save(email, personalDashboardSaveReqDto));
