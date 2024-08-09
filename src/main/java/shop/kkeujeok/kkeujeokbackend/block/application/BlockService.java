@@ -15,6 +15,9 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.block.exception.BlockNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository.DashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
@@ -27,12 +30,15 @@ public class BlockService {
 
     private final MemberRepository memberRepository;
     private final BlockRepository blockRepository;
+    private final DashboardRepository dashboardRepository;
 
     // 블록 생성
     @Transactional
     public BlockInfoResDto save(String email, BlockSaveReqDto blockSaveReqDto) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        Block block = blockRepository.save(blockSaveReqDto.toEntity(member));
+        Dashboard dashboard = dashboardRepository.findById(blockSaveReqDto.dashboardId())
+                .orElseThrow(DashboardNotFoundException::new);
+        Block block = blockRepository.save(blockSaveReqDto.toEntity(member, dashboard));
 
         return BlockInfoResDto.from(block);
     }
