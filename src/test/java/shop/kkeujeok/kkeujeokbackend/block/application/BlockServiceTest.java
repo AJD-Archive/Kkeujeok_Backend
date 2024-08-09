@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,9 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository.DashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
@@ -37,12 +41,16 @@ class BlockServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private DashboardRepository dashboardRepository;
+
     @InjectMocks
     private BlockService blockService;
 
     private Member member;
     private Block block;
     private Block deleteBlock;
+    private Dashboard dashboard;
     private BlockSaveReqDto blockSaveReqDto;
     private BlockUpdateReqDto blockUpdateReqDto;
 
@@ -58,8 +66,16 @@ class BlockServiceTest {
                 .build();
 
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
-        
-        blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED, "2024.07.25 13:23");
+
+        dashboard = PersonalDashboard.builder()
+                .member(member)
+                .title("title")
+                .description("description")
+                .isPublic(false)
+                .category("category")
+                .build();
+
+        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.07.25 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
         block = Block.builder()
                 .title(blockSaveReqDto.title())
@@ -67,6 +83,7 @@ class BlockServiceTest {
                 .progress(blockSaveReqDto.progress())
                 .deadLine(blockSaveReqDto.deadLine())
                 .member(member)
+                .dashboard(dashboard)
                 .build();
 
         deleteBlock = Block.builder()
@@ -75,6 +92,7 @@ class BlockServiceTest {
                 .progress(blockSaveReqDto.progress())
                 .deadLine(blockSaveReqDto.deadLine())
                 .member(member)
+                .dashboard(dashboard)
                 .build();
         deleteBlock.statusUpdate();
     }
@@ -84,6 +102,7 @@ class BlockServiceTest {
     void 블록_저장() {
         // given
         when(blockRepository.save(any(Block.class))).thenReturn(block);
+        when(dashboardRepository.findById(anyLong())).thenReturn(Optional.of(dashboard));
 
         // when
         BlockInfoResDto result = blockService.save("email", blockSaveReqDto);

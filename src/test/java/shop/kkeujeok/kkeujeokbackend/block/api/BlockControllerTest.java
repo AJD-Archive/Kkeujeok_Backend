@@ -31,14 +31,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
@@ -49,13 +47,14 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
-@ExtendWith(RestDocumentationExtension.class)
 class BlockControllerTest extends ControllerTest {
 
     private Member member;
@@ -77,9 +76,17 @@ class BlockControllerTest extends ControllerTest {
                 .picture("picture")
                 .build();
 
-        blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED, "2024.08.03 13:23");
+        Dashboard dashboard = PersonalDashboard.builder()
+                .member(member)
+                .title("title")
+                .description("description")
+                .isPublic(false)
+                .category("category")
+                .build();
+
+        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.08.03 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
-        block = blockSaveReqDto.toEntity(member);
+        block = blockSaveReqDto.toEntity(member, dashboard);
 
         blockController = new BlockController(blockService);
 
@@ -113,6 +120,7 @@ class BlockControllerTest extends ControllerTest {
                                 headerWithName("Authorization").description("JWT 토큰")
                         ),
                         requestFields(
+                                fieldWithPath("dashboardId").description("대시보드 아이디"),
                                 fieldWithPath("title").description("블록 제목"),
                                 fieldWithPath("contents").description("블록 내용"),
                                 fieldWithPath("progress").description("블록 진행 상태"),

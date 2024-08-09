@@ -4,12 +4,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -36,14 +38,20 @@ public class Block extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dashboard_id")
+    private Dashboard dashboard;
+
     @Builder
-    private Block(String title, String contents, Progress progress, Member member, String deadLine) {
+    private Block(String title, String contents, Progress progress, Member member, String deadLine,
+                  Dashboard dashboard) {
         this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
         this.progress = progress;
         this.deadLine = deadLine;
         this.member = member;
+        this.dashboard = dashboard;
     }
 
     public void update(String updateTitle, String updateContents, String updateDeadLine) {

@@ -28,9 +28,8 @@ public class BlockController {
     private final BlockService blockService;
 
     @PostMapping("/")
-    public RspTemplate<BlockInfoResDto> save(
-            @CurrentUserEmail String email,
-            @RequestBody BlockSaveReqDto blockSaveReqDto) {
+    public RspTemplate<BlockInfoResDto> save(@CurrentUserEmail String email,
+                                             @RequestBody BlockSaveReqDto blockSaveReqDto) {
         return new RspTemplate<>(HttpStatus.CREATED, "블럭 생성", blockService.save(email, blockSaveReqDto));
     }
 
