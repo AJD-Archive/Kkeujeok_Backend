@@ -68,9 +68,9 @@ public class BlockService {
     }
 
     // 블록 리스트
-    public BlockListResDto findForBlockByProgress(String email, String progress, Pageable pageable) {
+    public BlockListResDto findForBlockByProgress(String email, Long dashboardId, String progress, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(parseProgress(progress), pageable);
+        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboardId, parseProgress(progress), pageable);
 
         List<BlockInfoResDto> blockInfoResDtoList = blocks.stream()
                 .map(BlockInfoResDto::from)
