@@ -4,11 +4,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -134,7 +136,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personalDashboardUpdateReqDto)))
                 .andDo(print())
-                .andDo(document("dashboard/save",
+                .andDo(document("dashboard/update",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -160,4 +162,29 @@ class PersonalDashboardControllerTest extends ControllerTest {
                 ))
                 .andExpect(status().isOk());
     }
+
+    @DisplayName("DELETE 개인 대시보드를 논리적으로 삭제합니다.")
+    @Test
+    void 개인_대시보드_삭제() throws Exception {
+        // given
+        doNothing().when(personalDashboardService).delete(anyString(), anyLong());
+
+        // when & then
+        mockMvc.perform(delete("/api/dashboards/{dashboardId}", 1L)
+                        .header("Authorization", "Bearer valid-token")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("dashboard/delete",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("dashboardId").description("개인 대시보드 ID")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+    
 }

@@ -21,6 +21,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.Persona
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
@@ -39,6 +40,7 @@ class PersonalDashboardServiceTest {
 
     private Member member;
     private PersonalDashboard personalDashboard;
+    private PersonalDashboard deletePersonalDashboard;
     private PersonalDashboardSaveReqDto personalDashboardSaveReqDto;
     private PersonalDashboardUpdateReqDto personalDashboardUpdateReqDto;
 
@@ -61,6 +63,7 @@ class PersonalDashboardServiceTest {
                 "updateDescription",
                 true,
                 "updateCategory");
+
         personalDashboard = PersonalDashboard.builder()
                 .title(personalDashboardSaveReqDto.title())
                 .description(personalDashboardSaveReqDto.description())
@@ -68,6 +71,15 @@ class PersonalDashboardServiceTest {
                 .category(personalDashboardSaveReqDto.category())
                 .member(member)
                 .build();
+
+        deletePersonalDashboard = PersonalDashboard.builder()
+                .title(personalDashboardSaveReqDto.title())
+                .description(personalDashboardSaveReqDto.description())
+                .isPublic(personalDashboardSaveReqDto.isPublic())
+                .category(personalDashboardSaveReqDto.category())
+                .member(member)
+                .build();
+        deletePersonalDashboard.statusUpdate();
     }
 
     @DisplayName("개인 대시보드를 저장합니다.")
@@ -135,6 +147,38 @@ class PersonalDashboardServiceTest {
         assertThatThrownBy(
                 () -> personalDashboardService.update(unauthorizedEmail, dashboardId, personalDashboardUpdateReqDto)
         ).isInstanceOf(DashboardAccessDeniedException.class);
+    }
+
+    @DisplayName("개인 대시보드를 삭제합니다.")
+    @Test
+    void 개인_대시보드_삭제() {
+        // given
+        Long dashboardId = 1L;
+        when(personalDashboardRepository.findById(dashboardId)).thenReturn(Optional.of(personalDashboard));
+
+        // when
+        personalDashboardService.delete(member.getEmail(), dashboardId);
+
+        // then
+        assertAll(() -> {
+            assertThat(personalDashboard.getStatus()).isEqualTo(Status.DELETED);
+        });
+    }
+
+    @DisplayName("삭제되었던 개인 대시보드를 복구합니다.")
+    @Test
+    void 개인_대시보드_복구() {
+        // given
+        Long dashboardId = 1L;
+        when(personalDashboardRepository.findById(dashboardId)).thenReturn(Optional.of(deletePersonalDashboard));
+
+        // when
+        personalDashboardService.delete(member.getEmail(), dashboardId);
+
+        // then
+        assertAll(() -> {
+            assertThat(personalDashboard.getStatus()).isEqualTo(Status.ACTIVE);
+        });
     }
 
 }
