@@ -129,6 +129,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -169,6 +170,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -208,6 +210,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -280,10 +283,10 @@ class BlockControllerTest extends ControllerTest {
                 Collections.singletonList(BlockInfoResDto.from(block)),
                 PageInfoResDto.from(blockPage));
 
-        given(blockService.findForBlockByProgress(anyString(), anyString(), any())).willReturn(response);
+        given(blockService.findForBlockByProgress(anyString(), anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get(String.format("/api/blocks?progress=%s", progressString))
+        mockMvc.perform(get(String.format("/api/blocks?dashboardId=%d&progress=%s", 1L, progressString))
                         .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -291,12 +294,15 @@ class BlockControllerTest extends ControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         queryParameters(
+                                parameterWithName("dashboardId")
+                                        .description("대시보드 아이디"),
                                 parameterWithName("progress")
                                         .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockListResDto[].blockId").description("블록 아이디"),
                                 fieldWithPath("data.blockListResDto[].title").description("블록 제목"),
                                 fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
                                 fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
@@ -333,6 +339,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
