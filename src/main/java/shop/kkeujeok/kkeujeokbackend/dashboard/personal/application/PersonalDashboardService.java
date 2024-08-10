@@ -1,15 +1,20 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.personal.application;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
+import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -30,7 +35,7 @@ public class PersonalDashboardService {
 
         personalDashboardRepository.save(dashboard);
 
-        return PersonalDashboardInfoResDto.from(dashboard);
+        return PersonalDashboardInfoResDto.of(member, dashboard);
     }
 
     // 개인 대시보드 수정
@@ -49,7 +54,30 @@ public class PersonalDashboardService {
                 personalDashboardUpdateReqDto.isPublic(),
                 personalDashboardUpdateReqDto.category());
 
-        return PersonalDashboardInfoResDto.from(dashboard);
+        return PersonalDashboardInfoResDto.of(member, dashboard);
+    }
+
+    // 개인 대시보드 전체 조회
+    public PersonalDashboardListResDto findForPersonalDashboard(String email, Pageable pageable) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Page<PersonalDashboard> personalDashboards = personalDashboardRepository.
+                findForPersonalDashboard(member, pageable);
+
+        List<PersonalDashboardInfoResDto> personalDashboardInfoResDtoList = personalDashboards.stream()
+                .map(p -> PersonalDashboardInfoResDto.of(member, p))
+                .toList();
+
+        return PersonalDashboardListResDto
+                .from(personalDashboardInfoResDtoList, PageInfoResDto.from(personalDashboards));
+    }
+
+    // 개인 대시보드 상세조회
+    public PersonalDashboardInfoResDto findById(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        PersonalDashboard dashboard = personalDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        return PersonalDashboardInfoResDto.of(member, dashboard);
     }
 
     // 개인 대시보드 삭제 유무 업데이트 (논리 삭제)
