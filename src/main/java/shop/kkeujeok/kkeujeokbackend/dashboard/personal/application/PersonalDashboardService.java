@@ -52,6 +52,16 @@ public class PersonalDashboardService {
         return PersonalDashboardInfoResDto.from(dashboard);
     }
 
+    // 개인 대시보드 삭제 유무 업데이트 (논리 삭제)
+    @Transactional
+    public void delete(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        PersonalDashboard dashboard = personalDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        dashboard.statusUpdate();
+    }
+
     private void verifyMemberIsAuthor(PersonalDashboard dashboard, Member member) {
         if (!member.equals(dashboard.getMember())) {
             throw new DashboardAccessDeniedException();

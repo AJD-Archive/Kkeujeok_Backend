@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Entity
@@ -28,6 +29,10 @@ public class PersonalDashboard extends Dashboard {
         super.update(updateTitle, updateDescription);
         this.isPublic = updateIsPublic;
         this.category = updateCategory;
+    }
+
+    public void statusUpdate() {
+        super.statusUpdate((super.getStatus() == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE);
     }
 
 }

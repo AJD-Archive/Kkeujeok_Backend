@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,13 @@ public class PersonalDashboardController {
         return new RspTemplate<>(HttpStatus.OK,
                 "개인 대시보드 수정",
                 personalDashboardService.update(email, dashboardId, personalDashboardUpdateReqDto));
+    }
+
+    @DeleteMapping("/{dashboardId}")
+    public RspTemplate<Void> delete(@CurrentUserEmail String email,
+                                    @PathVariable(name = "dashboardId") Long dashboardId) {
+        personalDashboardService.delete(email, dashboardId);
+        return new RspTemplate<>(HttpStatus.OK, "개인 대시보드 삭제");
     }
 
 }
