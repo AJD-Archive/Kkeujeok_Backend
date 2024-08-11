@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository;
 
+import static shop.kkeujeok.kkeujeokbackend.block.domain.QBlock.block;
 import static shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.QPersonalDashboard.personalDashboard;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
@@ -38,5 +40,26 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
                 .fetch();
 
         return new PageImpl<>(dashboards, pageable, total);
+    }
+
+    public double calculateCompletionPercentage(Long dashboardId) {
+        long totalBlocks = queryFactory
+                .selectFrom(block)
+                .where(block.dashboard.id.eq(dashboardId))
+                .stream()
+                .count();
+
+        long completedBlocks = queryFactory
+                .select(block)
+                .where(block.dashboard.id.eq(dashboardId)
+                        .and(block.progress.eq(Progress.COMPLETED)))
+                .stream()
+                .count();
+
+        if (totalBlocks == 0) {
+            return 0;
+        }
+
+        return (double) completedBlocks / totalBlocks * 100;
     }
 }

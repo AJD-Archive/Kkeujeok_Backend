@@ -12,9 +12,24 @@ public record PersonalDashboardInfoResDto(
         String title,
         String description,
         boolean isPublic,
-        String category
+        String category,
+        double blockProgress
 ) {
     public static PersonalDashboardInfoResDto of(Member member, PersonalDashboard dashboard) {
+        return commonBuilder(member, dashboard)
+                .build();
+    }
+
+    public static PersonalDashboardInfoResDto detailOf(Member member,
+                                                       PersonalDashboard dashboard,
+                                                       double blockProgress) {
+        return commonBuilder(member, dashboard)
+                .blockProgress(blockProgress)
+                .build();
+    }
+
+    private static PersonalDashboardInfoResDtoBuilder commonBuilder(Member member,
+                                                                    PersonalDashboard dashboard) {
         return PersonalDashboardInfoResDto.builder()
                 .dashboardId(dashboard.getId())
                 .myId(member.getId())
@@ -22,7 +37,7 @@ public record PersonalDashboardInfoResDto(
                 .title(dashboard.getTitle())
                 .description(dashboard.getDescription())
                 .isPublic(dashboard.isPublic())
-                .category(dashboard.getCategory())
-                .build();
+                .category(dashboard.getCategory());
     }
+
 }
