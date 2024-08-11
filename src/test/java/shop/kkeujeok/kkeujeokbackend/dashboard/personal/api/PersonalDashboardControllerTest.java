@@ -259,7 +259,8 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("개인 대시보드 제목"),
                                 fieldWithPath("data.description").description("개인 대시보드 설명"),
                                 fieldWithPath("data.isPublic").description("개인 대시보드 공개 범위"),
-                                fieldWithPath("data.category").description("개인 대시보드 카테고리")
+                                fieldWithPath("data.category").description("개인 대시보드 카테고리"),
+                                fieldWithPath("data.blockProgress").description("개인 대시보드의 완료된 블록 진행률")
                         )
                 ))
                 .andExpect(status().isOk());

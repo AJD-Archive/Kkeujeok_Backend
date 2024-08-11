@@ -209,6 +209,7 @@ class PersonalDashboardServiceTest {
             assertThat(result.description()).isEqualTo("description");
             assertThat(result.isPublic()).isEqualTo(false);
             assertThat(result.category()).isEqualTo("category");
+            assertThat(result.blockProgress()).isEqualTo(0.0);
         });
     }
 
