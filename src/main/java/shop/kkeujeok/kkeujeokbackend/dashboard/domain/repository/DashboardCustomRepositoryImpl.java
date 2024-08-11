@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -43,17 +44,15 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     }
 
     public double calculateCompletionPercentage(Long dashboardId) {
-        long totalBlocks = queryFactory
+        List<Block> blocks = queryFactory
                 .selectFrom(block)
                 .where(block.dashboard.id.eq(dashboardId))
-                .stream()
-                .count();
+                .fetch();
 
-        long completedBlocks = queryFactory
-                .select(block)
-                .where(block.dashboard.id.eq(dashboardId)
-                        .and(block.progress.eq(Progress.COMPLETED)))
-                .stream()
+        long totalBlocks = blocks.size();
+
+        long completedBlocks = blocks.stream()
+                .filter(b -> b.getProgress().equals(Progress.COMPLETED))
                 .count();
 
         if (totalBlocks == 0) {
