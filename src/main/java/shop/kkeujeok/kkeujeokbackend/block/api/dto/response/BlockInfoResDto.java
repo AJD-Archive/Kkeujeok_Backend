@@ -10,6 +10,7 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 
 @Builder
 public record BlockInfoResDto(
+        Long blockId,
         String title,
         String contents,
         Progress progress,
@@ -19,6 +20,7 @@ public record BlockInfoResDto(
 ) {
     public static BlockInfoResDto from(Block block) {
         return BlockInfoResDto.builder()
+                .blockId(block.getId())
                 .title(block.getTitle())
                 .contents(block.getContents())
                 .progress(block.getProgress())

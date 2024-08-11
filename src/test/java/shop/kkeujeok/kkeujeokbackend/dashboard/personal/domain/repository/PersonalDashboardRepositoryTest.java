@@ -1,7 +1,7 @@
-package shop.kkeujeok.kkeujeokbackend.block.domain.repository;
-
+package shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
-import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
-import shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository.DashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.config.JpaAuditingConfig;
 import shop.kkeujeok.kkeujeokbackend.global.config.QuerydslConfig;
@@ -27,7 +26,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 @DataJpaTest
 @Import({JpaAuditingConfig.class, QuerydslConfig.class})
 @ActiveProfiles("test")
-class BlockRepositoryTest {
+class PersonalDashboardRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -36,14 +35,13 @@ class BlockRepositoryTest {
     private BlockRepository blockRepository;
 
     @Autowired
-    private DashboardRepository dashboardRepository;
+    private PersonalDashboardRepository personalDashboardRepository;
 
     private Member member;
-    private Dashboard dashboard;
+    private PersonalDashboard personalDashboard;
     private Block block1;
     private Block block2;
     private Block block3;
-
 
     @BeforeEach
     void setUp() {
@@ -56,7 +54,9 @@ class BlockRepositoryTest {
                 .picture("picture")
                 .build();
 
-        dashboard = PersonalDashboard.builder()
+        memberRepository.save(member);
+
+        personalDashboard = PersonalDashboard.builder()
                 .member(member)
                 .title("title")
                 .description("description")
@@ -64,12 +64,14 @@ class BlockRepositoryTest {
                 .category("category")
                 .build();
 
+        personalDashboardRepository.save(personalDashboard);
+
         block1 = Block.builder()
                 .title("title1")
                 .contents("contents1")
-                .progress(Progress.NOT_STARTED)
+                .progress(Progress.COMPLETED)
                 .deadLine("2024.07.27 11:03")
-                .dashboard(dashboard)
+                .dashboard(personalDashboard)
                 .build();
 
         block2 = Block.builder()
@@ -77,51 +79,46 @@ class BlockRepositoryTest {
                 .contents("contents2")
                 .progress(Progress.NOT_STARTED)
                 .deadLine("2024.07.27 11:04")
-                .dashboard(dashboard)
+                .dashboard(personalDashboard)
                 .build();
 
         block3 = Block.builder()
                 .title("title3")
                 .contents("contents3")
-                .progress(Progress.IN_PROGRESS)
+                .progress(Progress.COMPLETED)
                 .deadLine("2024.07.27 11:05")
-                .dashboard(dashboard)
+                .dashboard(personalDashboard)
                 .build();
 
-        memberRepository.save(member);
-        dashboardRepository.save(dashboard);
         blockRepository.save(block1);
         blockRepository.save(block2);
         blockRepository.save(block3);
     }
 
-    @DisplayName("블록을 진행 상태별로 전체 조회합니다.")
+    @DisplayName("개인 대시보드를 전체 조회합니다.")
     @Test
-    void 블록_진행_상태_전체_조회() {
+    void 개인_대시보드_전체_조회() {
         // given
-        Progress progress = Progress.NOT_STARTED;
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboard.getId(), progress, pageable);
+        Page<PersonalDashboard> result = personalDashboardRepository.findForPersonalDashboard(member, pageable);
 
         // then
-        assertThat(blocks.getContent().size()).isEqualTo(2);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("title");
+        assertThat(result.getContent().get(0).getMember()).isEqualTo(member);
     }
 
-    @DisplayName("블록을 논리 삭제 상태별로 전체 조회합니다.")
+    @DisplayName("대시보드의 완료된 블록 비율을 계산합니다.")
     @Test
-    void 블록_삭제_상태_전체_조회() {
-        // given
-        Progress progress = Progress.NOT_STARTED;
-        Pageable pageable = PageRequest.of(0, 10);
-        block1.statusUpdate();
-
+    void 개인_대시보드_완료_블록_비율_계산() {
         // when
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(1L, progress, pageable);
+        double completionPercentage = personalDashboardRepository
+                .calculateCompletionPercentage(personalDashboard.getId());
 
         // then
-        assertThat(blocks.getContent().size()).isEqualTo(1);
+        assertThat(completionPercentage).isEqualTo(66.67, offset(0.01));
     }
 
 }
