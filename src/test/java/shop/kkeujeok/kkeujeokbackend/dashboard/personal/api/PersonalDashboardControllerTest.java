@@ -122,7 +122,8 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("개인 대시보드 제목"),
                                 fieldWithPath("data.description").description("개인 대시보드 설명"),
                                 fieldWithPath("data.isPublic").description("개인 대시보드 공개 범위"),
-                                fieldWithPath("data.category").description("개인 대시보드 카테고리")
+                                fieldWithPath("data.category").description("개인 대시보드 카테고리"),
+                                fieldWithPath("data.blockProgress").description("개인 대시보드의 완료된 블록 진행률")
                         )
                 ))
                 .andExpect(status().isOk());
@@ -171,7 +172,8 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("개인 대시보드 제목"),
                                 fieldWithPath("data.description").description("개인 대시보드 설명"),
                                 fieldWithPath("data.isPublic").description("개인 대시보드 공개 범위"),
-                                fieldWithPath("data.category").description("개인 대시보드 카테고리")
+                                fieldWithPath("data.category").description("개인 대시보드 카테고리"),
+                                fieldWithPath("data.blockProgress").description("개인 대시보드의 완료된 블록 진행률")
                         )
                 ))
                 .andExpect(status().isOk());
@@ -220,6 +222,8 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                         .description("개인 대시보드 공개 범위"),
                                 fieldWithPath("data.personalDashboardListResDto[].category")
                                         .description("개인 대시보드 카테고리"),
+                                fieldWithPath("data.personalDashboardListResDto[].blockProgress")
+                                        .description("개인 대시보드의 완료된 블록 진행률"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
