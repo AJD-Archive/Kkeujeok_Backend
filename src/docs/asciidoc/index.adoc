@@ -8,3 +8,4 @@
 include::block.adoc[]
 include::challenge.adoc[]
 
+include::peronsalDashboard.adoc[]

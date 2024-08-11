@@ -15,6 +15,9 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.block.exception.BlockNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository.DashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
@@ -27,12 +30,15 @@ public class BlockService {
 
     private final MemberRepository memberRepository;
     private final BlockRepository blockRepository;
+    private final DashboardRepository dashboardRepository;
 
     // 블록 생성
     @Transactional
     public BlockInfoResDto save(String email, BlockSaveReqDto blockSaveReqDto) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        Block block = blockRepository.save(blockSaveReqDto.toEntity(member));
+        Dashboard dashboard = dashboardRepository.findById(blockSaveReqDto.dashboardId())
+                .orElseThrow(DashboardNotFoundException::new);
+        Block block = blockRepository.save(blockSaveReqDto.toEntity(member, dashboard));
 
         return BlockInfoResDto.from(block);
     }
@@ -62,9 +68,9 @@ public class BlockService {
     }
 
     // 블록 리스트
-    public BlockListResDto findForBlockByProgress(String email, String progress, Pageable pageable) {
+    public BlockListResDto findForBlockByProgress(String email, Long dashboardId, String progress, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(parseProgress(progress), pageable);
+        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboardId, parseProgress(progress), pageable);
 
         List<BlockInfoResDto> blockInfoResDtoList = blocks.stream()
                 .map(BlockInfoResDto::from)
