@@ -28,9 +28,8 @@ public class BlockController {
     private final BlockService blockService;
 
     @PostMapping("/")
-    public RspTemplate<BlockInfoResDto> save(
-            @CurrentUserEmail String email,
-            @RequestBody BlockSaveReqDto blockSaveReqDto) {
+    public RspTemplate<BlockInfoResDto> save(@CurrentUserEmail String email,
+                                             @RequestBody BlockSaveReqDto blockSaveReqDto) {
         return new RspTemplate<>(HttpStatus.CREATED, "블럭 생성", blockService.save(email, blockSaveReqDto));
     }
 
@@ -50,12 +49,13 @@ public class BlockController {
 
     @GetMapping("")
     public RspTemplate<BlockListResDto> findForBlockByProgress(@CurrentUserEmail String email,
+                                                               @RequestParam(name = "dashboardId") Long dashboardId,
                                                                @RequestParam(name = "progress") String progress,
                                                                @RequestParam(name = "page", defaultValue = "0") int page,
                                                                @RequestParam(name = "size", defaultValue = "10") int size) {
         return new RspTemplate<>(HttpStatus.OK,
                 "블록 상태별 전체 조회",
-                blockService.findForBlockByProgress(email, progress, PageRequest.of(page, size)));
+                blockService.findForBlockByProgress(email, dashboardId, progress, PageRequest.of(page, size)));
     }
 
     @DeleteMapping("/{blockId}")

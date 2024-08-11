@@ -7,3 +7,4 @@
 
 include::block.adoc[]
 
+include::peronsalDashboard.adoc[]
