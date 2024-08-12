@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Repository
@@ -35,7 +36,8 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
 
         List<PersonalDashboard> dashboards = queryFactory
                 .selectFrom(personalDashboard)
-                .where(personalDashboard._super.member.eq(member))
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
