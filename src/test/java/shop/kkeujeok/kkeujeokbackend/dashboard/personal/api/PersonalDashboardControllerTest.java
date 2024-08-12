@@ -270,7 +270,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("DELETE 개인 대시보드를 논리적으로 삭제합니다.")
+    @DisplayName("DELETE 개인 대시보드를 논리적으로 삭제하고 복구합니다.")
     @Test
     void 개인_대시보드_삭제() throws Exception {
         // given
