@@ -89,6 +89,8 @@ public class PersonalDashboardService {
         PersonalDashboard dashboard = personalDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        verifyMemberIsAuthor(dashboard, member);
+
         dashboard.statusUpdate();
     }
 
