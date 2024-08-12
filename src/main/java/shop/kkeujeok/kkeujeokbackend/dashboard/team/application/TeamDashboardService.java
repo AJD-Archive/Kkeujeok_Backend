@@ -50,6 +50,18 @@ public class TeamDashboardService {
         return TeamDashboardInfoResDto.of(member, dashboard);
     }
 
+    // 팀 대시보드 삭제 유무 업데이트 (논리 삭제)
+    @Transactional
+    public void delete(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        verifyMemberIsAuthor(dashboard, member);
+
+        dashboard.statusUpdate();
+    }
+
     private void verifyMemberIsAuthor(TeamDashboard teamDashboard, Member member) {
         if (!member.equals(teamDashboard.getMember())) {
             throw new DashboardAccessDeniedException();

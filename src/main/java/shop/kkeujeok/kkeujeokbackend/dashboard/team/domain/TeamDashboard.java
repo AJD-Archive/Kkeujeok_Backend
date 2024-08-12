@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Entity
@@ -27,6 +28,10 @@ public class TeamDashboard extends Dashboard {
 
     public void update(String updateTitle, String updateDescription) {
         super.update(updateTitle, updateDescription);
+    }
+
+    public void statusUpdate() {
+        super.statusUpdate((super.getStatus() == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE);
     }
 
 }
