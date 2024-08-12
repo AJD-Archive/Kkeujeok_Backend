@@ -25,4 +25,8 @@ public class TeamDashboard extends Dashboard {
         super(title, description, member);
     }
 
+    public void update(String updateTitle, String updateDescription) {
+        super.update(updateTitle, updateDescription);
+    }
+
 }
