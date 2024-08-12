@@ -62,7 +62,7 @@ public class BlockController {
     public RspTemplate<Void> delete(@CurrentUserEmail String email,
                                     @PathVariable(name = "blockId") Long blockId) {
         blockService.delete(email, blockId);
-        return new RspTemplate<>(HttpStatus.OK, "블록 삭제");
+        return new RspTemplate<>(HttpStatus.OK, "블록 삭제, 복구");
     }
 
     @GetMapping("/{blockId}")
