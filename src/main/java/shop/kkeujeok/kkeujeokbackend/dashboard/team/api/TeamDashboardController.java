@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.SearchMemberListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
@@ -80,5 +81,10 @@ public class TeamDashboardController {
         teamDashboardService.leaveTeam(email, dashboardId);
         return new RspTemplate<>(HttpStatus.OK, "팀 탈퇴");
     }
-    
+
+    @GetMapping("/search")
+    public RspTemplate<SearchMemberListResDto> search(@RequestParam(name = "query") String query) {
+        return new RspTemplate<>(HttpStatus.OK, "팀원 초대 리스트", teamDashboardService.searchMembers(query));
+    }
+
 }

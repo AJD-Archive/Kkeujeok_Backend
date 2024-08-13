@@ -10,6 +10,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundExcept
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.SearchMemberListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
@@ -107,6 +108,12 @@ public class TeamDashboardService {
                 .orElseThrow(DashboardNotFoundException::new);
 
         dashboard.removeMember(member);
+    }
+
+    public SearchMemberListResDto searchMembers(String query) {
+        List<Member> searchMembers = teamDashboardRepository.findForMembersByQuery(query);
+
+        return SearchMemberListResDto.from(searchMembers);
     }
 
     private void verifyMemberIsAuthor(TeamDashboard teamDashboard, Member member) {
