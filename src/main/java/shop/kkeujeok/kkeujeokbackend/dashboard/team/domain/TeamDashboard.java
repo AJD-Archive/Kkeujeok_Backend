@@ -34,4 +34,15 @@ public class TeamDashboard extends Dashboard {
         super.statusUpdate((super.getStatus() == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE);
     }
 
+    public void addMember(Member member) {
+        teamDashboardMemberMappings.add(TeamDashboardMemberMapping.builder()
+                .teamDashboard(this)
+                .member(member)
+                .build());
+    }
+
+    public void removeMember(Member member) {
+        teamDashboardMemberMappings.removeIf(mapping -> mapping.getMember().equals(member));
+    }
+
 }

@@ -1,8 +1,10 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response;
 
+import java.util.List;
 import lombok.Builder;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
 @Builder
 public record TeamDashboardInfoResDto(
@@ -11,7 +13,8 @@ public record TeamDashboardInfoResDto(
         Long creatorId,
         String title,
         String description,
-        double blockProgress
+        double blockProgress,
+        List<JoinMemberInfoResDto> joinMembers
 ) {
     public static TeamDashboardInfoResDto of(Member member, TeamDashboard dashboard) {
         return commonBuilder(member, dashboard)
@@ -21,6 +24,11 @@ public record TeamDashboardInfoResDto(
     public static TeamDashboardInfoResDto detailOf(Member member, TeamDashboard dashboard, double blockProgress) {
         return commonBuilder(member, dashboard)
                 .blockProgress(blockProgress)
+                .joinMembers(dashboard.getTeamDashboardMemberMappings().stream()
+                        .map(teamDashboardMemberMapping -> {
+                            return JoinMemberInfoResDto.from(teamDashboardMemberMapping.getMember());
+                        })
+                        .toList())
                 .build();
     }
 
@@ -32,4 +40,26 @@ public record TeamDashboardInfoResDto(
                 .title(dashboard.getTitle())
                 .description(dashboard.getDescription());
     }
+
+    @Builder
+    private record JoinMemberInfoResDto(
+            String picture,
+            String email,
+            String name,
+            String nickName,
+            SocialType socialType,
+            String introduction
+    ) {
+        private static JoinMemberInfoResDto from(Member member) {
+            return JoinMemberInfoResDto.builder()
+                    .picture(member.getPicture())
+                    .email(member.getEmail())
+                    .name(member.getName())
+                    .nickName(member.getNickname())
+                    .socialType(member.getSocialType())
+                    .introduction(member.getIntroduction())
+                    .build();
+        }
+    }
+
 }

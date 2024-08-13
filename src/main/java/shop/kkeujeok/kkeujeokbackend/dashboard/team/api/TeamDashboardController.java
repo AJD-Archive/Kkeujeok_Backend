@@ -38,7 +38,7 @@ public class TeamDashboardController {
 
     @PatchMapping("/{dashboardId}")
     public RspTemplate<TeamDashboardInfoResDto> update(@CurrentUserEmail String email,
-                                                       @PathVariable Long dashboardId,
+                                                       @PathVariable(name = "dashboardId") Long dashboardId,
                                                        @RequestBody @Valid TeamDashboardUpdateReqDto teamDashboardUpdateReqDto) {
         return new RspTemplate<>(HttpStatus.OK,
                 "팀 대시보드 수정",
@@ -62,9 +62,23 @@ public class TeamDashboardController {
 
     @DeleteMapping("/{dashboardId}")
     public RspTemplate<Void> delete(@CurrentUserEmail String email,
-                                    @PathVariable Long dashboardId) {
+                                    @PathVariable(name = "dashboardId") Long dashboardId) {
         teamDashboardService.delete(email, dashboardId);
         return new RspTemplate<>(HttpStatus.OK, "팀 대시보드 삭제, 복구");
     }
 
+    @PostMapping("/{dashboardId}/join")
+    public RspTemplate<Void> joinTeam(@CurrentUserEmail String email,
+                                      @PathVariable(name = "dashboardId") Long dashboardId) {
+        teamDashboardService.joinTeam(email, dashboardId);
+        return new RspTemplate<>(HttpStatus.OK, "팀 가입");
+    }
+
+    @PostMapping("/{dashboardId}/leave")
+    public RspTemplate<Void> leaveTeam(@CurrentUserEmail String email,
+                                       @PathVariable(name = "dashboardId") Long dashboardId) {
+        teamDashboardService.leaveTeam(email, dashboardId);
+        return new RspTemplate<>(HttpStatus.OK, "팀 탈퇴");
+    }
+    
 }

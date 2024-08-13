@@ -57,7 +57,7 @@ public class TeamDashboardService {
 
     // 팀 대시보드 전체 조회
     public TeamDashboardListResDto findForTeamDashboard(String email, Pageable pageable) {
-        Member member = memberRepository.findByEmail("email").orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Page<TeamDashboard> teamDashboards = teamDashboardRepository.findForTeamDashboard(member, pageable);
 
         List<TeamDashboardInfoResDto> teamDashboardInfoResDtoList = teamDashboards.stream()
@@ -89,6 +89,24 @@ public class TeamDashboardService {
         verifyMemberIsAuthor(dashboard, member);
 
         dashboard.statusUpdate();
+    }
+
+    @Transactional
+    public void joinTeam(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        dashboard.addMember(member);
+    }
+
+    @Transactional
+    public void leaveTeam(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        dashboard.removeMember(member);
     }
 
     private void verifyMemberIsAuthor(TeamDashboard teamDashboard, Member member) {
