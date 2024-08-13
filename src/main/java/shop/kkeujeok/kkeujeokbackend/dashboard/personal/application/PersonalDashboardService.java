@@ -68,7 +68,7 @@ public class PersonalDashboardService {
                 .toList();
 
         return PersonalDashboardListResDto
-                .from(personalDashboardInfoResDtoList, PageInfoResDto.from(personalDashboards));
+                .of(personalDashboardInfoResDtoList, PageInfoResDto.from(personalDashboards));
     }
 
     // 개인 대시보드 상세조회

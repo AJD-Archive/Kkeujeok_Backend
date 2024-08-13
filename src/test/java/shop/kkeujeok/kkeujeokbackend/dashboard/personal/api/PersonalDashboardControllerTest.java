@@ -187,7 +187,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
                 List.of(personalDashboard),
                 PageRequest.of(0, 10),
                 1);
-        PersonalDashboardListResDto response = PersonalDashboardListResDto.from(
+        PersonalDashboardListResDto response = PersonalDashboardListResDto.of(
                 Collections.singletonList(PersonalDashboardInfoResDto.of(member, personalDashboard)),
                 PageInfoResDto.from(personalDashboardPage)
         );
