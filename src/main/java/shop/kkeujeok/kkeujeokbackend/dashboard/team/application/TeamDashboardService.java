@@ -1,6 +1,9 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.team.application;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
@@ -8,8 +11,10 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAcces
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.repository.TeamDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -48,6 +53,30 @@ public class TeamDashboardService {
                 teamDashboardUpdateReqDto.description());
 
         return TeamDashboardInfoResDto.of(member, dashboard);
+    }
+
+    // 팀 대시보드 전체 조회
+    public TeamDashboardListResDto findForTeamDashboard(String email, Pageable pageable) {
+        Member member = memberRepository.findByEmail("email").orElseThrow(MemberNotFoundException::new);
+        Page<TeamDashboard> teamDashboards = teamDashboardRepository.findForTeamDashboard(member, pageable);
+
+        List<TeamDashboardInfoResDto> teamDashboardInfoResDtoList = teamDashboards.stream()
+                .map(t -> TeamDashboardInfoResDto.of(member, t))
+                .toList();
+
+        return TeamDashboardListResDto
+                .of(teamDashboardInfoResDtoList, PageInfoResDto.from(teamDashboards));
+    }
+
+    // 팀 대시보드 상세 조회
+    public TeamDashboardInfoResDto findById(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        double blockProgress = teamDashboardRepository.calculateCompletionPercentage(dashboard.getId());
+
+        return TeamDashboardInfoResDto.detailOf(member, dashboard, blockProgress);
     }
 
     // 팀 대시보드 삭제 유무 업데이트 (논리 삭제)

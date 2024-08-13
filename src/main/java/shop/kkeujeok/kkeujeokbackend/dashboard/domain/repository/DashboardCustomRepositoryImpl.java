@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository;
 
 import static shop.kkeujeok.kkeujeokbackend.block.domain.QBlock.block;
 import static shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.QPersonalDashboard.personalDashboard;
+import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboard.teamDashboard;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
@@ -45,6 +47,26 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
         return new PageImpl<>(dashboards, pageable, total);
     }
 
+    @Override
+    public Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(teamDashboard)
+                .where(teamDashboard._super.member.eq(member))
+                .stream()
+                .count();
+
+        List<TeamDashboard> dashboards = queryFactory
+                .selectFrom(teamDashboard)
+                .where(teamDashboard._super.member.eq(member)
+                        .and(teamDashboard._super.status.eq(Status.ACTIVE)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(dashboards, pageable, total);
+    }
+
+    @Override
     public double calculateCompletionPercentage(Long dashboardId) {
         List<Block> blocks = queryFactory
                 .selectFrom(block)

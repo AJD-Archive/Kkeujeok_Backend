@@ -14,12 +14,22 @@ public record TeamDashboardInfoResDto(
         double blockProgress
 ) {
     public static TeamDashboardInfoResDto of(Member member, TeamDashboard dashboard) {
+        return commonBuilder(member, dashboard)
+                .build();
+    }
+
+    public static TeamDashboardInfoResDto detailOf(Member member, TeamDashboard dashboard, double blockProgress) {
+        return commonBuilder(member, dashboard)
+                .blockProgress(blockProgress)
+                .build();
+    }
+
+    public static TeamDashboardInfoResDtoBuilder commonBuilder(Member member, TeamDashboard dashboard) {
         return TeamDashboardInfoResDto.builder()
                 .dashboardId(dashboard.getId())
                 .myId(member.getId())
                 .creatorId(dashboard.getMember().getId())
                 .title(dashboard.getTitle())
-                .description(dashboard.getDescription())
-                .build();
+                .description(dashboard.getDescription());
     }
 }
