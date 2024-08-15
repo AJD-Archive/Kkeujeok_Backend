@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 
 @Builder
 public record ChallengeInfoResDto(
         String title,
         String contents,
+        Cycle cycle,
         List<CycleDetail> cycleDetails,
         LocalDate startDate,
         LocalDate endDate,
@@ -21,6 +23,7 @@ public record ChallengeInfoResDto(
         return ChallengeInfoResDto.builder()
                 .title(challenge.getTitle())
                 .contents(challenge.getContents())
+                .cycle(challenge.getCycle())
                 .cycleDetails(challenge.getCycleDetails())
                 .startDate(challenge.getStartDate())
                 .endDate(challenge.getEndDate())

@@ -39,6 +39,7 @@ public record ChallengeSaveReqDto(
                 .status(Status.ACTIVE)
                 .title(title)
                 .contents(contents)
+                .cycle(cycle)
                 .cycleDetails(cycleDetails)
                 .startDate(startDate)
                 .endDate(endDate)
