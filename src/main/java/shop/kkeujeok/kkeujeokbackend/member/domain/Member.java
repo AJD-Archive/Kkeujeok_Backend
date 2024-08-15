@@ -44,9 +44,17 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Challenge> challenges = new ArrayList<>();
 
+    private String tag;
+
     @Builder
-    private Member(Status status, Role role, String email, String name, String picture, SocialType socialType,
-                   boolean firstLogin, String nickname, String introduction) {
+    private Member(Status status, Role role,
+                   String email, String name,
+                   String picture,
+                   SocialType socialType,
+                   boolean firstLogin,
+                   String nickname,
+                   String introduction,
+                   String tag) {
         this.status = status;
         this.role = role;
         this.email = email;
@@ -56,6 +64,7 @@ public class Member extends BaseEntity {
         this.firstLogin = firstLogin;
         this.nickname = nickname;
         this.introduction = introduction;
+        this.tag = tag;
     }
 
     public void update(String nickname, String introduction) {
@@ -69,5 +78,4 @@ public class Member extends BaseEntity {
         return !this.nickname.equals(updateNickname) ||
                 !this.introduction.equals(updateIntroduction);
     }
-
 }

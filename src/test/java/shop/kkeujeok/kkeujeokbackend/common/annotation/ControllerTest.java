@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.common.annotation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,12 +20,16 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDashboardService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
+import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
         BlockController.class,
         AuthController.class,
-        ChallengeController.class
+        ChallengeController.class,
+        MemberControllerTest.class
 })
 @ExtendWith(RestDocumentationExtension.class)
 @ActiveProfiles("test")
@@ -56,9 +59,15 @@ public abstract class ControllerTest {
     @MockBean
     protected TokenService tokenService;
 
-    @Mock
+    @MockBean
     protected AuthService authService;
 
     @MockBean
     protected ChallengeService challengeService;
+
+    @MockBean
+    protected NicknameService nicknameService;
+
+    @MockBean
+    protected MyPageService myPageService;
 }
