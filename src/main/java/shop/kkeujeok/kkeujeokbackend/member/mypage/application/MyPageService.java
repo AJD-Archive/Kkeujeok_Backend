@@ -51,9 +51,7 @@ public class MyPageService {
         return nickname.replaceAll("\\s+", "");
     }
 
-    // 팀 대시보드 정보 조회
-
-    // 챌린지 정보 조회
+    // 팀 대시보드 / 챌린지 정보 조회
 
     // 알림 조회
 }

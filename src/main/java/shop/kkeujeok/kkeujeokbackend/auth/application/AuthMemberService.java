@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.auth.application;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
@@ -11,17 +12,19 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
+import shop.kkeujeok.kkeujeokbackend.member.tag.application.TagService;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthMemberService {
-    private final MemberRepository memberRepository;
 
-    public AuthMemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
+    private final MemberRepository memberRepository;
+    private final NicknameService nicknameService;
+    private final TagService tagService;
 
     @Transactional
     public MemberLoginResDto saveUserInfo(UserInfo userInfo, SocialType provider) {
@@ -47,7 +50,8 @@ public class AuthMemberService {
     private Member createMember(UserInfo userInfo, SocialType provider) {
         String userPicture = getUserPicture(userInfo.picture());
         String name = unionName(userInfo.name(), userInfo.nickname());
-        String nickname = unionNickname(userInfo.name(), userInfo.nickname());
+        String nickname = nicknameService.getRandomNickname();
+        String tag = tagService.getRandomTag(nickname);
 
         return memberRepository.save(
                 Member.builder()
@@ -60,25 +64,15 @@ public class AuthMemberService {
                         .firstLogin(true)
                         .nickname(nickname)
                         .introduction("자기 소개를 입력해 주세요.")
+                        .tag(tag)
                         .build()
         );
     }
 
     private String unionName(String name, String nickname) {
-        if (name == null && nickname != null) {
-            return nickname;
-        } else if (nickname == null && name != null) {
-            return name;
-        }
-        return name;
+        return nickname != null ? nickname : name;
     }
-
-    private String unionNickname(String name, String nickname) {
-        if (nickname == null) {
-            return name;
-        }
-        return nickname;
-    }
+    
     private String getUserPicture(String picture) {
         return Optional.ofNullable(picture)
                 .map(this::convertToHighRes)
@@ -94,5 +88,4 @@ public class AuthMemberService {
             throw new ExistsMemberEmailException();
         }
     }
-
 }

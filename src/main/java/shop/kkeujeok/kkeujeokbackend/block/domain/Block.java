@@ -32,6 +32,9 @@ public class Block extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Progress progress;
 
+    @Enumerated(value = EnumType.STRING)
+    private Type type;
+
     private String deadLine;
 
     @ManyToOne
@@ -43,12 +46,13 @@ public class Block extends BaseEntity {
     private Dashboard dashboard;
 
     @Builder
-    private Block(String title, String contents, Progress progress, Member member, String deadLine,
+    private Block(String title, String contents, Progress progress, Type type, Member member, String deadLine,
                   Dashboard dashboard) {
         this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
         this.progress = progress;
+        this.type = type;
         this.deadLine = deadLine;
         this.member = member;
         this.dashboard = dashboard;

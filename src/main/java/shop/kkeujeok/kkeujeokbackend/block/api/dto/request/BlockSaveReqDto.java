@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.block.api.dto.request;
 
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
@@ -17,6 +18,7 @@ public record BlockSaveReqDto(
                 .title(title)
                 .contents(contents)
                 .progress(progress)
+                .type(Type.BASIC)
                 .deadLine(deadLine)
                 .member(member)
                 .dashboard(dashboard)
