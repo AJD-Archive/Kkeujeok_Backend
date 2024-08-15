@@ -1,0 +1,14 @@
+== 멤버 API 문서
+
+=== 내 프로필 정보 조회 API
+
+==== 요청
+
+include::{snippets}/member/mypage/http-request.adoc[]
+include::{snippets}/member/mypage/request-headers.adoc[]
+
+==== 응답
+
+include::{snippets}/member/mypage/http-response.adoc[]
+include::{snippets}/member/mypage/response-fields.adoc[]
+

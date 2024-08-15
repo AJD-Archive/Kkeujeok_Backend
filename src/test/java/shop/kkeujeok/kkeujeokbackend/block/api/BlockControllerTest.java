@@ -31,14 +31,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
@@ -49,13 +47,14 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
-@ExtendWith(RestDocumentationExtension.class)
 class BlockControllerTest extends ControllerTest {
 
     private Member member;
@@ -77,9 +76,17 @@ class BlockControllerTest extends ControllerTest {
                 .picture("picture")
                 .build();
 
-        blockSaveReqDto = new BlockSaveReqDto("Title", "Contents", Progress.NOT_STARTED, "2024.08.03 13:23");
+        Dashboard dashboard = PersonalDashboard.builder()
+                .member(member)
+                .title("title")
+                .description("description")
+                .isPublic(false)
+                .category("category")
+                .build();
+
+        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.08.03 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
-        block = blockSaveReqDto.toEntity(member);
+        block = blockSaveReqDto.toEntity(member, dashboard);
 
         blockController = new BlockController(blockService);
 
@@ -113,6 +120,7 @@ class BlockControllerTest extends ControllerTest {
                                 headerWithName("Authorization").description("JWT 토큰")
                         ),
                         requestFields(
+                                fieldWithPath("dashboardId").description("대시보드 아이디"),
                                 fieldWithPath("title").description("블록 제목"),
                                 fieldWithPath("contents").description("블록 내용"),
                                 fieldWithPath("progress").description("블록 진행 상태"),
@@ -121,6 +129,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -161,6 +170,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -200,6 +210,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -272,10 +283,10 @@ class BlockControllerTest extends ControllerTest {
                 Collections.singletonList(BlockInfoResDto.from(block)),
                 PageInfoResDto.from(blockPage));
 
-        given(blockService.findForBlockByProgress(anyString(), anyString(), any())).willReturn(response);
+        given(blockService.findForBlockByProgress(anyString(), anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get(String.format("/api/blocks?progress=%s", progressString))
+        mockMvc.perform(get(String.format("/api/blocks?dashboardId=%d&progress=%s", 1L, progressString))
                         .header("Authorization", "Bearer valid-token")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -283,12 +294,15 @@ class BlockControllerTest extends ControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         queryParameters(
+                                parameterWithName("dashboardId")
+                                        .description("대시보드 아이디"),
                                 parameterWithName("progress")
                                         .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockListResDto[].blockId").description("블록 아이디"),
                                 fieldWithPath("data.blockListResDto[].title").description("블록 제목"),
                                 fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
                                 fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
@@ -325,6 +339,7 @@ class BlockControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
