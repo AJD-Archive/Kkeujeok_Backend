@@ -251,7 +251,7 @@ class BlockControllerTest extends ControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @DisplayName("Delete 블록을 논리적으로 삭제합니다.")
+    @DisplayName("Delete 블록을 논리적으로 삭제하고, 복구합니다.")
     @Test
     void 블록_삭제() throws Exception {
         // given
