@@ -1,20 +1,32 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.application;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
+import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUtil;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -25,6 +37,8 @@ public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
+    private final PersonalDashboardRepository personalDashboardRepository;
+    private final BlockRepository blockRepository;
 
     @Transactional
     public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto) {
@@ -89,6 +103,41 @@ public class ChallengeService {
         verifyMemberIsAuthor(challenge, member);
 
         challenge.updateStatus();
+    }
+
+    @Transactional
+    public BlockInfoResDto addChallengeToPersonalDashboard(String email, Long personalDashboardId, Long challengeId) {
+        Member member = findMemberByEmail(email);
+        Challenge challenge = findChallengeById(challengeId);
+        Dashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        Block block = createBlock(challenge, member, personalDashboard);
+        updateBlockStatusIfNotActive(block, challenge);
+
+        blockRepository.save(block);
+
+        return BlockInfoResDto.from(block);
+    }
+
+    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
+        return Block.builder()
+                .title(challenge.getTitle())
+                .contents(challenge.getContents())
+                .progress(Progress.NOT_STARTED)
+                .type(Type.CHALLENGE)
+                .deadLine(LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
+                .member(member)
+                .dashboard(personalDashboard)
+                .challenge(challenge)
+                .build();
+    }
+
+    private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
+        if (!ChallengeBlockStatusUtil.isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
+            block.updateChallengeStatus(Status.UN_ACTIVE);
+        }
     }
 
     private Member findMemberByEmail(String email) {
