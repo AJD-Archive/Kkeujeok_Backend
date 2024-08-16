@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
+import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
@@ -32,6 +39,9 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
@@ -46,12 +56,22 @@ class ChallengeServiceTest {
     private Challenge challenge;
     private ChallengeSaveReqDto updateDto;
     private ChallengeSaveReqDto challengeSaveReqDto;
+    private PersonalDashboard personalDashboard;
+    private Block block;
+    private PersonalDashboardSaveReqDto personalDashboardSaveReqDto;
+
 
     @Mock
     private ChallengeRepository challengeRepository;
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private PersonalDashboardRepository personalDashboardRepository;
+
+    @Mock
+    private BlockRepository blockRepository;
 
     @InjectMocks
     private ChallengeService challengeService;
@@ -85,6 +105,7 @@ class ChallengeServiceTest {
         challenge = Challenge.builder()
                 .title(challengeSaveReqDto.title())
                 .contents(challengeSaveReqDto.contents())
+                .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
                 .startDate(challengeSaveReqDto.startDate())
                 .endDate(challengeSaveReqDto.endDate())
@@ -101,6 +122,31 @@ class ChallengeServiceTest {
                 LocalDate.now().plusDays(30),
                 "업데이트 이미지"
         );
+
+        block = Block.builder()
+                .title(challenge.getTitle())
+                .contents(challenge.getContents())
+                .progress(Progress.NOT_STARTED)
+                .type(Type.CHALLENGE)
+                .deadLine(LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
+                .member(member)
+                .dashboard(personalDashboard)
+                .challenge(challenge)
+                .build();
+
+        personalDashboardSaveReqDto = new PersonalDashboardSaveReqDto("개인 대시보드",
+                "테스트용 대시보드",
+                false,
+                "category");
+
+        personalDashboard = PersonalDashboard.builder()
+                .title(personalDashboardSaveReqDto.title())
+                .description(personalDashboardSaveReqDto.description())
+                .isPublic(personalDashboardSaveReqDto.isPublic())
+                .category(personalDashboardSaveReqDto.category())
+                .member(member)
+                .build();
     }
 
     @Test
@@ -213,7 +259,8 @@ class ChallengeServiceTest {
         // given
         Pageable pageable = PageRequest.of(0, 10);
         Page<Challenge> page = new PageImpl<>(List.of(challenge), PageRequest.of(0, 10), 1);
-        when(challengeRepository.findAllChallenges(any(Pageable.class))).thenReturn(page);
+        when(challengeRepository.findAllChallenges(any(Pageable.class)))
+                .thenReturn(page);
 
         // when
         ChallengeListResDto result = challengeService.findAllChallenges(pageable);
@@ -294,4 +341,31 @@ class ChallengeServiceTest {
         assertThatThrownBy(() -> challengeService.delete("other@example.com", challengeId))
                 .isInstanceOf(ChallengeAccessDeniedException.class);
     }
+
+    @Test
+    @DisplayName("챌린지를 개인 대시보드에 추가할 수 있다")
+    void 챌린지를_개인_대시보드에_추가할_수_있다() {
+        // given
+        Long personalDashboardId = 1L;
+        Long challengeId = 1L;
+
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
+        when(challengeRepository.findById(anyLong())).thenReturn(Optional.of(challenge));
+        when(personalDashboardRepository.findById(anyLong())).thenReturn(Optional.of(personalDashboard));
+        when(blockRepository.save(any(Block.class))).thenReturn(block);
+
+        // when
+        BlockInfoResDto result = challengeService.addChallengeToPersonalDashboard(member.getEmail(),
+                personalDashboardId, challengeId);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.title()).isEqualTo("1일 1커밋");
+            assertThat(result.contents()).isEqualTo("1일 1커밋하기");
+            assertThat(result.progress()).isEqualTo(Progress.NOT_STARTED);
+            assertThat(result.deadLine()).isEqualTo(
+                    LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")));
+        });
+    }
 }
+
