@@ -71,3 +71,14 @@ include::{snippets}/challenge/delete/path-parameters.adoc[]
 === 응답
 
 include::{snippets}/challenge/delete/http-response.adoc[]
+
+== 챌린지 참여 API
+
+include::{snippets}/challenge/addChallengeToPersonalDashboard/http-request.adoc[]
+include::{snippets}/challenge/addChallengeToPersonalDashboard/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/addChallengeToPersonalDashboard/http-response.adoc[]
+
+
