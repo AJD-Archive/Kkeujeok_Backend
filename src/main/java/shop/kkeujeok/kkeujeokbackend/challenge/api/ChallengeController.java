@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
@@ -70,5 +71,14 @@ public class ChallengeController {
                                     @PathVariable(name = "challengeId") Long challengeId) {
         challengeService.delete(email, challengeId);
         return new RspTemplate<>(HttpStatus.OK, "챌린지 삭제 성공");
+    }
+
+    @PostMapping("/{challengeId}/{dashboardId}")
+    public RspTemplate<BlockInfoResDto> addChallengeToPersonalDashboard(@CurrentUserEmail String email,
+                                                                        @PathVariable(name = "challengeId") Long challengeId,
+                                                                        @PathVariable(name = "dashboardId") Long personalDashboardId) {
+        return new RspTemplate<>(HttpStatus.OK,
+                "챌린지 참여 성공",
+                challengeService.addChallengeToPersonalDashboard(email, challengeId, personalDashboardId));
     }
 }
