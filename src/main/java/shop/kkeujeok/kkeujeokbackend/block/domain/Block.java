@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
@@ -45,9 +46,13 @@ public class Block extends BaseEntity {
     @JoinColumn(name = "dashboard_id")
     private Dashboard dashboard;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_id")
+    private Challenge challenge;
+
     @Builder
     private Block(String title, String contents, Progress progress, Type type, Member member, String deadLine,
-                  Dashboard dashboard) {
+                  Dashboard dashboard, Challenge challenge) {
         this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
@@ -56,6 +61,7 @@ public class Block extends BaseEntity {
         this.deadLine = deadLine;
         this.member = member;
         this.dashboard = dashboard;
+        this.challenge = challenge;
     }
 
     public void update(String updateTitle, String updateContents, String updateDeadLine) {
@@ -80,4 +86,10 @@ public class Block extends BaseEntity {
         this.status = (this.status == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE;
     }
 
+    public void updateChallengeStatus(Status status) {
+        if (this.status == status) {
+            return;
+        }
+        this.status = status;
+    }
 }
