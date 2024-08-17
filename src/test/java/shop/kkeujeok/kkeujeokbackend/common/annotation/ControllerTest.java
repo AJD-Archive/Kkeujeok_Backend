@@ -19,6 +19,7 @@ import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDashboardService;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.application.DocumentService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.application.FileService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
@@ -78,4 +79,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected FileService fileService;
+
+    @MockBean
+    protected DocumentService documentService;
 }

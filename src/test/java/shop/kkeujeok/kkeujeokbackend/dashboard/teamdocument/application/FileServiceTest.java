@@ -26,7 +26,6 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.repository.Do
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.repository.FileRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception.DocumentNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception.FileNotFoundException;
-import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 
 import java.util.List;
 import java.util.Optional;
