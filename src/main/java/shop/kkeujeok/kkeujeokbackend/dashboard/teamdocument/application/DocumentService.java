@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.repository.TeamDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception.DocumentNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentInfoResDto;
@@ -43,10 +44,10 @@ public class DocumentService {
 
     // 팀 문서 수정
     @Transactional
-    public DocumentInfoResDto update(Long documentId, DocumentInfoReqDto documentInfoReqDto) {
+    public DocumentInfoResDto update(Long documentId, DocumentUpdateReqDto documentUpdateReqDto) {
         Document document = documentRepository.findById(documentId).orElseThrow(DocumentNotFoundException::new);
 
-        document.update(documentInfoReqDto.title());
+        document.update(documentUpdateReqDto.title());
 
         return DocumentInfoResDto.from(document);
     }

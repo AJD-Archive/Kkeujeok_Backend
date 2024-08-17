@@ -33,6 +33,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentInfoReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.Document;
@@ -113,10 +114,10 @@ class DocumentControllerTest extends ControllerTest {
     void PATCH_팀_문서_수정_컨트롤러_로직_확인() throws Exception {
         // given
         Long documentId = 1L;
-        DocumentInfoReqDto request = new DocumentInfoReqDto(1L, "Updated Document Title");
+        DocumentUpdateReqDto request = new DocumentUpdateReqDto("Updated Document Title");
         DocumentInfoResDto response = new DocumentInfoResDto(documentId, "Updated Document Title");
 
-        given(documentService.update(anyLong(), any(DocumentInfoReqDto.class))).willReturn(response);
+        given(documentService.update(anyLong(), any(DocumentUpdateReqDto.class))).willReturn(response);
 
         // when & then
         mockMvc.perform(patch("/api/documents/{documentId}", documentId)
@@ -132,7 +133,6 @@ class DocumentControllerTest extends ControllerTest {
                                 parameterWithName("documentId").description("문서 ID")
                         ),
                         requestFields(
-                                fieldWithPath("teamDashboardId").description("팀 대시보드 ID"),
                                 fieldWithPath("title").description("문서 제목")
                         ),
                         responseFields(

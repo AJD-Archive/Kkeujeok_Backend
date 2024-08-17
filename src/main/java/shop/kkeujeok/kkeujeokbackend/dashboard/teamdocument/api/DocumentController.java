@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentInfoReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentListResDto;
@@ -26,8 +27,8 @@ public class DocumentController {
 
     @PatchMapping("/{documentId}")
     public RspTemplate<DocumentInfoResDto> update(@PathVariable(name = "documentId") Long documentId,
-                                                  @RequestBody DocumentInfoReqDto documentInfoReqDto) {
-        return new RspTemplate<>(HttpStatus.OK, "팀 문서 수회", documentService.update(documentId, documentInfoReqDto));
+                                                  @RequestBody DocumentUpdateReqDto documentUpdateReqDto) {
+        return new RspTemplate<>(HttpStatus.OK, "팀 문서 수회", documentService.update(documentId, documentUpdateReqDto));
     }
 
     // 팀 문서 조회

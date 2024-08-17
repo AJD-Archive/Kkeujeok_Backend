@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.repository.TeamDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentInfoReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.request.DocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.api.dto.response.DocumentListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.Document;
@@ -102,15 +103,15 @@ class DocumentServiceTest {
     @Test
     void 문서를_성공적으로_수정합니다() {
         // given
-        DocumentInfoReqDto documentInfoReqDto = new DocumentInfoReqDto(1L, "Updated Document Title");
+        DocumentUpdateReqDto documentUpdateReqDto = new DocumentUpdateReqDto("Updated Document Title");
 
         when(documentRepository.findById(anyLong())).thenReturn(Optional.of(document));
 
         // when
-        DocumentInfoResDto result = documentService.update(1L, documentInfoReqDto);
+        DocumentInfoResDto result = documentService.update(1L, documentUpdateReqDto);
 
         // then
-        assertThat(result.title()).isEqualTo(documentInfoReqDto.title());
+        assertThat(result.title()).isEqualTo(documentUpdateReqDto.title());
 
         verify(documentRepository).findById(1L);
     }
@@ -119,12 +120,12 @@ class DocumentServiceTest {
     @Test
     void 존재하지_않는_문서를_수정_시_예외가_발생합니다() {
         // given
-        DocumentInfoReqDto documentInfoReqDto = new DocumentInfoReqDto(1L, "Updated Document Title");
+        DocumentUpdateReqDto documentUpdateReqDto = new DocumentUpdateReqDto("Updated Document Title");
 
         when(documentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> documentService.update(1L, documentInfoReqDto))
+        assertThatThrownBy(() -> documentService.update(1L, documentUpdateReqDto))
                 .isInstanceOf(DocumentNotFoundException.class);
 
         verify(documentRepository).findById(1L);
