@@ -68,7 +68,7 @@ public class PersonalDashboardService {
                 .toList();
 
         return PersonalDashboardListResDto
-                .from(personalDashboardInfoResDtoList, PageInfoResDto.from(personalDashboards));
+                .of(personalDashboardInfoResDtoList, PageInfoResDto.from(personalDashboards));
     }
 
     // 개인 대시보드 상세조회
@@ -88,6 +88,8 @@ public class PersonalDashboardService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         PersonalDashboard dashboard = personalDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
+
+        verifyMemberIsAuthor(dashboard, member);
 
         dashboard.statusUpdate();
     }

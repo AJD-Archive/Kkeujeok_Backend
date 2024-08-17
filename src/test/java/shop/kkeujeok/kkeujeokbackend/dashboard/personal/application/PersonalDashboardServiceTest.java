@@ -225,7 +225,7 @@ class PersonalDashboardServiceTest {
 
         // then
         assertAll(() -> {
-            assertThat(personalDashboard.getStatus()).isEqualTo(Status.ACTIVE);
+            assertThat(deletePersonalDashboard.getStatus()).isEqualTo(Status.ACTIVE);
         });
     }
 
