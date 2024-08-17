@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -62,7 +63,7 @@ class TeamDashboardServiceTest {
                 .picture("picture")
                 .build();
 
-        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
+        lenient().when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
 
         teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description");
         teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription");
