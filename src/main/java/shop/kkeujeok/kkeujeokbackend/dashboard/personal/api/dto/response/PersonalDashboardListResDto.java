@@ -9,8 +9,8 @@ public record PersonalDashboardListResDto(
         List<PersonalDashboardInfoResDto> personalDashboardListResDto,
         PageInfoResDto pageInfoResDto
 ) {
-    public static PersonalDashboardListResDto from(List<PersonalDashboardInfoResDto> personalDashboards,
-                                                   PageInfoResDto pageInfoResDto) {
+    public static PersonalDashboardListResDto of(List<PersonalDashboardInfoResDto> personalDashboards,
+                                                 PageInfoResDto pageInfoResDto) {
         return PersonalDashboardListResDto.builder()
                 .personalDashboardListResDto(personalDashboards)
                 .pageInfoResDto(pageInfoResDto)

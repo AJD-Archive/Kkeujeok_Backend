@@ -133,6 +133,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
+                                fieldWithPath("data.type").description("블록 타입"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
@@ -174,6 +175,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
+                                fieldWithPath("data.type").description("블록 타입"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
@@ -213,8 +215,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
-                                fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
+                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
                         )
@@ -306,6 +309,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockListResDto[].title").description("블록 제목"),
                                 fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
                                 fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
+                                fieldWithPath("data.blockListResDto[].type").description("블록 타입"),
                                 fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
                                 fieldWithPath("data.blockListResDto[].dDay").description("마감 기한"),
@@ -343,6 +347,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
+                                fieldWithPath("data.type").description("블록 타입"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
