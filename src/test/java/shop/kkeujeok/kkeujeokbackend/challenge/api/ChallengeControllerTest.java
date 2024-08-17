@@ -42,6 +42,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
@@ -147,12 +148,9 @@ class ChallengeControllerTest extends ControllerTest {
 
         // when & then
         mockMvc.perform(
-                        patch("/api/challenges/{challengeId}", 1L)
-                                .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(challengeSaveReqDto)))
-                .andDo(print())
+                        patch("/api/challenges/{challengeId}", 1L).header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
+                                .accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(challengeSaveReqDto))).andDo(print())
                 .andDo(document("challenge/update", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
                         pathParameters(parameterWithName("challengeId").description("챌린지 ID")),
@@ -189,14 +187,9 @@ class ChallengeControllerTest extends ControllerTest {
 
         // when & then
         mockMvc.perform(
-                        get("/api/challenges")
-                                .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andDo(document("challenge/findAll",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        get("/api/challenges").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print()).andDo(document("challenge/findAll", preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()), responseFields(fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
                                 fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
@@ -206,8 +199,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
                                 fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
                                 fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description(
-                                        "챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description("챌린지 작성자 프로필 이미지"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
@@ -228,11 +220,8 @@ class ChallengeControllerTest extends ControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/challenges/search?keyword=%s", challengeSearchReqDto.keyWord()).accept(
-                        MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andDo(document("challenge/search",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
+                        MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andDo(print())
+                .andDo(document("challenge/search", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         responseFields(fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
@@ -301,41 +290,31 @@ class ChallengeControllerTest extends ControllerTest {
     void 챌린지를_개인_대시보드에_추가_성공_시_상태코드_200_반환() throws Exception {
         // given
         BlockInfoResDto blockInfoResDto = new BlockInfoResDto(1L, "1일 1커밋", "1일 1커밋하기", Progress.NOT_STARTED,
-                "2024.09.31 23:59", "동동", 0);
+                Type.CHALLENGE, "2024.09.31 23:59", "동동", 0);
 
         given(challengeService.addChallengeToPersonalDashboard(anyString(), anyLong(), anyLong())).willReturn(
                 blockInfoResDto);
 
         // when & then
-        mockMvc.perform(post("/api/challenges/{challengeId}/{dashboardId}", 1L, 1L)
-                        .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/challenges/{challengeId}/{dashboardId}", 1L, 1L).header(AUTHORIZATION_HEADER_NAME,
+                                AUTHORIZATION_HEADER_VALUE).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(blockInfoResDto)))
 
                 .andDo(print())
-                .andDo(document("challenge/addChallengeToPersonalDashboard",
-                        preprocessRequest(prettyPrint()),
+                .andDo(document("challenge/addChallengeToPersonalDashboard", preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        requestHeaders(
-                                headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")
-                        ),
-                        pathParameters(
-                                parameterWithName("challengeId").description("챌린지 ID"),
-                                parameterWithName("dashboardId").description("대시보드 ID")
-                        ),
-                        responseFields(
-                                fieldWithPath("statusCode").description("상태 코드"),
+                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
+                        pathParameters(parameterWithName("challengeId").description("챌린지 ID"),
+                                parameterWithName("dashboardId").description("대시보드 ID")),
+                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.blockId").description("블록 ID"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행도"),
+                                fieldWithPath("data.type").description("블록 타입"),
                                 fieldWithPath("data.deadLine").description("블록 마감기한"),
                                 fieldWithPath("data.nickname").description("블록 작성자"),
-                                fieldWithPath("data.dDay").description("블록 디데이")
-                        )
-                ))
-                .andExpect(status().isOk());
+                                fieldWithPath("data.dDay").description("블록 디데이")))).andExpect(status().isOk());
     }
 }
