@@ -187,7 +187,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
                 List.of(personalDashboard),
                 PageRequest.of(0, 10),
                 1);
-        PersonalDashboardListResDto response = PersonalDashboardListResDto.from(
+        PersonalDashboardListResDto response = PersonalDashboardListResDto.of(
                 Collections.singletonList(PersonalDashboardInfoResDto.of(member, personalDashboard)),
                 PageInfoResDto.from(personalDashboardPage)
         );
@@ -270,7 +270,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("DELETE 개인 대시보드를 논리적으로 삭제합니다.")
+    @DisplayName("DELETE 개인 대시보드를 논리적으로 삭제하고 복구합니다.")
     @Test
     void 개인_대시보드_삭제() throws Exception {
         // given
