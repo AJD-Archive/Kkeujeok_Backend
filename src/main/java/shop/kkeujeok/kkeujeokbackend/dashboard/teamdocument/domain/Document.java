@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 
@@ -23,14 +24,18 @@ public class Document extends BaseEntity {
 
     // 팀 대시보드 연관관계
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teamDashboard_id")
+    private TeamDashboard teamDashboard;
+
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
     private List<File> files = new ArrayList<>();
 
     @Builder
-    private Document(String title) {
+    private Document(String title, TeamDashboard teamDashboard) {
         this.status = Status.ACTIVE;
         this.title = title;
-        // 팀 대시보드 설정
+        this.teamDashboard = teamDashboard;
     }
 
     public void update(String updateTitle) {

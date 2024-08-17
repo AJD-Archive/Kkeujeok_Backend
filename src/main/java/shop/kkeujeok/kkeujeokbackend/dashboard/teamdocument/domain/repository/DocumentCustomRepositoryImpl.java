@@ -24,16 +24,16 @@ public class DocumentCustomRepositoryImpl implements DocumentCustomRepository {
     }
 
     @Override
-    public Page<Document> findByDocumentWithTeamDashboard(Long documentId, Pageable pageable) {
+    public Page<Document> findByDocumentWithTeamDashboard(Long teamDashboardId, Pageable pageable) {
         long total = queryFactory
                 .selectFrom(document)
-                .where(document.id.eq(documentId)
+                .where(document.teamDashboard.id.eq(teamDashboardId) // 수정된 부분
                         .and(document.status.eq(Status.ACTIVE)))
                 .fetchCount();
 
         List<Document> documents = queryFactory
                 .selectFrom(document)
-                .where(document.id.eq(documentId)
+                .where(document.teamDashboard.id.eq(teamDashboardId) // 수정된 부분
                         .and(document.status.eq(Status.ACTIVE)))
                 .orderBy(document.id.desc())
                 .offset(pageable.getOffset())
@@ -42,4 +42,5 @@ public class DocumentCustomRepositoryImpl implements DocumentCustomRepository {
 
         return new PageImpl<>(documents, pageable, total);
     }
+
 }
