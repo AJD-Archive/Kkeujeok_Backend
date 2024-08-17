@@ -22,8 +22,6 @@ public class Document extends BaseEntity {
 
     private String title;
 
-    // 팀 대시보드 연관관계
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teamDashboard_id")
     private TeamDashboard teamDashboard;
