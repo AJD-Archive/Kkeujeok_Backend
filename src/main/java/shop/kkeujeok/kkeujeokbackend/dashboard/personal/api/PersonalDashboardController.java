@@ -64,7 +64,7 @@ public class PersonalDashboardController {
     public RspTemplate<Void> delete(@CurrentUserEmail String email,
                                     @PathVariable(name = "dashboardId") Long dashboardId) {
         personalDashboardService.delete(email, dashboardId);
-        return new RspTemplate<>(HttpStatus.OK, "개인 대시보드 삭제");
+        return new RspTemplate<>(HttpStatus.OK, "개인 대시보드 삭제, 복구");
     }
 
 }
