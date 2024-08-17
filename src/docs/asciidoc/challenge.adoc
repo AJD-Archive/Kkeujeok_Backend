@@ -1,0 +1,84 @@
+= 챌린지 API 문서
+
+== 챌린지 생성 API
+
+=== 요청
+
+include::{snippets}/challenge/save/http-request.adoc[]
+include::{snippets}/challenge/save/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/save/http-response.adoc[]
+include::{snippets}/challenge/save/response-fields.adoc[]
+
+== 챌린지 수정 API
+
+=== 요청
+
+include::{snippets}/challenge/update/http-request.adoc[]
+include::{snippets}/challenge/update/path-parameters.adoc[]
+include::{snippets}/challenge/update/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/update/http-response.adoc[]
+include::{snippets}/challenge/update/response-fields.adoc[]
+
+== 챌린지 전체 조회 API
+
+=== 요청
+
+include::{snippets}/challenge/findAll/http-request.adoc[]
+include::{snippets}/challenge/findAll/response-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/findAll/http-response.adoc[]
+include::{snippets}/challenge/findAll/response-fields.adoc[]
+
+== 챌린지 검색 API
+
+=== 요청
+
+include::{snippets}/challenge/search/http-request.adoc[]
+include::{snippets}/challenge/search/response-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/search/http-response.adoc[]
+include::{snippets}/challenge/search/response-fields.adoc[]
+
+== 챌린지 상세 조회 API
+
+=== 요청
+
+include::{snippets}/challenge/findById/http-request.adoc[]
+include::{snippets}/challenge/findById/path-parameters.adoc
+
+=== 응답
+
+include::{snippets}/challenge/findById/http-response.adoc[]
+include::{snippets}/challenge/findById/response-fields.adoc[]
+
+== 챌린지 삭제 API
+
+=== 요청
+
+include::{snippets}/challenge/delete/http-request.adoc[]
+include::{snippets}/challenge/delete/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/delete/http-response.adoc[]
+
+== 챌린지 참여 API
+
+include::{snippets}/challenge/addChallengeToPersonalDashboard/http-request.adoc[]
+include::{snippets}/challenge/addChallengeToPersonalDashboard/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/addChallengeToPersonalDashboard/http-response.adoc[]
+
+
