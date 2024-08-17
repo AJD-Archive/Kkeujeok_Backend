@@ -8,15 +8,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.challenge.converter.CycleDetailsConverter;
-import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -33,6 +30,8 @@ public class Challenge extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String contents;
+
+    private Cycle cycle;
 
     @Convert(converter = CycleDetailsConverter.class)
     @Column(name = "cycle_details")
@@ -55,6 +54,7 @@ public class Challenge extends BaseEntity {
     private Challenge(Status status,
                       String title,
                       String contents,
+                      Cycle cycle,
                       List<CycleDetail> cycleDetails,
                       LocalDate startDate,
                       LocalDate endDate,
@@ -63,6 +63,7 @@ public class Challenge extends BaseEntity {
         this.status = status;
         this.title = title;
         this.contents = contents;
+        this.cycle = cycle;
         this.cycleDetails = cycleDetails;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -70,25 +71,30 @@ public class Challenge extends BaseEntity {
         this.member = member;
     }
 
-    public void validateCycleDetails(Cycle cycle) {
-        Set<CycleDetail> seenDetails = new HashSet<>();
-        for (CycleDetail cycleDetail : cycleDetails) {
-            validateCycleDetailUniqueness(seenDetails, cycleDetail);
-            validateCycleDetailMatch(cycleDetail, cycle);
+    public void update(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
+                       LocalDate updateStartDate, LocalDate updateEndDate, String updateRepresentImage) {
+        if (hasChanges(updateTitle, updateContents, updateCycleDetails, updateStartDate, updateEndDate,
+                updateRepresentImage)) {
+            this.title = updateTitle;
+            this.contents = updateContents;
+            this.cycleDetails = updateCycleDetails;
+            this.startDate = updateStartDate;
+            this.endDate = updateEndDate;
+            this.representImage = updateRepresentImage;
         }
     }
 
-    private void validateCycleDetailUniqueness(Set<CycleDetail> seenDetails, CycleDetail cycleDetail) {
-        if (!seenDetails.add(cycleDetail)) {
-            throw new InvalidCycleException("중복된 주기 세부 항목이 발견되었습니다: "
-                    + cycleDetail.getDescription() + cycleDetail.getCycle().name());
-        }
+    private boolean hasChanges(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
+                               LocalDate updateStartDate, LocalDate updateEndDate, String updateRepresentImage) {
+        return !this.title.equals(updateTitle) ||
+                !this.contents.equals(updateContents) ||
+                !this.cycleDetails.equals(updateCycleDetails) ||
+                !this.startDate.equals(updateStartDate) ||
+                !this.endDate.equals(updateEndDate) ||
+                !this.representImage.equals(updateRepresentImage);
     }
 
-    private void validateCycleDetailMatch(CycleDetail cycleDetail, Cycle cycle) {
-        if (cycleDetail.getCycle() != cycle) {
-            throw new InvalidCycleException("주기와 일치하지 않는 세부 항목이 있습니다: "
-                    + cycleDetail.getDescription() + cycleDetail.getCycle().name());
-        }
+    public void updateStatus() {
+        this.status = (this.status == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE;
     }
 }

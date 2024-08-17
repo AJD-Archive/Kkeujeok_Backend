@@ -6,5 +6,6 @@
 :toclevels: 3
 
 include::block.adoc[]
+include::challenge.adoc[]
 
 include::peronsalDashboard.adoc[]
