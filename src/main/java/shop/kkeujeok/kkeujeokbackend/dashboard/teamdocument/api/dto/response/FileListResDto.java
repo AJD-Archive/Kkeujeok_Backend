@@ -10,7 +10,7 @@ public record FileListResDto(
         List<FileInfoResDto> fileInfoResDto,
         PageInfoResDto pageInfoResDto
 ) {
-    public static FileListResDto from(List<FileInfoResDto> fileInfoResDto, PageInfoResDto pageInfoResDto) {
+    public static FileListResDto of(List<FileInfoResDto> fileInfoResDto, PageInfoResDto pageInfoResDto) {
         return FileListResDto.builder()
                 .fileInfoResDto(fileInfoResDto)
                 .pageInfoResDto(pageInfoResDto)

@@ -16,7 +16,6 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception.DocumentNo
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception.FileNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 
-import java.security.PublicKey;
 import java.util.List;
 
 @Service
@@ -57,7 +56,7 @@ public class FileService {
                 .map(FileInfoResDto::from)
                 .toList();
 
-        return FileListResDto.from(fileInfoResDtoList, PageInfoResDto.from(files));
+        return FileListResDto.of(fileInfoResDtoList, PageInfoResDto.from(files));
     }
 
     // 팀 파일 상세보기

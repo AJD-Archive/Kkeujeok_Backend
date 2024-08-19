@@ -16,9 +16,6 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.Document;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.repository.DocumentRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception.TeamDashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
-import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
-import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 
 import java.util.List;
 
@@ -60,7 +57,7 @@ public class DocumentService {
                 .map(DocumentInfoResDto::from)
                 .toList();
 
-        return DocumentListResDto.from(documentInfoResDtoList, PageInfoResDto.from(documents));
+        return DocumentListResDto.of(documentInfoResDtoList, PageInfoResDto.from(documents));
     }
 
     // 팀 문서 삭제

@@ -9,6 +9,6 @@ public class TeamDashboardNotFoundException extends NotFoundGroupException {
     }
 
     public TeamDashboardNotFoundException() {
-        this("존재하지 않는 팀 문서 입니다.");
+        this("존재하지 않는 팀 대시보드 입니다.");
     }
 }

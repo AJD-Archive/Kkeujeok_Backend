@@ -10,7 +10,7 @@ public record DocumentListResDto(
         List<DocumentInfoResDto> documentInfoResDtos,
         PageInfoResDto pageInfoResDto
 ) {
-    public static DocumentListResDto from(List<DocumentInfoResDto> documentInfoResDtos, PageInfoResDto pageInfoResDto) {
+    public static DocumentListResDto of(List<DocumentInfoResDto> documentInfoResDtos, PageInfoResDto pageInfoResDto) {
         return DocumentListResDto.builder()
                 .documentInfoResDtos(documentInfoResDtos)
                 .pageInfoResDto(pageInfoResDto)
