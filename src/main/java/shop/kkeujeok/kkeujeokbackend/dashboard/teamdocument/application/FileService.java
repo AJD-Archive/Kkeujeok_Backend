@@ -60,7 +60,6 @@ public class FileService {
     }
 
     // 팀 파일 상세보기
-
     public FileInfoResDto findById(Long fileId) {
         File file = fileRepository.findById(fileId).orElseThrow(FileNotFoundException::new);
 
