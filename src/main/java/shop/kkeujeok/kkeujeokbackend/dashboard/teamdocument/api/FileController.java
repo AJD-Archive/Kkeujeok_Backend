@@ -20,7 +20,8 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("")
-    public RspTemplate<FileInfoResDto> save(@CurrentUserEmail String email, @RequestBody FileInfoReqDto fileInfoReqDto) {
+    public RspTemplate<FileInfoResDto> save(@CurrentUserEmail String email,
+                                            @RequestBody FileInfoReqDto fileInfoReqDto) {
         return new RspTemplate<>(HttpStatus.OK, "팀 파일 등록", fileService.save(email, fileInfoReqDto));
     }
 
