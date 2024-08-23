@@ -290,7 +290,7 @@ class ChallengeControllerTest extends ControllerTest {
     void 챌린지를_개인_대시보드에_추가_성공_시_상태코드_200_반환() throws Exception {
         // given
         BlockInfoResDto blockInfoResDto = new BlockInfoResDto(1L, "1일 1커밋", "1일 1커밋하기", Progress.NOT_STARTED,
-                Type.CHALLENGE, "2024.09.31 23:59", "동동", 0);
+                Type.CHALLENGE, "2024.09.31 23:59", "2024.09.31 23:59", "동동", 0);
 
         given(challengeService.addChallengeToPersonalDashboard(anyString(), anyLong(), anyLong())).willReturn(
                 blockInfoResDto);
@@ -313,6 +313,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행도"),
                                 fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.startDate").description("블록 시작기한"),
                                 fieldWithPath("data.deadLine").description("블록 마감기한"),
                                 fieldWithPath("data.nickname").description("블록 작성자"),
                                 fieldWithPath("data.dDay").description("블록 디데이")))).andExpect(status().isOk());

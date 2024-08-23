@@ -36,6 +36,8 @@ public class Block extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Type type;
 
+    private String startDate;
+
     private String deadLine;
 
     @ManyToOne
@@ -51,30 +53,35 @@ public class Block extends BaseEntity {
     private Challenge challenge;
 
     @Builder
-    private Block(String title, String contents, Progress progress, Type type, Member member, String deadLine,
+    private Block(String title, String contents, Progress progress, Type type, Member member, String startDate,
+                  String deadLine,
                   Dashboard dashboard, Challenge challenge) {
         this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
         this.progress = progress;
         this.type = type;
+        this.startDate = startDate;
         this.deadLine = deadLine;
         this.member = member;
         this.dashboard = dashboard;
         this.challenge = challenge;
     }
 
-    public void update(String updateTitle, String updateContents, String updateDeadLine) {
-        if (isUpdateRequired(updateTitle, updateContents, updateDeadLine)) {
+    public void update(String updateTitle, String updateContents, String updateStartDate, String updateDeadLine) {
+        if (isUpdateRequired(updateTitle, updateContents, updateStartDate, updateDeadLine)) {
             this.title = updateTitle;
             this.contents = updateContents;
+            this.startDate = updateStartDate;
             this.deadLine = updateDeadLine;
         }
     }
 
-    private boolean isUpdateRequired(String updateTitle, String updateContents, String updateDeadLine) {
+    private boolean isUpdateRequired(String updateTitle, String updateContents, String updateStartDate,
+                                     String updateDeadLine) {
         return !this.title.equals(updateTitle) ||
                 !this.contents.equals(updateContents) ||
+                !this.startDate.equals(updateStartDate) ||
                 !this.deadLine.equals(updateDeadLine);
     }
 
