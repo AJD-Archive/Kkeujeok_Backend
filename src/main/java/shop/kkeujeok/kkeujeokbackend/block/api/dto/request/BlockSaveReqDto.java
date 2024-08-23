@@ -11,6 +11,7 @@ public record BlockSaveReqDto(
         String title,
         String contents,
         Progress progress,
+        String startDate,
         String deadLine
 ) {
     public Block toEntity(Member member, Dashboard dashboard) {
@@ -19,6 +20,7 @@ public record BlockSaveReqDto(
                 .contents(contents)
                 .progress(progress)
                 .type(Type.BASIC)
+                .startDate(startDate)
                 .deadLine(deadLine)
                 .member(member)
                 .dashboard(dashboard)
