@@ -11,6 +11,7 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 class BlockTest {
     private String title;
     private String contents;
+    private String startDate;
     private String deadLine;
 
     private Block block;
@@ -19,12 +20,14 @@ class BlockTest {
     void setUp() {
         title = "title";
         contents = "contents";
+        startDate = "2024.07.03 22:34";
         deadLine = "2024.07.27 22:34";
 
         block = Block.builder()
                 .title(title)
                 .contents(contents)
                 .progress(Progress.NOT_STARTED)
+                .startDate(startDate)
                 .deadLine(deadLine)
                 .build();
     }
@@ -35,10 +38,11 @@ class BlockTest {
         // given
         String updateTitle = "updateTitle";
         String updateContents = "updateContents";
+        String updateStartDate = "updateStartDate";
         String updateDeadLine = "updateDeadLine";
 
         // when
-        block.update(updateTitle, updateContents, updateDeadLine);
+        block.update(updateTitle, updateContents, updateStartDate, updateDeadLine);
 
         // then
         assertAll(() -> {
@@ -55,7 +59,7 @@ class BlockTest {
         String updateTitle = "updateTitle";
 
         // when
-        block.update(updateTitle, contents, deadLine);
+        block.update(updateTitle, contents, startDate, deadLine);
 
         // then
         assertAll(() -> {
@@ -72,7 +76,7 @@ class BlockTest {
         String updateContents = "updateContents";
 
         // when
-        block.update(title, updateContents, deadLine);
+        block.update(title, updateContents, startDate, deadLine);
 
         // then
         assertAll(() -> {
@@ -89,7 +93,7 @@ class BlockTest {
         String updateDeadLine = "2024.07.28 22:34";
 
         // when
-        block.update(title, contents, updateDeadLine);
+        block.update(title, contents, startDate, updateDeadLine);
 
         // then
         assertAll(() -> {
