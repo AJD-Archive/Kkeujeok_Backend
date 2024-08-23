@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import lombok.Builder;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 
 @Builder
 public record BlockInfoResDto(
@@ -14,6 +15,8 @@ public record BlockInfoResDto(
         String title,
         String contents,
         Progress progress,
+        Type type,
+        String startDate,
         String deadLine,
         String nickname,
         int dDay
@@ -24,6 +27,8 @@ public record BlockInfoResDto(
                 .title(block.getTitle())
                 .contents(block.getContents())
                 .progress(block.getProgress())
+                .type(block.getType())
+                .startDate(block.getStartDate())
                 .deadLine(block.getDeadLine())
                 .nickname(block.getMember().getNickname())
                 .dDay(calculateDDay(block.getDeadLine()))
