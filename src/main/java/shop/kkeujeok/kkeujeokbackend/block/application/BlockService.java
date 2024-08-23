@@ -49,7 +49,10 @@ public class BlockService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
-        block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents(), blockUpdateReqDto.deadLine());
+        block.update(blockUpdateReqDto.title(),
+                blockUpdateReqDto.contents(),
+                blockUpdateReqDto.startDate(),
+                blockUpdateReqDto.deadLine());
 
         return BlockInfoResDto.from(block);
     }

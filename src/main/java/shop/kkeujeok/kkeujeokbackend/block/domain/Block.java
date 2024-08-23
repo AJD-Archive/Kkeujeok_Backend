@@ -35,6 +35,8 @@ public class Block extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Type type;
 
+    private String startDate;
+
     private String deadLine;
 
     @ManyToOne
@@ -46,8 +48,9 @@ public class Block extends BaseEntity {
     private Dashboard dashboard;
 
     @Builder
-    private Block(String title, String contents, Progress progress, Type type, Member member, String deadLine,
-                  Dashboard dashboard) {
+    private Block(String title, String contents, Progress progress, Type type, String startDate, Member member,
+                  String deadLine, Dashboard dashboard) {
+        this.startDate = startDate;
         this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
@@ -58,17 +61,20 @@ public class Block extends BaseEntity {
         this.dashboard = dashboard;
     }
 
-    public void update(String updateTitle, String updateContents, String updateDeadLine) {
-        if (isUpdateRequired(updateTitle, updateContents, updateDeadLine)) {
+    public void update(String updateTitle, String updateContents, String updateStartDate, String updateDeadLine) {
+        if (isUpdateRequired(updateTitle, updateContents, updateStartDate, updateDeadLine)) {
             this.title = updateTitle;
             this.contents = updateContents;
+            this.startDate = updateStartDate;
             this.deadLine = updateDeadLine;
         }
     }
 
-    private boolean isUpdateRequired(String updateTitle, String updateContents, String updateDeadLine) {
+    private boolean isUpdateRequired(String updateTitle, String updateContents, String updateStartDate,
+                                     String updateDeadLine) {
         return !this.title.equals(updateTitle) ||
                 !this.contents.equals(updateContents) ||
+                !this.startDate.equals(updateStartDate) ||
                 !this.deadLine.equals(updateDeadLine);
     }
 
