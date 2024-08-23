@@ -84,8 +84,10 @@ class BlockControllerTest extends ControllerTest {
                 .category("category")
                 .build();
 
-        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.08.03 13:23");
-        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
+        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.07.03 13:23",
+                "2024.08.03 13:23");
+        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.03 13:23",
+                "2024.07.28 16:40");
         block = blockSaveReqDto.toEntity(member, dashboard);
 
         blockController = new BlockController(blockService);
@@ -124,6 +126,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("title").description("블록 제목"),
                                 fieldWithPath("contents").description("블록 내용"),
                                 fieldWithPath("progress").description("블록 진행 상태"),
+                                fieldWithPath("startDate").description("블록 시작 시간"),
                                 fieldWithPath("deadLine").description("블록 마감 시간")
                         ),
                         responseFields(
@@ -134,6 +137,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
@@ -142,11 +146,12 @@ class BlockControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Patch 블록 수정 컨트롤러 로직 확인")
+    @DisplayName("PATCH 블록 수정 컨트롤러 로직 확인")
     @Test
     void 블록_수정() throws Exception {
         // given
-        block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents(), blockUpdateReqDto.deadLine());
+        block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents(), blockUpdateReqDto.startDate(),
+                blockUpdateReqDto.deadLine());
         BlockInfoResDto response = BlockInfoResDto.from(block);
         given(blockService.update(anyString(), anyLong(), any(BlockUpdateReqDto.class))).willReturn(response);
 
@@ -166,6 +171,7 @@ class BlockControllerTest extends ControllerTest {
                         requestFields(
                                 fieldWithPath("title").description("블록 제목"),
                                 fieldWithPath("contents").description("블록 내용"),
+                                fieldWithPath("startDate").description("블록 시작 시간"),
                                 fieldWithPath("deadLine").description("블록 마감 시간")
                         ),
                         responseFields(
@@ -176,6 +182,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
@@ -184,7 +191,7 @@ class BlockControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("Patch 블록 상태 수정 컨트롤러 로직 확인")
+    @DisplayName("PATCH 블록 상태 수정 컨트롤러 로직 확인")
     @Test
     void 블록_상태_수정() throws Exception {
         // given
@@ -215,6 +222,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockId").description("블록 아이디"),
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
+                                fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.type").description("블록 타입"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
@@ -310,6 +318,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
                                 fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
                                 fieldWithPath("data.blockListResDto[].type").description("블록 타입"),
+                                fieldWithPath("data.blockListResDto[].startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
                                 fieldWithPath("data.blockListResDto[].dDay").description("마감 기한"),
@@ -348,6 +357,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")

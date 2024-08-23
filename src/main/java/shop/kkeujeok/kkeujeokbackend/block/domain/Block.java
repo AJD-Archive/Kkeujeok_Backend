@@ -72,6 +72,7 @@ public class Block extends BaseEntity {
         if (isUpdateRequired(updateTitle, updateContents, updateStartDate, updateDeadLine)) {
             this.title = updateTitle;
             this.contents = updateContents;
+            this.startDate = updateStartDate;
             this.deadLine = updateDeadLine;
         }
     }
