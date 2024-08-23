@@ -5,6 +5,7 @@ import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallenge.challeng
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +17,10 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 
 @Repository
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository {
-    private final JPAQueryFactory queryFactory;
 
-    public ChallengeCustomRepositoryImpl(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public Page<Challenge> findAllChallenges(Pageable pageable) {
