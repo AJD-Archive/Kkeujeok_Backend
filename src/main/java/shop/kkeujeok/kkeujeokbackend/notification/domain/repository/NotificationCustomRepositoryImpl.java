@@ -42,6 +42,4 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
 
         return new PageImpl<>(notifications, pageable, total);
     }
-
-
 }
