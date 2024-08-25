@@ -49,7 +49,11 @@ public class NotificationService {
 
     @Transactional
     public void sendNotification(Member member, String message) {
-        Notification notification = new Notification(member, message, false);
+        Notification notification = Notification.builder()
+                .receiver(member)
+                .message(message)
+                .isRead(false)
+                .build();
 
         Notification savedNotification = notificationRepository.save(notification);
         sendRealTimeNotification(savedNotification);
@@ -67,10 +71,10 @@ public class NotificationService {
                             notification.getId(), notification.getReceiver().getId(), e.getMessage(), e);
                 }
             });
-        } else {
-            log.warn("회원 ID: {}에 대한 활성화된 Emitter가 없습니다. 알림 ID: {}를 전송할 수 없습니다.",
-                    notification.getReceiver().getId(), notification.getId());
         }
+        log.warn("회원 ID: {}에 대한 활성화된 Emitter가 없습니다. 알림 ID: {}를 전송할 수 없습니다.",
+                notification.getReceiver().getId(), notification.getId());
+
     }
 
     @Transactional(readOnly = true)
