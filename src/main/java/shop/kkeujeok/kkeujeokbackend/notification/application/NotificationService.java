@@ -41,6 +41,7 @@ public class NotificationService {
                 .build();
 
         Notification savedNotification = notificationRepository.save(notification);
+
         sseEmitterManager.sendNotification(member.getId(), savedNotification.getMessage());
     }
 
