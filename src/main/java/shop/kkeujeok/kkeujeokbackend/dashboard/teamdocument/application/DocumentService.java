@@ -27,7 +27,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final TeamDashboardRepository teamDashboardRepository;
 
-    // 팀 문서 생성 , 팀 대시보드 연관관계 설정 필요
+    // 팀 문서 생성
     @Transactional
     public DocumentInfoResDto save(DocumentInfoReqDto documentInfoReqDto) {
         TeamDashboard teamDashboard = teamDashboardRepository.findById(documentInfoReqDto.teamDashboardId())
@@ -49,7 +49,7 @@ public class DocumentService {
         return DocumentInfoResDto.from(document);
     }
 
-    // 팀 문서 조회 팀 대시보드 아이디로 조회
+    // 팀 문서 조회
     public DocumentListResDto findDocumentByTeamDashboardId(Long teamDashboardId, Pageable pageable) {
         Page<Document> documents = documentRepository.findByDocumentWithTeamDashboard(teamDashboardId, pageable);
 
