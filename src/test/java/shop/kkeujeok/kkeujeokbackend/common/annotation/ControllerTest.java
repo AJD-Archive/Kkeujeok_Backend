@@ -19,13 +19,14 @@ import shop.kkeujeok.kkeujeokbackend.block.application.BlockService;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.ChallengeController;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDashboardService;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.application.DocumentService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.application.FileService;
-import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
@@ -82,4 +83,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected DocumentService documentService;
+
+    @MockBean
+    protected NotificationService notificationService;
 }
