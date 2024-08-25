@@ -75,12 +75,15 @@ class BlockServiceTest {
                 .category("category")
                 .build();
 
-        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.07.25 13:23");
-        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.28 16:40");
+        blockSaveReqDto = new BlockSaveReqDto(1L, "Title", "Contents", Progress.NOT_STARTED, "2024.07.03 13:23",
+                "2024.07.25 13:23");
+        blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.03 13:23",
+                "2024.07.28 16:40");
         block = Block.builder()
                 .title(blockSaveReqDto.title())
                 .contents(blockSaveReqDto.contents())
                 .progress(blockSaveReqDto.progress())
+                .startDate(blockSaveReqDto.startDate())
                 .deadLine(blockSaveReqDto.deadLine())
                 .member(member)
                 .dashboard(dashboard)
@@ -90,6 +93,7 @@ class BlockServiceTest {
                 .title(blockSaveReqDto.title())
                 .contents(blockSaveReqDto.contents())
                 .progress(blockSaveReqDto.progress())
+                .startDate(blockSaveReqDto.startDate())
                 .deadLine(blockSaveReqDto.deadLine())
                 .member(member)
                 .dashboard(dashboard)
@@ -140,7 +144,8 @@ class BlockServiceTest {
     void 블록_수정_X() {
         // given
         Long blockId = 1L;
-        BlockUpdateReqDto originBlockUpdateReqDto = new BlockUpdateReqDto("Title", "Contents", "2024.07.25 13:23");
+        BlockUpdateReqDto originBlockUpdateReqDto = new BlockUpdateReqDto("Title", "Contents", "2024.07.03 13:23",
+                "2024.07.25 13:23");
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when
