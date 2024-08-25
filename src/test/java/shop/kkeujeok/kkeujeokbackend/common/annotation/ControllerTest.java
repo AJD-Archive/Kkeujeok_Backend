@@ -27,6 +27,7 @@ import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
+import shop.kkeujeok.kkeujeokbackend.notification.util.SseEmitterManager;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
@@ -86,4 +87,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected NotificationService notificationService;
+
+    @MockBean
+    protected SseEmitterManager sseEmitterManager;
 }
