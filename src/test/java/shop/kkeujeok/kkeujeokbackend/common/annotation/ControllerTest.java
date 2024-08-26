@@ -26,6 +26,7 @@ import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
+import shop.kkeujeok.kkeujeokbackend.notification.api.NotificationController;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 import shop.kkeujeok.kkeujeokbackend.notification.util.SseEmitterManager;
 
@@ -34,7 +35,8 @@ import shop.kkeujeok.kkeujeokbackend.notification.util.SseEmitterManager;
         BlockController.class,
         AuthController.class,
         ChallengeController.class,
-        MemberControllerTest.class
+        MemberControllerTest.class,
+        NotificationController.class
 })
 @ExtendWith(RestDocumentationExtension.class)
 @ActiveProfiles("test")
