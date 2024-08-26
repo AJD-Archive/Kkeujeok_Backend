@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.member.api;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +16,10 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/members")
+@RequiredArgsConstructor
 public class MemberController {
 
     private final MyPageService myPageService;
-    private final NicknameService nicknameService;
-
-    public MemberController(MyPageService myPageService, NicknameService nicknameService) {
-        this.myPageService = myPageService;
-        this.nicknameService = nicknameService;
-    }
 
     @GetMapping("/mypage")
     public RspTemplate<MyPageInfoResDto> myProfileInfo(@CurrentUserEmail String email) {
