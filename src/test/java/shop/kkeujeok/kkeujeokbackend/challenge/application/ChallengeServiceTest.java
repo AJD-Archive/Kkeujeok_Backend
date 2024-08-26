@@ -33,6 +33,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqD
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
@@ -100,6 +101,7 @@ class ChallengeServiceTest {
         challengeSaveReqDto = new ChallengeSaveReqDto(
                 "1일 1커밋",
                 "1일 1커밋하기",
+                Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
@@ -121,6 +123,7 @@ class ChallengeServiceTest {
         updateDto = new ChallengeSaveReqDto(
                 "업데이트 제목",
                 "업데이트 내용",
+                Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
                 LocalDate.now(),
@@ -184,6 +187,7 @@ class ChallengeServiceTest {
         ChallengeSaveReqDto wrongChallengeSaveReqDto = new ChallengeSaveReqDto(
                 "1일 1커밋",
                 "1일 1커밋하기",
+                Category.CREATIVITY_AND_ARTS,
                 Cycle.MONTHLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
