@@ -304,6 +304,26 @@ class ChallengeServiceTest {
     }
 
     @Test
+    @DisplayName("챌린지를 카테고리 별로 검색할 수 있다")
+    void 챌린지를_카테고리_별로_검색할_수_있다() {
+        //given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
+        when(challengeRepository.findChallengesByCategory(any(Category.class), any(PageRequest.class)))
+                .thenReturn(page);
+
+        // when
+        ChallengeListResDto result = challengeService.findByCategory(Category.CREATIVITY_AND_ARTS, pageable);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.challengeInfoResDto().size()).isEqualTo(1);
+            assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
+            assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
+        });
+    }
+
+    @Test
     @DisplayName("챌린지 상세정보를 조회할 수 있다")
     void 챌린지_상세정보를_조회할_수_있다() {
         // given
