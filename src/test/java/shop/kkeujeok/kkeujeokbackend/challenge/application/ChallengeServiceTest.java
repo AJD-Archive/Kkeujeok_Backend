@@ -48,6 +48,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class ChallengeServiceTest {
@@ -73,8 +74,12 @@ class ChallengeServiceTest {
     @Mock
     private BlockRepository blockRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private ChallengeService challengeService;
+
 
     @BeforeEach
     void setUp() {

@@ -30,6 +30,7 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,7 @@ public class ChallengeService {
     private final MemberRepository memberRepository;
     private final PersonalDashboardRepository personalDashboardRepository;
     private final BlockRepository blockRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto) {
@@ -116,6 +118,9 @@ public class ChallengeService {
         updateBlockStatusIfNotActive(block, challenge);
 
         blockRepository.save(block);
+
+        String message = String.format("%s님이 챌린지에 참여했습니다", member.getName());
+        notificationService.sendNotification(challenge.getMember(), message);
 
         return BlockInfoResDto.from(block);
     }
