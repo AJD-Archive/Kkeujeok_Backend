@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.member.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,11 +43,13 @@ public class Member extends BaseEntity {
 
     private String introduction;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Challenge> challenges = new ArrayList<>();
 
     private String tag;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Notification> notifications = new ArrayList<>();
 
