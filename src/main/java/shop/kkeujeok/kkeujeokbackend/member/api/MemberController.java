@@ -10,7 +10,6 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateR
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
-import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 
 import java.util.Set;
 

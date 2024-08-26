@@ -37,7 +37,7 @@ public class MemberControllerTest extends ControllerTest {
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
-        memberController = new MemberController(myPageService, nicknameService);
+        memberController = new MemberController(myPageService);
 
         mockMvc = MockMvcBuilders.standaloneSetup(memberController)
                 .apply(documentationConfiguration(restDocumentation))
