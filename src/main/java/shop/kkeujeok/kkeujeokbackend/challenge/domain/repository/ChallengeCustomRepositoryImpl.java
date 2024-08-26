@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 
@@ -61,6 +62,27 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        return new PageImpl<>(challenges, pageable, total);
+    }
+
+    @Override
+    public Page<Challenge> findChallengesByCategory(Category category, Pageable pageable) {
+        long total = Optional.ofNullable(
+                queryFactory
+                        .select(challenge.count())
+                        .from(challenge)
+                        .where(challenge.status.eq(Status.ACTIVE),
+                                challenge.category.eq(category))
+                        .fetchOne()
+        ).orElse(0L);
+
+        List<Challenge> challenges = queryFactory
+                .selectFrom(challenge)
+                .where(challenge.status.eq(Status.ACTIVE),
+                        challenge.category.eq(category))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
         return new PageImpl<>(challenges, pageable, total);
     }
 }
