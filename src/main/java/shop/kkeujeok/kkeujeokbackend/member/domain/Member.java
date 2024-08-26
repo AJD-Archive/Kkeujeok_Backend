@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
+import shop.kkeujeok.kkeujeokbackend.notification.domain.Notification;
 
 @Entity
 @Getter
@@ -45,6 +46,9 @@ public class Member extends BaseEntity {
     private List<Challenge> challenges = new ArrayList<>();
 
     private String tag;
+
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<Notification> notifications = new ArrayList<>();
 
     @Builder
     private Member(Status status, Role role,
