@@ -104,7 +104,7 @@ class NotificationControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(member.getEmail()))
                 .andDo(print())
-                .andDo(document("notifications/stream",
+                .andDo(document("notification/stream",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")
