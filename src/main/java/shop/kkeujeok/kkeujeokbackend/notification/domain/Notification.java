@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.notification.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
@@ -17,8 +16,8 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification extends BaseEntity {
 
+    @ManyToOne
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     private Member receiver;
 
     private String message;
@@ -34,6 +33,9 @@ public class Notification extends BaseEntity {
     }
 
     public void markAsRead() {
-        this.isRead = true;
+        if (isRead) {
+            return;
+        }
+        isRead = true;
     }
 }
