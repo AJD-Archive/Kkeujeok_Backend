@@ -16,8 +16,8 @@ import java.security.Key;
 import java.util.Date;
 
 @Slf4j
-@Component
 @Getter
+@Component
 @NoArgsConstructor
 public class TokenProvider {
 

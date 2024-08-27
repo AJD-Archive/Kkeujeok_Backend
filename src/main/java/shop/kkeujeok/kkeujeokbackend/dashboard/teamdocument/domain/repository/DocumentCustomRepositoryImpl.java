@@ -27,13 +27,13 @@ public class DocumentCustomRepositoryImpl implements DocumentCustomRepository {
     public Page<Document> findByDocumentWithTeamDashboard(Long teamDashboardId, Pageable pageable) {
         long total = queryFactory
                 .selectFrom(document)
-                .where(document.teamDashboard.id.eq(teamDashboardId) // 수정된 부분
+                .where(document.teamDashboard.id.eq(teamDashboardId)
                         .and(document.status.eq(Status.ACTIVE)))
                 .fetchCount();
 
         List<Document> documents = queryFactory
                 .selectFrom(document)
-                .where(document.teamDashboard.id.eq(teamDashboardId) // 수정된 부분
+                .where(document.teamDashboard.id.eq(teamDashboardId)
                         .and(document.status.eq(Status.ACTIVE)))
                 .orderBy(document.id.desc())
                 .offset(pageable.getOffset())

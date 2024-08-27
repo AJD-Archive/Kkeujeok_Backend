@@ -22,9 +22,9 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
-@Slf4j
 public class KakaoAuthService implements AuthService {
 
     private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
