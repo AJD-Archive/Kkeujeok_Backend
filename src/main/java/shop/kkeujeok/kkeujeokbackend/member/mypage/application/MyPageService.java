@@ -62,10 +62,9 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public TeamDashboardsAndChallengesResDto findTeamDashboardsAndChallenges(String email, Pageable pageable) {
         TeamDashboardListResDto teamDashboardListResDto = teamDashboardService.findForTeamDashboard(email, pageable);
-        ChallengeListResDto challengeListResDto = challengeService.findAllChallenges(pageable);
+        ChallengeListResDto challengeListResDto = challengeService.findChallengeForMemberId(email, pageable);
 
         return TeamDashboardsAndChallengesResDto.of(teamDashboardListResDto, challengeListResDto);
     }
 
-    // 알림 조회
 }
