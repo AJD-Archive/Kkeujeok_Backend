@@ -7,8 +7,6 @@ import static shop.kkeujeok.kkeujeokbackend.member.domain.QMember.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +23,6 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 @Transactional(readOnly = true)
 public class DashboardCustomRepositoryImpl implements DashboardCustomRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(DashboardCustomRepositoryImpl.class);
     private final JPAQueryFactory queryFactory;
 
     public DashboardCustomRepositoryImpl(JPAQueryFactory queryFactory) {
@@ -49,6 +46,16 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
                 .fetch();
 
         return new PageImpl<>(dashboards, pageable, total);
+    }
+
+    @Override
+    public List<String> findForPersonalDashboardByCategory(Member member) {
+        return queryFactory
+                .select(personalDashboard.category)
+                .from(personalDashboard)
+                .where(personalDashboard._super.member.eq(member))
+                .stream()
+                .toList();
     }
 
     @Override
@@ -83,7 +90,7 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
                             .and(member.tag.eq(tag)))
                     .fetch();
         }
-        
+
         return queryFactory
                 .selectFrom(member)
                 .where(member.email.eq(query))
