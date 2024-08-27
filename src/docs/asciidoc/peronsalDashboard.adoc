@@ -52,6 +52,18 @@ include::{snippets}/dashboard/personal/findById/path-parameters.adoc[]
 include::{snippets}/dashboard/personal/findById/http-response.adoc[]
 include::{snippets}/dashboard/personal/findById/response-fields.adoc[]
 
+=== 사용자의 개인 대시보드 카테고리 조회
+
+==== 요청
+
+include::{snippets}/dashboard/personal/categories/http-request.adoc[]
+include::{snippets}/dashboard/personal/categories/request-headers.adoc[]
+
+==== 응답
+
+include::{snippets}/dashboard/personal/categories/http-response.adoc[]
+include::{snippets}/dashboard/personal/categories/response-fields.adoc[]
+
 === 개인 대시보드 삭제 API
 
 ==== 요청

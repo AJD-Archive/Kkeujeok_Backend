@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
@@ -211,6 +212,22 @@ class PersonalDashboardServiceTest {
             assertThat(result.category()).isEqualTo("category");
             assertThat(result.blockProgress()).isEqualTo(0.0);
         });
+    }
+
+    @DisplayName("개인 대시보드 카테고리를 조회합니다.")
+    @Test
+    void 개인_대시보드_카테고리_조회() {
+        // given
+        List<String> categories = List.of("category");
+        when(personalDashboardRepository.findForPersonalDashboardByCategory(any(Member.class))).thenReturn(categories);
+
+        // when
+        PersonalDashboardCategoriesResDto result = personalDashboardService.findForPersonalDashboardByCategories(
+                member.getEmail());
+
+        // then
+        assertThat(result.categories()).hasSize(1);
+        assertThat(result.categories().get(0)).isEqualTo("category");
     }
 
     @DisplayName("삭제되었던 개인 대시보드를 복구합니다.")
