@@ -18,7 +18,6 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchRe
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUtil;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
@@ -93,7 +92,7 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeListResDto findByCategory(Category category, Pageable pageable) {
+    public ChallengeListResDto findByCategory(String category, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findChallengesByCategory(category, pageable);
 
         List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
