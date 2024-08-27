@@ -66,20 +66,20 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     }
 
     @Override
-    public Page<Challenge> findChallengesByCategory(Category category, Pageable pageable) {
+    public Page<Challenge> findChallengesByCategory(String category, Pageable pageable) {
         long total = Optional.ofNullable(
                 queryFactory
                         .select(challenge.count())
                         .from(challenge)
                         .where(challenge.status.eq(Status.ACTIVE),
-                                challenge.category.eq(category))
+                                challenge.category.eq(Category.valueOf(category)))
                         .fetchOne()
         ).orElse(0L);
 
         List<Challenge> challenges = queryFactory
                 .selectFrom(challenge)
                 .where(challenge.status.eq(Status.ACTIVE),
-                        challenge.category.eq(category))
+                        challenge.category.eq(Category.valueOf(category)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

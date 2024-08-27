@@ -3,7 +3,6 @@ package shop.kkeujeok.kkeujeokbackend.challenge.domain.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 
 public interface ChallengeCustomRepository {
@@ -11,5 +10,5 @@ public interface ChallengeCustomRepository {
 
     Page<Challenge> findChallengesByKeyWord(ChallengeSearchReqDto challengeSearchReqDto, Pageable pageable);
 
-    Page<Challenge> findChallengesByCategory(Category category, Pageable pageable);
+    Page<Challenge> findChallengesByCategory(String category, Pageable pageable);
 }

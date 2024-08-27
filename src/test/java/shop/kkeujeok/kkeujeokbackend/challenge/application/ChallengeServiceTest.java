@@ -309,11 +309,11 @@ class ChallengeServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 10);
         Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
-        when(challengeRepository.findChallengesByCategory(any(Category.class), any(PageRequest.class)))
+        when(challengeRepository.findChallengesByCategory(anyString(), any(PageRequest.class)))
                 .thenReturn(page);
 
         // when
-        ChallengeListResDto result = challengeService.findByCategory(Category.CREATIVITY_AND_ARTS, pageable);
+        ChallengeListResDto result = challengeService.findByCategory("CREATIVITY_AND_ARTS", pageable);
 
         // then
         assertAll(() -> {
