@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
@@ -18,6 +19,9 @@ public record ChallengeSaveReqDto(
 
         @NotNull(message = "내용은 필수 입력값입니다.")
         String contents,
+
+        @NotNull(message = "카테고리는 필수 입력값입니다.")
+        Category category,
 
         @NotNull(message = "주기는 필수 입력값입니다.")
         Cycle cycle,
@@ -39,6 +43,7 @@ public record ChallengeSaveReqDto(
                 .status(Status.ACTIVE)
                 .title(title)
                 .contents(contents)
+                .category(category)
                 .cycle(cycle)
                 .cycleDetails(cycleDetails)
                 .startDate(startDate)

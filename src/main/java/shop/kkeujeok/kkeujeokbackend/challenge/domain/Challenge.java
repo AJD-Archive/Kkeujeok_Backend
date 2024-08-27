@@ -31,6 +31,9 @@ public class Challenge extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String contents;
 
+    @Enumerated(value = EnumType.STRING)
+    private Category category;
+
     private Cycle cycle;
 
     @Convert(converter = CycleDetailsConverter.class)
@@ -54,6 +57,7 @@ public class Challenge extends BaseEntity {
     private Challenge(Status status,
                       String title,
                       String contents,
+                      Category category,
                       Cycle cycle,
                       List<CycleDetail> cycleDetails,
                       LocalDate startDate,
@@ -63,6 +67,7 @@ public class Challenge extends BaseEntity {
         this.status = status;
         this.title = title;
         this.contents = contents;
+        this.category = category;
         this.cycle = cycle;
         this.cycleDetails = cycleDetails;
         this.startDate = startDate;

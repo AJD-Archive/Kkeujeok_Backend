@@ -33,6 +33,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqD
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
@@ -100,6 +101,7 @@ class ChallengeServiceTest {
         challengeSaveReqDto = new ChallengeSaveReqDto(
                 "1일 1커밋",
                 "1일 1커밋하기",
+                Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
@@ -121,6 +123,7 @@ class ChallengeServiceTest {
         updateDto = new ChallengeSaveReqDto(
                 "업데이트 제목",
                 "업데이트 내용",
+                Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
                 LocalDate.now(),
@@ -184,6 +187,7 @@ class ChallengeServiceTest {
         ChallengeSaveReqDto wrongChallengeSaveReqDto = new ChallengeSaveReqDto(
                 "1일 1커밋",
                 "1일 1커밋하기",
+                Category.CREATIVITY_AND_ARTS,
                 Cycle.MONTHLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
@@ -290,6 +294,26 @@ class ChallengeServiceTest {
 
         // when
         ChallengeListResDto result = challengeService.findChallengesByKeyWord(searchReqDto, pageable);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.challengeInfoResDto().size()).isEqualTo(1);
+            assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
+            assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
+        });
+    }
+
+    @Test
+    @DisplayName("챌린지를 카테고리 별로 검색할 수 있다")
+    void 챌린지를_카테고리_별로_검색할_수_있다() {
+        //given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
+        when(challengeRepository.findChallengesByCategory(anyString(), any(PageRequest.class)))
+                .thenReturn(page);
+
+        // when
+        ChallengeListResDto result = challengeService.findByCategory("CREATIVITY_AND_ARTS", pageable);
 
         // then
         assertAll(() -> {

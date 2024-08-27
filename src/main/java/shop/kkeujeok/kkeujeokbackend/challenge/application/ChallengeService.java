@@ -92,6 +92,17 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
+    public ChallengeListResDto findByCategory(String category, Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findChallengesByCategory(category, pageable);
+
+        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
+                .map(ChallengeInfoResDto::from)
+                .toList();
+
+        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
+    }
+
+    @Transactional(readOnly = true)
     public ChallengeInfoResDto findById(Long challengeId) {
         Challenge challenge = findChallengeById(challengeId);
 
