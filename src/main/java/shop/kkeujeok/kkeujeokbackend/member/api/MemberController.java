@@ -14,8 +14,8 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/members")
 @RequiredArgsConstructor
+@RequestMapping("/api/members")
 public class MemberController {
 
     private final MyPageService myPageService;
