@@ -46,6 +46,15 @@ public class MyPageService {
         return MyPageInfoResDto.From(member);
     }
 
+    // 팀 대시보드 & 챌린지 정보 조회
+    @Transactional(readOnly = true)
+    public TeamDashboardsAndChallengesResDto findTeamDashboardsAndChallenges(String email, Pageable pageable) {
+        TeamDashboardListResDto teamDashboardListResDto = teamDashboardService.findForTeamDashboard(email, pageable);
+        ChallengeListResDto challengeListResDto = challengeService.findChallengeForMemberId(email, pageable);
+
+        return TeamDashboardsAndChallengesResDto.of(teamDashboardListResDto, challengeListResDto);
+    }
+
     private boolean isNicknameChanged(Member member, String newNickname) {
         return !normalizeNickname(member.getNickname()).equals(normalizeNickname(newNickname));
     }
@@ -57,14 +66,4 @@ public class MyPageService {
     private String normalizeNickname(String nickname) {
         return nickname.replaceAll("\\s+", "");
     }
-
-    // 팀 대시보드 & 챌린지 정보 조회
-    @Transactional(readOnly = true)
-    public TeamDashboardsAndChallengesResDto findTeamDashboardsAndChallenges(String email, Pageable pageable) {
-        TeamDashboardListResDto teamDashboardListResDto = teamDashboardService.findForTeamDashboard(email, pageable);
-        ChallengeListResDto challengeListResDto = challengeService.findChallengeForMemberId(email, pageable);
-
-        return TeamDashboardsAndChallengesResDto.of(teamDashboardListResDto, challengeListResDto);
-    }
-
 }
