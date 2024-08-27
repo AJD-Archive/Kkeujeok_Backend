@@ -19,7 +19,6 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchRe
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 
@@ -63,7 +62,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/find")
-    public RspTemplate<ChallengeListResDto> findByCategory(@RequestParam(name = "category") Category category,
+    public RspTemplate<ChallengeListResDto> findByCategory(@RequestParam(name = "category") String category,
                                                            @RequestParam(defaultValue = "0", name = "page") int page,
                                                            @RequestParam(defaultValue = "10", name = "size") int size) {
         return new RspTemplate<>(HttpStatus.OK,
