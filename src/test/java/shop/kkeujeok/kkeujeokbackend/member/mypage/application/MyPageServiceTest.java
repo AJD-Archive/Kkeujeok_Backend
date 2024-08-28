@@ -7,12 +7,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
@@ -28,12 +36,21 @@ public class MyPageServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private TeamDashboardService teamDashboardService;
+
+    @Mock
+    private ChallengeService challengeService;
+
     @InjectMocks
     private MyPageService myPageService;
 
     private MyPageUpdateReqDto myPageUpdateReqDto;
     private MyPageInfoResDto myPageInfoResDto;
     private Member member;
+    private Pageable pageable;
+    private TeamDashboardListResDto teamDashboardListResDto;
+    private ChallengeListResDto challengeListResDto;
 
     @BeforeEach
     void setUp() {
@@ -47,6 +64,18 @@ public class MyPageServiceTest {
                 .introduction("introduction")
                 .picture("picture")
                 .build();
+
+        pageable = PageRequest.of(0, 10);
+
+        teamDashboardListResDto = TeamDashboardListResDto.of(
+                Collections.emptyList(),
+                null
+        );
+
+        challengeListResDto = ChallengeListResDto.of(
+                Collections.emptyList(),
+                null
+        );
     }
 
     @DisplayName("프로필을 조회합니다.")
@@ -84,9 +113,20 @@ public class MyPageServiceTest {
         verify(memberRepository, times(1)).findByEmail("email");
     }
 
-    // 팀 대시보드 정보 조회
+    @DisplayName("팀 대시보드와 챌린지 정보를 조회합니다.")
+    @Test
+    void 팀_대시보드와_챌린지_정보를_조회합니다() {
+        // Given
+        String email = "test@example.com";
 
-    // 챌린지 정보 조회
+        when(teamDashboardService.findForTeamDashboard(email, pageable)).thenReturn(teamDashboardListResDto);
+        when(challengeService.findChallengeForMemberId(email, pageable)).thenReturn(challengeListResDto);
 
-    // 알림 조회
+        // When
+        TeamDashboardsAndChallengesResDto result = myPageService.findTeamDashboardsAndChallenges(email, pageable);
+
+        // Then
+        assertEquals(teamDashboardListResDto, result.teamDashboardList());
+        assertEquals(challengeListResDto, result.challengeList());
+    }
 }

@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.global.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,12 +9,10 @@ import shop.kkeujeok.kkeujeokbackend.global.filter.LoginCheckFilter;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 
 @Configuration
+@RequiredArgsConstructor
 public class FilterWebConfig {
-    private final TokenProvider tokenProvider;
 
-    public FilterWebConfig(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
-    }
+    private final TokenProvider tokenProvider;
 
     @Bean
     public FilterRegistrationBean<LogFilter> logFilter() {
