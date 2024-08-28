@@ -19,11 +19,12 @@ import shop.kkeujeok.kkeujeokbackend.global.oauth.KakaoAuthService;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
-@RestController
 @Slf4j
+@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthServiceFactory authServiceFactory;
     private final AuthMemberService memberService;
     private final TokenService tokenService;
@@ -40,7 +41,6 @@ public class AuthController {
         return kakaoAuthService.getIdToken(code);
     }
 
-//    @Operation(summary = "로그인 후 토큰 발급", description = "액세스, 리프레쉬 토큰을 발급합니다.")
     @PostMapping("/{provider}/token")
     public RspTemplate<TokenDto> generateAccessAndRefreshToken(
             @PathVariable(name = "provider") String provider,
@@ -55,12 +55,10 @@ public class AuthController {
         return new RspTemplate<>(HttpStatus.OK, "토큰 발급", getToken);
     }
 
-//    @Operation(summary = "액세스 토큰 재발급", description = "리프레쉬 토큰으로 액세스 토큰을 발급합니다.")
     @PostMapping("/token/access")
     public RspTemplate<TokenDto> generateAccessToken(@RequestBody RefreshTokenReqDto refreshTokenReqDto) {
         TokenDto getToken = tokenService.generateAccessToken(refreshTokenReqDto);
 
         return new RspTemplate<>(HttpStatus.OK, "액세스 토큰 발급", getToken);
     }
-
 }

@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.auth.application;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
@@ -13,18 +14,13 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TokenService {
 
     private final TokenProvider tokenProvider;
     private final TokenRepository tokenRepository;
     private final MemberRepository memberRepository;
-
-    public TokenService(TokenProvider tokenProvider, TokenRepository tokenRepository, MemberRepository memberRepository) {
-        this.tokenProvider = tokenProvider;
-        this.tokenRepository = tokenRepository;
-        this.memberRepository = memberRepository;
-    }
 
     @Transactional
     public TokenDto getToken(MemberLoginResDto memberLoginResDto) {
