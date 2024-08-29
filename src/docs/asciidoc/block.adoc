@@ -84,3 +84,13 @@ include::{snippets}/block/delete/path-parameters.adoc[]
 ==== 응답
 
 include::{snippets}/block/delete/http-response.adoc[]
+
+=== 블록 상태 변경
+
+==== 요청
+
+include::{snippets}/block/change/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/block/change/http-response.adoc[]
