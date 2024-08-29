@@ -40,6 +40,8 @@ public class Block extends BaseEntity {
 
     private String deadLine;
 
+    private int sequence;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -54,8 +56,7 @@ public class Block extends BaseEntity {
 
     @Builder
     private Block(String title, String contents, Progress progress, Type type, Member member, String startDate,
-                  String deadLine,
-                  Dashboard dashboard, Challenge challenge) {
+                  String deadLine, int sequence, Dashboard dashboard, Challenge challenge) {
         this.status = Status.ACTIVE;
         this.title = title;
         this.contents = contents;
@@ -63,6 +64,7 @@ public class Block extends BaseEntity {
         this.type = type;
         this.startDate = startDate;
         this.deadLine = deadLine;
+        this.sequence = sequence;
         this.member = member;
         this.dashboard = dashboard;
         this.challenge = challenge;
@@ -99,4 +101,9 @@ public class Block extends BaseEntity {
         }
         this.status = status;
     }
+
+    public void sequenceUpdate(int sequence) {
+        this.sequence = sequence;
+    }
+    
 }
