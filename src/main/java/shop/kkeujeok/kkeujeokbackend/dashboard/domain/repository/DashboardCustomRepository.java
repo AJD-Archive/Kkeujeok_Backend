@@ -11,6 +11,8 @@ public interface DashboardCustomRepository {
 
     Page<PersonalDashboard> findForPersonalDashboard(Member member, Pageable pageable);
 
+    List<String> findForPersonalDashboardByCategory(Member member);
+
     Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable);
 
     List<Member> findForMembersByQuery(String query);

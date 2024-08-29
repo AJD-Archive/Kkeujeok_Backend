@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDashboardService;
@@ -58,6 +59,14 @@ public class PersonalDashboardController {
     public RspTemplate<PersonalDashboardInfoResDto> findById(@CurrentUserEmail String email,
                                                              @PathVariable(name = "dashboardId") Long dashboardId) {
         return new RspTemplate<>(HttpStatus.OK, "개인 대시보드 상세보기", personalDashboardService.findById(email, dashboardId));
+    }
+
+    @GetMapping("/categories")
+    public RspTemplate<PersonalDashboardCategoriesResDto> findForPersonalDashboardByCategories(
+            @CurrentUserEmail String email) {
+        return new RspTemplate<>(HttpStatus.OK,
+                "개인 대시보드 카테고리 조회",
+                personalDashboardService.findForPersonalDashboardByCategories(email));
     }
 
     @DeleteMapping("/{dashboardId}")

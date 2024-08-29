@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
@@ -80,6 +81,15 @@ public class PersonalDashboardService {
         double blockProgress = personalDashboardRepository.calculateCompletionPercentage(dashboard.getId());
 
         return PersonalDashboardInfoResDto.detailOf(member, dashboard, blockProgress);
+    }
+
+    // 개인 대시보드 카테고리 조회
+    public PersonalDashboardCategoriesResDto findForPersonalDashboardByCategories(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+
+        List<String> categories = personalDashboardRepository.findForPersonalDashboardByCategory(member);
+
+        return PersonalDashboardCategoriesResDto.from(categories);
     }
 
     // 개인 대시보드 삭제 유무 업데이트 (논리 삭제)
