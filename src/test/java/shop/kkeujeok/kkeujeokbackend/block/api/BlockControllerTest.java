@@ -37,6 +37,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
@@ -82,6 +83,7 @@ class BlockControllerTest extends ControllerTest {
                 .member(member)
                 .title("title")
                 .description("description")
+                .dType("PersonalDashboard")
                 .isPublic(false)
                 .category("category")
                 .build();
@@ -91,6 +93,8 @@ class BlockControllerTest extends ControllerTest {
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.03 13:23",
                 "2024.07.28 16:40");
         block = blockSaveReqDto.toEntity(member, dashboard, 0);
+
+        ReflectionTestUtils.setField(block, "id", 1L);
 
         blockSequenceUpdateReqDto = new BlockSequenceUpdateReqDto(
                 List.of(2L, 3L),
@@ -144,7 +148,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
@@ -189,7 +195,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
@@ -232,7 +240,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
@@ -325,7 +335,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockListResDto[].title").description("블록 제목"),
                                 fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
                                 fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
-                                fieldWithPath("data.blockListResDto[].type").description("블록 타입"),
+                                fieldWithPath("data.blockListResDto[].type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.blockListResDto[].dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.blockListResDto[].startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
@@ -364,7 +376,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
