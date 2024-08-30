@@ -15,6 +15,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchRe
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Repository
 @Transactional(readOnly = true)
@@ -66,6 +67,24 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     }
 
     @Override
+    public Page<Challenge> findChallengesByEmail(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(challenge)
+                .where(challenge.member.eq(member))
+                .stream()
+                .count();
+
+        List<Challenge> challenges = queryFactory
+                .selectFrom(challenge)
+                .where(challenge.member.eq(member)
+                        .and(challenge.status.eq(Status.ACTIVE)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(challenges, pageable, total);
+    }
+
     public Page<Challenge> findChallengesByCategory(String category, Pageable pageable) {
         long total = Optional.ofNullable(
                 queryFactory

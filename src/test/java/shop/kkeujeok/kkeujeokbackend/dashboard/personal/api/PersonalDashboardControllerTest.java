@@ -41,6 +41,7 @@ import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
@@ -265,6 +266,34 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.isPublic").description("개인 대시보드 공개 범위"),
                                 fieldWithPath("data.category").description("개인 대시보드 카테고리"),
                                 fieldWithPath("data.blockProgress").description("개인 대시보드의 완료된 블록 진행률")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("GET 사용자 개인 대시보드들의 카테고리를 불러옵니다.")
+    @Test
+    void 개인_대시보드_카테고리_조회() throws Exception {
+        // given
+        PersonalDashboardCategoriesResDto response = PersonalDashboardCategoriesResDto.from(List.of("category"));
+
+        given(personalDashboardService.findForPersonalDashboardByCategories(anyString())).willReturn(response);
+
+        // when & then
+        mockMvc.perform(get("/api/dashboards/personal/categories")
+                        .header("Authorization", "Bearer valid-token")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("dashboard/personal/categories",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.categories[]").description("개인 대시보드 카테고리")
                         )
                 ))
                 .andExpect(status().isOk());

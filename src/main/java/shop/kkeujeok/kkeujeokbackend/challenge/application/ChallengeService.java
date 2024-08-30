@@ -3,6 +3,8 @@ package shop.kkeujeok.kkeujeokbackend.challenge.application;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -134,6 +136,19 @@ public class ChallengeService {
         notificationService.sendNotification(challenge.getMember(), message);
 
         return BlockInfoResDto.from(block);
+    }
+
+    @Transactional(readOnly = true)
+    public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+
+        Page<Challenge> challenges = challengeRepository.findChallengesByEmail(member, pageable);
+
+        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
+                .map(ChallengeInfoResDto::from)
+                .collect(Collectors.toList());
+
+        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
     private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
