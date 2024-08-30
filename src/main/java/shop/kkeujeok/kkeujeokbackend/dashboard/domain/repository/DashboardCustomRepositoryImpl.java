@@ -49,6 +49,16 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     }
 
     @Override
+    public List<String> findForPersonalDashboardByCategory(Member member) {
+        return queryFactory
+                .select(personalDashboard.category)
+                .from(personalDashboard)
+                .where(personalDashboard._super.member.eq(member))
+                .stream()
+                .toList();
+    }
+
+    @Override
     public Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable) {
         long total = queryFactory
                 .selectFrom(teamDashboard)

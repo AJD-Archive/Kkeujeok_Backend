@@ -13,6 +13,8 @@ public interface DashboardCustomRepository {
 
     List<String> findForPersonalDashboardByCategory(Member member);
 
+    List<String> findForPersonalDashboardByCategory(Member member);
+
     Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable);
 
     List<TeamDashboard> findForTeamDashboard(Member member);
