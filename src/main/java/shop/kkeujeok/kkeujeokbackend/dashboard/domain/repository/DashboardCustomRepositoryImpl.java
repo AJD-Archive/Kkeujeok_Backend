@@ -30,22 +30,22 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     }
 
     @Override
-    public List<PersonalDashboard> findForPersonalDashboard(Member member) {
-        return queryFactory
+    public Page<PersonalDashboard> findForPersonalDashboard(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member))
+                .stream()
+                .count();
+
+        List<PersonalDashboard> dashboards = queryFactory
                 .selectFrom(personalDashboard)
                 .where(personalDashboard._super.member.eq(member)
                         .and(personalDashboard._super.status.eq(Status.ACTIVE)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
-    }
 
-    @Override
-    public List<String> findForPersonalDashboardByCategory(Member member) {
-        return queryFactory
-                .select(personalDashboard.category)
-                .from(personalDashboard)
-                .where(personalDashboard._super.member.eq(member))
-                .stream()
-                .toList();
+        return new PageImpl<>(dashboards, pageable, total);
     }
 
     @Override
@@ -75,15 +75,6 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
                 .fetch();
 
         return new PageImpl<>(dashboards, pageable, total);
-    }
-
-    @Override
-    public List<TeamDashboard> findForTeamDashboard(Member member) {
-        return queryFactory
-                .selectFrom(teamDashboard)
-                .where(teamDashboard._super.member.eq(member)
-                        .and(teamDashboard._super.status.eq(Status.ACTIVE)))
-                .fetch();
     }
 
     @Override

@@ -32,6 +32,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -45,6 +48,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboa
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
+import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
@@ -186,11 +190,17 @@ class TeamDashboardControllerTest extends ControllerTest {
     @Test
     void 팀_대시보드_전체_조회() throws Exception {
         // given
-        TeamDashboardListResDto response = TeamDashboardListResDto.from(
-                Collections.singletonList(TeamDashboardInfoResDto.of(member, teamDashboard))
+        Page<TeamDashboard> teamDashboardPage = new PageImpl<>(
+                List.of(teamDashboard),
+                PageRequest.of(0, 10),
+                1
+        );
+        TeamDashboardListResDto response = TeamDashboardListResDto.of(
+                Collections.singletonList(TeamDashboardInfoResDto.of(member, teamDashboard)),
+                PageInfoResDto.from(teamDashboardPage)
         );
 
-        given(teamDashboardService.findForTeamDashboard(anyString())).willReturn(response);
+        given(teamDashboardService.findForTeamDashboard(anyString(), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/api/dashboards/team/")
@@ -220,8 +230,9 @@ class TeamDashboardControllerTest extends ControllerTest {
                                         .description("팀 대시보드의 완료된 블록 진행률"),
                                 fieldWithPath("data.teamDashboardInfoResDto[].joinMembers")
                                         .description("팀 대시보드에 참여한 사용자"),
-                                fieldWithPath("data.pageInfoResDto")
-                                        .description("페이지 정보가 없습니다.")
+                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
+                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
+                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
                         )
                 ))
                 .andExpect(status().isOk());

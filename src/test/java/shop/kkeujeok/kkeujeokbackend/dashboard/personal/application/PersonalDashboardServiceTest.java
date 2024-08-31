@@ -16,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
@@ -172,11 +176,18 @@ class PersonalDashboardServiceTest {
     @Test
     void 개인_대시보드_전체_조회() {
         // given
-        when(personalDashboardRepository.findForPersonalDashboard(any(Member.class)))
-                .thenReturn(List.of(personalDashboard));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<PersonalDashboard> personalDashboardPage = new PageImpl<>(
+                List.of(personalDashboard),
+                pageable,
+                1);
+
+        when(personalDashboardRepository.findForPersonalDashboard(any(Member.class), any(Pageable.class)))
+                .thenReturn(personalDashboardPage);
 
         // when
-        PersonalDashboardListResDto result = personalDashboardService.findForPersonalDashboard(member.getEmail());
+        PersonalDashboardListResDto result = personalDashboardService.
+                findForPersonalDashboard(member.getEmail(), pageable);
 
         // then
         assertThat(result).isNotNull();
