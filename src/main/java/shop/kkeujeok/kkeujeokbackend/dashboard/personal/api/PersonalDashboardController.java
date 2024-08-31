@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
@@ -47,12 +45,10 @@ public class PersonalDashboardController {
     }
 
     @GetMapping("/")
-    public RspTemplate<PersonalDashboardListResDto> findForPersonalDashboard(@CurrentUserEmail String email,
-                                                                             @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                             @RequestParam(name = "size", defaultValue = "10") int size) {
+    public RspTemplate<PersonalDashboardListResDto> findForPersonalDashboard(@CurrentUserEmail String email) {
         return new RspTemplate<>(HttpStatus.OK,
                 "개인 대시보드 전체 조회",
-                personalDashboardService.findForPersonalDashboard(email, PageRequest.of(page, size)));
+                personalDashboardService.findForPersonalDashboard(email));
     }
 
     @GetMapping("/{dashboardId}")
