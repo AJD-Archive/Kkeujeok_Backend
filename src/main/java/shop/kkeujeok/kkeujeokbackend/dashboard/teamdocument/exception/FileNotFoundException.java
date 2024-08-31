@@ -3,7 +3,6 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.exception;
 import shop.kkeujeok.kkeujeokbackend.global.error.exception.NotFoundGroupException;
 
 public class FileNotFoundException extends NotFoundGroupException {
-
     public FileNotFoundException(String message) {
         super(message);
     }

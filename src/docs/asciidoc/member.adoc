@@ -12,3 +12,14 @@ include::{snippets}/member/mypage/request-headers.adoc[]
 include::{snippets}/member/mypage/http-response.adoc[]
 include::{snippets}/member/mypage/response-fields.adoc[]
 
+=== 팀 대시보드와 챌린지 정보 조회 API
+
+==== 요청
+
+include::{snippets}/member/team-challenges/http-request.adoc[]
+include::{snippets}/member/team-challenges/request-headers.adoc[]
+
+==== 응답
+
+include::{snippets}/member/team-challenges/http-response.adoc[]
+include::{snippets}/member/team-challenges/response-fields.adoc[]

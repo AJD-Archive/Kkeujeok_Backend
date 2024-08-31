@@ -31,21 +31,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
-import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
@@ -75,6 +73,10 @@ class PersonalDashboardControllerTest extends ControllerTest {
         personalDashboardUpdateReqDto = new PersonalDashboardUpdateReqDto("updateTitle", "updateDescription", true,
                 "updateCategory");
         personalDashboard = personalDashboardSaveReqDto.toEntity(member);
+
+        ReflectionTestUtils.setField(personalDashboard, "id", 1L);
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(personalDashboard, "member", member);
 
         personalDashboardController = new PersonalDashboardController(personalDashboardService);
 
@@ -183,16 +185,11 @@ class PersonalDashboardControllerTest extends ControllerTest {
     @Test
     void 개인_대시보드_전체_조회() throws Exception {
         // given
-        Page<PersonalDashboard> personalDashboardPage = new PageImpl<>(
-                List.of(personalDashboard),
-                PageRequest.of(0, 10),
-                1);
         PersonalDashboardListResDto response = PersonalDashboardListResDto.of(
-                Collections.singletonList(PersonalDashboardInfoResDto.of(member, personalDashboard)),
-                PageInfoResDto.from(personalDashboardPage)
+                Collections.singletonList(PersonalDashboardInfoResDto.of(member, personalDashboard))
         );
 
-        given(personalDashboardService.findForPersonalDashboard(anyString(), any())).willReturn(response);
+        given(personalDashboardService.findForPersonalDashboard(anyString())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/api/dashboards/personal/")
@@ -223,10 +220,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.personalDashboardListResDto[].category")
                                         .description("개인 대시보드 카테고리"),
                                 fieldWithPath("data.personalDashboardListResDto[].blockProgress")
-                                        .description("개인 대시보드의 완료된 블록 진행률"),
-                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
+                                        .description("개인 대시보드의 완료된 블록 진행률")
                         )
                 ))
                 .andExpect(status().isOk());
@@ -265,6 +259,34 @@ class PersonalDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.isPublic").description("개인 대시보드 공개 범위"),
                                 fieldWithPath("data.category").description("개인 대시보드 카테고리"),
                                 fieldWithPath("data.blockProgress").description("개인 대시보드의 완료된 블록 진행률")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("GET 사용자 개인 대시보드들의 카테고리를 불러옵니다.")
+    @Test
+    void 개인_대시보드_카테고리_조회() throws Exception {
+        // given
+        PersonalDashboardCategoriesResDto response = PersonalDashboardCategoriesResDto.from(List.of("category"));
+
+        given(personalDashboardService.findForPersonalDashboardByCategories(anyString())).willReturn(response);
+
+        // when & then
+        mockMvc.perform(get("/api/dashboards/personal/categories")
+                        .header("Authorization", "Bearer valid-token")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("dashboard/personal/categories",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.categories[]").description("개인 대시보드 카테고리")
                         )
                 ))
                 .andExpect(status().isOk());

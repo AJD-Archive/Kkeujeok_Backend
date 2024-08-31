@@ -16,6 +16,7 @@ public record BlockInfoResDto(
         String contents,
         Progress progress,
         Type type,
+        String dType,
         String startDate,
         String deadLine,
         String nickname,
@@ -28,6 +29,7 @@ public record BlockInfoResDto(
                 .contents(block.getContents())
                 .progress(block.getProgress())
                 .type(block.getType())
+                .dType(block.getDashboard().getDType())
                 .startDate(block.getStartDate())
                 .deadLine(block.getDeadLine())
                 .nickname(block.getMember().getNickname())

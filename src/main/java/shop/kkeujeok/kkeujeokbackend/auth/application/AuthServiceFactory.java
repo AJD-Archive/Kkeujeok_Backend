@@ -9,6 +9,7 @@ import java.util.Map;
 
 @Service
 public class AuthServiceFactory {
+
     private final Map<String, AuthService> authServiceMap;
 
     @Autowired
