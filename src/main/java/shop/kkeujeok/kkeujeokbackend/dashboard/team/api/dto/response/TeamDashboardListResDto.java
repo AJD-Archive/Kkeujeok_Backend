@@ -16,10 +16,4 @@ public record TeamDashboardListResDto(
                 .pageInfoResDto(pageInfoResDto)
                 .build();
     }
-
-    public static TeamDashboardListResDto from(List<TeamDashboardInfoResDto> teamDashboards) {
-        return TeamDashboardListResDto.builder()
-                .teamDashboardInfoResDto(teamDashboards)
-                .build();
-    }
 }
