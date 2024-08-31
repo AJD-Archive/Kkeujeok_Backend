@@ -29,6 +29,7 @@ class BlockTest {
                 .progress(Progress.NOT_STARTED)
                 .startDate(startDate)
                 .deadLine(deadLine)
+                .sequence(1)
                 .build();
     }
 
@@ -133,6 +134,18 @@ class BlockTest {
 
         // then
         assertThat(block.getStatus()).isEqualTo(Status.ACTIVE);
+    }
+
+    @DisplayName("블록의 순번이 변경됩니다.")
+    @Test
+    void 블록_순번_변경() {
+        // given
+
+        // when
+        block.sequenceUpdate(5);
+
+        // then
+        assertThat(block.getSequence()).isEqualTo(5);
     }
 
 }

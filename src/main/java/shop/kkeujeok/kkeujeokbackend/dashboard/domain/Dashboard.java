@@ -23,7 +23,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Entity
 @Getter
-@DiscriminatorColumn
+@DiscriminatorColumn(name = "dtype")
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Dashboard extends BaseEntity {
@@ -36,6 +36,9 @@ public class Dashboard extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "dtype", insertable = false, updatable = false)
+    private String dType;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -43,10 +46,11 @@ public class Dashboard extends BaseEntity {
     @OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Block> blocks = new ArrayList<>();
 
-    public Dashboard(String title, String description, Member member) {
+    public Dashboard(String title, String description, String dType, Member member) {
         this.status = Status.ACTIVE;
         this.title = title;
         this.description = description;
+        this.dType = dType;
         this.member = member;
     }
 

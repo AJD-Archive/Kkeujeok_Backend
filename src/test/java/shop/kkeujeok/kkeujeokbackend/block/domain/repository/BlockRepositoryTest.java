@@ -70,6 +70,7 @@ class BlockRepositoryTest {
                 .progress(Progress.NOT_STARTED)
                 .deadLine("2024.07.27 11:03")
                 .dashboard(dashboard)
+                .sequence(1)
                 .build();
 
         block2 = Block.builder()
@@ -78,6 +79,7 @@ class BlockRepositoryTest {
                 .progress(Progress.NOT_STARTED)
                 .deadLine("2024.07.27 11:04")
                 .dashboard(dashboard)
+                .sequence(2)
                 .build();
 
         block3 = Block.builder()
@@ -86,6 +88,7 @@ class BlockRepositoryTest {
                 .progress(Progress.IN_PROGRESS)
                 .deadLine("2024.07.27 11:05")
                 .dashboard(dashboard)
+                .sequence(3)
                 .build();
 
         memberRepository.save(member);
@@ -122,6 +125,18 @@ class BlockRepositoryTest {
 
         // then
         assertThat(blocks.getContent().size()).isEqualTo(1);
+    }
+
+    @DisplayName("블록의 마지막 순번을 가져옵니다.")
+    @Test
+    void 블록_마지막_순번() {
+        // given
+
+        // when
+        int lastSequence = blockRepository.findLastSequenceByProgress(member, dashboard.getId(), Progress.NOT_STARTED);
+
+        // then
+        assertThat(lastSequence).isEqualTo(2);
     }
 
 }

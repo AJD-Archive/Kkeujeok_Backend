@@ -14,7 +14,7 @@ public record BlockSaveReqDto(
         String startDate,
         String deadLine
 ) {
-    public Block toEntity(Member member, Dashboard dashboard) {
+    public Block toEntity(Member member, Dashboard dashboard, int lastSequence) {
         return Block.builder()
                 .title(title)
                 .contents(contents)
@@ -22,6 +22,7 @@ public record BlockSaveReqDto(
                 .type(Type.BASIC)
                 .startDate(startDate)
                 .deadLine(deadLine)
+                .sequence(lastSequence + 1)
                 .member(member)
                 .dashboard(dashboard)
                 .build();

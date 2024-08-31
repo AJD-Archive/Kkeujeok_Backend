@@ -37,6 +37,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
@@ -86,6 +87,10 @@ class TeamDashboardControllerTest extends ControllerTest {
         teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description");
         teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription");
         teamDashboard = teamDashboardSaveReqDto.toEntity(member);
+
+        ReflectionTestUtils.setField(teamDashboard, "id", 1L);
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(teamDashboard, "member", member);
 
         teamDashboardController = new TeamDashboardController(teamDashboardService);
 

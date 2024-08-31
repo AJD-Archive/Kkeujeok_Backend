@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
@@ -76,6 +77,10 @@ class PersonalDashboardControllerTest extends ControllerTest {
         personalDashboardUpdateReqDto = new PersonalDashboardUpdateReqDto("updateTitle", "updateDescription", true,
                 "updateCategory");
         personalDashboard = personalDashboardSaveReqDto.toEntity(member);
+
+        ReflectionTestUtils.setField(personalDashboard, "id", 1L);
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(personalDashboard, "member", member);
 
         personalDashboardController = new PersonalDashboardController(personalDashboardService);
 
