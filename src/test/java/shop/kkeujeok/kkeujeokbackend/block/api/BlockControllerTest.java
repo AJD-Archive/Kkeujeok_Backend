@@ -315,9 +315,10 @@ class BlockControllerTest extends ControllerTest {
         given(blockService.findForBlockByProgress(anyString(), anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get(String.format("/api/blocks?dashboardId=%d&progress=%s", 1L, progressString))
-                        .header("Authorization", "Bearer valid-token")
-                        .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get(String.format("/api/blocks?dashboardId=%d&progress=%s&page=%d&size=%d", 1L, progressString, 0, 10))
+                                .header("Authorization", "Bearer valid-token")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/findByBlockWithProgress",
                         preprocessRequest(prettyPrint()),
@@ -326,7 +327,11 @@ class BlockControllerTest extends ControllerTest {
                                 parameterWithName("dashboardId")
                                         .description("대시보드 아이디"),
                                 parameterWithName("progress")
-                                        .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
+                                        .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)"),
+                                parameterWithName("page")
+                                        .description("페이지 번호"),
+                                parameterWithName("size")
+                                        .description("페이지 크기")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -411,5 +416,5 @@ class BlockControllerTest extends ControllerTest {
                 ))
                 .andExpect(status().isOk());
     }
-    
+
 }
