@@ -26,7 +26,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @Transactional(readOnly = true)
 public class TeamDashboardService {
 
-    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s 대시보드에 초대되었습니다.";
+    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.";
 
 
     private final TeamDashboardRepository teamDashboardRepository;
@@ -103,9 +103,6 @@ public class TeamDashboardService {
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
-        String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, dashboard.getTitle());
-        notificationService.sendNotification(member, message);
-
         dashboard.addMember(member);
     }
 
@@ -122,6 +119,18 @@ public class TeamDashboardService {
         List<Member> searchMembers = teamDashboardRepository.findForMembersByQuery(query);
 
         return SearchMemberListResDto.from(searchMembers);
+    }
+
+    public void inviteMember(String inviteSendMemberEmail, String inviteReceivedMemberEmail, Long dashboardId) {
+        Member inviteSendMember = memberRepository.findByEmail(inviteSendMemberEmail)
+                .orElseThrow(MemberNotFoundException::new);
+        Member inviteReceivedMember = memberRepository.findByEmail(inviteReceivedMemberEmail)
+                .orElseThrow(MemberNotFoundException::new);
+        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, inviteSendMember.getName(), dashboard.getTitle());
+        notificationService.sendNotification(inviteReceivedMember, message);
     }
 
     private void verifyMemberIsAuthor(TeamDashboard teamDashboard, Member member) {
