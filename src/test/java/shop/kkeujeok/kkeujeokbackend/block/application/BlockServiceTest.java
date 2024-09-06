@@ -266,4 +266,18 @@ class BlockServiceTest {
         verify(blockRepository, times(6)).findById(anyLong());  // 6번 블록 조회가 이루어졌는지 검증
     }
 
+    @DisplayName("블록을 영구 삭제 합니다.")
+    @Test
+    void 블록_영구_삭제() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(deleteBlock));
+
+        // when
+        blockService.deletePermanently("email", blockId);
+
+        // then
+        verify(blockRepository, times(1)).delete(deleteBlock);
+    }
+
 }
