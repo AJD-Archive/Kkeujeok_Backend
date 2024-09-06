@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.InvalidMemberInviteException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
@@ -19,14 +20,19 @@ import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamDashboardService {
 
+    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.";
+
+
     private final TeamDashboardRepository teamDashboardRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     // 팀 대시보드 저장
     @Transactional
@@ -126,6 +132,23 @@ public class TeamDashboardService {
         List<Member> searchMembers = teamDashboardRepository.findForMembersByQuery(query);
 
         return SearchMemberListResDto.from(searchMembers);
+    }
+
+    @Transactional
+    public void inviteMember(String inviteSendMemberEmail, String inviteReceivedMemberEmail, Long dashboardId) {
+        if (inviteSendMemberEmail.equals(inviteReceivedMemberEmail)) {
+            throw new InvalidMemberInviteException();
+        }
+
+        Member inviteSendMember = memberRepository.findByEmail(inviteSendMemberEmail)
+                .orElseThrow(MemberNotFoundException::new);
+        Member inviteReceivedMember = memberRepository.findByEmail(inviteReceivedMemberEmail)
+                .orElseThrow(MemberNotFoundException::new);
+        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+
+        String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, inviteSendMember.getName(), dashboard.getTitle());
+        notificationService.sendNotification(inviteReceivedMember, message);
     }
 
     private void verifyMemberIsAuthor(TeamDashboard teamDashboard, Member member) {
