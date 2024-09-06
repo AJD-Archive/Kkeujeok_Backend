@@ -42,6 +42,7 @@ public class TeamDashboardService {
 
         teamDashboardRepository.save(teamDashboard);
 
+        inviteMember(member, teamDashboard, teamDashboardSaveReqDto.invitedEmails());
         return TeamDashboardInfoResDto.of(member, teamDashboard);
     }
 
@@ -58,6 +59,8 @@ public class TeamDashboardService {
 
         dashboard.update(teamDashboardUpdateReqDto.title(),
                 teamDashboardUpdateReqDto.description());
+
+        inviteMember(member, dashboard, teamDashboardUpdateReqDto.invitedEmails());
 
         return TeamDashboardInfoResDto.of(member, dashboard);
     }
@@ -122,21 +125,23 @@ public class TeamDashboardService {
         return SearchMemberListResDto.from(searchMembers);
     }
 
-    @Transactional
-    public void inviteMember(String inviteSendMemberEmail, String inviteReceivedMemberEmail, Long dashboardId) {
-        if (inviteSendMemberEmail.equals(inviteReceivedMemberEmail)) {
+    private void inviteMember(Member member, TeamDashboard teamDashboard, List<String> invitedEmails) {
+        for (String email : invitedEmails) {
+            verifyIsSameEmail(member.getEmail(), email);
+
+            Member inviteReceivedMember = memberRepository.findByEmail(email)
+                    .orElseThrow(MemberNotFoundException::new);
+
+            String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
+                    teamDashboard.getTitle());
+            notificationService.sendNotification(inviteReceivedMember, message);
+        }
+    }
+
+    private void verifyIsSameEmail(String email, String otherEmail) {
+        if (email.equals(otherEmail)) {
             throw new InvalidMemberInviteException();
         }
-
-        Member inviteSendMember = memberRepository.findByEmail(inviteSendMemberEmail)
-                .orElseThrow(MemberNotFoundException::new);
-        Member inviteReceivedMember = memberRepository.findByEmail(inviteReceivedMemberEmail)
-                .orElseThrow(MemberNotFoundException::new);
-        TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
-                .orElseThrow(DashboardNotFoundException::new);
-
-        String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, inviteSendMember.getName(), dashboard.getTitle());
-        notificationService.sendNotification(inviteReceivedMember, message);
     }
 
     private void verifyMemberIsAuthor(TeamDashboard teamDashboard, Member member) {
