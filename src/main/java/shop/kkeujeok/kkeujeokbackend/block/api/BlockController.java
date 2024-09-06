@@ -79,4 +79,23 @@ public class BlockController {
         return new RspTemplate<>(HttpStatus.OK, "블록 순서 변경");
     }
 
+    @GetMapping("/deleted")
+    public RspTemplate<BlockListResDto> findDeletedBlocks(@CurrentUserEmail String email,
+                                                          @RequestParam(name = "dashboardId") Long dashboardId,
+                                                          @RequestParam(name = "page", defaultValue = "0") int page,
+                                                          @RequestParam(name = "size", defaultValue = "10") int size) {
+        BlockListResDto deletedBlocks = blockService.findDeletedBlocks(email, dashboardId, PageRequest.of(page, size));
+        return new RspTemplate<>(HttpStatus.OK,
+                "삭제된 블록 조회",
+                deletedBlocks);
+    }
+
+    @DeleteMapping("/permanent/{blockId}")
+    public RspTemplate<Void> deletePermanently(@CurrentUserEmail String email,
+                                               @PathVariable(name = "blockId") Long blockId) {
+        blockService.deletePermanently(email, blockId);
+        return new RspTemplate<>(HttpStatus.OK,
+                "블록 영구 삭제");
+    }
+
 }

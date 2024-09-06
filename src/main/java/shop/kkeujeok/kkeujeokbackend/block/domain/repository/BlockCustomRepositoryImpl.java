@@ -28,7 +28,9 @@ public class BlockCustomRepositoryImpl implements BlockCustomRepository {
     public Page<Block> findByBlockWithProgress(Long dashboardId, Progress progress, Pageable pageable) {
         long total = queryFactory
                 .selectFrom(block)
-                .where(block.progress.eq(progress))
+                .where(block.progress.eq(progress)
+                        .and(block.dashboard.id.eq(dashboardId))
+                        .and(block.status.eq(Status.ACTIVE)))
                 .stream()
                 .count();
 
@@ -62,4 +64,24 @@ public class BlockCustomRepositoryImpl implements BlockCustomRepository {
                 .orElse(0);
     }
 
+    @Override
+    public Page<Block> findByDeletedBlocks(Long dashboardId, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(block)
+                .where(block.dashboard.id.eq(dashboardId)
+                        .and(block.status.eq(Status.DELETED)))
+                .stream()
+                .count();
+
+        List<Block> blocks = queryFactory
+                .selectFrom(block)
+                .where(block.dashboard.id.eq(dashboardId)
+                        .and(block.status.eq(Status.DELETED)))
+                .orderBy(block.sequence.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(blocks, pageable, total);
+    }
 }
