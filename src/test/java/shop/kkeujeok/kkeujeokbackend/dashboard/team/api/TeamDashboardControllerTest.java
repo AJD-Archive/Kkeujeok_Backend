@@ -88,8 +88,9 @@ class TeamDashboardControllerTest extends ControllerTest {
                 .picture("joinPicture")
                 .build();
 
-        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description");
-        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription");
+        List<String> emails = List.of("joinEmail");
+        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", emails);
+        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription", emails);
         teamDashboard = teamDashboardSaveReqDto.toEntity(member);
 
         teamDashboardController = new TeamDashboardController(teamDashboardService);
@@ -125,7 +126,8 @@ class TeamDashboardControllerTest extends ControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("title").description("팀 대시보드 제목"),
-                                fieldWithPath("description").description("팀 대시보드 설명")
+                                fieldWithPath("description").description("팀 대시보드 설명"),
+                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -169,7 +171,8 @@ class TeamDashboardControllerTest extends ControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("title").description("개인 대시보드 제목"),
-                                fieldWithPath("description").description("개인 대시보드 설명")
+                                fieldWithPath("description").description("개인 대시보드 설명"),
+                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -375,33 +378,6 @@ class TeamDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.searchMembers[].id").description("대시보드 아이디"),
                                 fieldWithPath("data.searchMembers[].picture").description("내 아이디"),
                                 fieldWithPath("data.searchMembers[].email").description("팀 대시보드 생성자 아이디")
-                        )
-                ))
-                .andExpect(status().isOk());
-    }
-
-    @DisplayName("팀 대시보드에 초대 알림을 전송합니다")
-    @Test
-    void 팀_대시보드_초대() throws Exception {
-        // given
-        doNothing().when(teamDashboardService)
-                .inviteMember(member.getEmail(), joinMember.getEmail(), 1L);
-
-        mockMvc.perform(get("/api/dashboards/team/{dashboardId}/invite?email=%s", 1L, joinMember.getEmail())
-                        .header("Authorization", "Bearer valid-token")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andDo(document("dashboard/team/leave",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(
-                                headerWithName("Authorization").description("JWT 토큰")
-                        ),
-                        pathParameters(
-                                parameterWithName("dashboardId").description("팀 대시보드 ID")
-                        ),
-                        queryParameters(
-                                parameterWithName("email").description("초대 받는 사람 이메일")
                         )
                 ))
                 .andExpect(status().isOk());

@@ -69,8 +69,9 @@ class TeamDashboardServiceTest {
 
         lenient().when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
 
-        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description");
-        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription");
+        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", List.of("joinEmail"));
+        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription",
+                List.of("joinEmail"));
 
         teamDashboard = TeamDashboard.builder()
                 .title(teamDashboardSaveReqDto.title())
