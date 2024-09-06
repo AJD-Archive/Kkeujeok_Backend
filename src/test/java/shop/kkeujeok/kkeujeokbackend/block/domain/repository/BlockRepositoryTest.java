@@ -43,6 +43,7 @@ class BlockRepositoryTest {
     private Block block1;
     private Block block2;
     private Block block3;
+    private Block block4;
 
 
     @BeforeEach
@@ -91,11 +92,23 @@ class BlockRepositoryTest {
                 .sequence(3)
                 .build();
 
+        block4 = Block.builder()
+                .title("title3")
+                .contents("contents3")
+                .progress(Progress.COMPLETED)
+                .deadLine("2024.09.07 12:36")
+                .dashboard(dashboard)
+                .sequence(4)
+                .build();
+
         memberRepository.save(member);
         dashboardRepository.save(dashboard);
         blockRepository.save(block1);
         blockRepository.save(block2);
         blockRepository.save(block3);
+        blockRepository.save(block4);
+
+        block4.statusUpdate();
     }
 
     @DisplayName("블록을 진행 상태별로 전체 조회합니다.")
@@ -137,6 +150,19 @@ class BlockRepositoryTest {
 
         // then
         assertThat(lastSequence).isEqualTo(2);
+    }
+
+    @DisplayName("논리적으로 삭제된 블록을 조회합니다. ")
+    @Test
+    void 삭제_블록_조회() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<Block> blocks = blockRepository.findByDeletedBlocks(dashboard.getId(), pageable);
+
+        // then
+        assertThat(blocks.getContent().size()).isEqualTo(1);
     }
 
 }
