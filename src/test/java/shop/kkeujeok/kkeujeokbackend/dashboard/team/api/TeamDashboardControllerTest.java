@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +52,7 @@ import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 class TeamDashboardControllerTest extends ControllerTest {
 
@@ -62,6 +64,9 @@ class TeamDashboardControllerTest extends ControllerTest {
 
     @InjectMocks
     private TeamDashboardController teamDashboardController;
+
+    @Mock
+    private NotificationService notificationService;
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
@@ -370,6 +375,33 @@ class TeamDashboardControllerTest extends ControllerTest {
                                 fieldWithPath("data.searchMembers[].id").description("대시보드 아이디"),
                                 fieldWithPath("data.searchMembers[].picture").description("내 아이디"),
                                 fieldWithPath("data.searchMembers[].email").description("팀 대시보드 생성자 아이디")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("팀 대시보드에 초대 알림을 전송합니다")
+    @Test
+    void 팀_대시보드_초대() throws Exception {
+        // given
+        doNothing().when(teamDashboardService)
+                .inviteMember(member.getEmail(), joinMember.getEmail(), 1L);
+
+        mockMvc.perform(get("/api/dashboards/team/{dashboardId}/invite?email=%s", 1L, joinMember.getEmail())
+                        .header("Authorization", "Bearer valid-token")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("dashboard/team/leave",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("dashboardId").description("팀 대시보드 ID")
+                        ),
+                        queryParameters(
+                                parameterWithName("email").description("초대 받는 사람 이메일")
                         )
                 ))
                 .andExpect(status().isOk());
