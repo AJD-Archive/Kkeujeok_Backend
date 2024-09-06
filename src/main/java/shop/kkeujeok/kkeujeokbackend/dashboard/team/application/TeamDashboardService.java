@@ -19,14 +19,19 @@ import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamDashboardService {
 
+    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s 대시보드에 초대되었습니다.";
+
+
     private final TeamDashboardRepository teamDashboardRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     // 팀 대시보드 저장
     @Transactional
@@ -97,6 +102,9 @@ public class TeamDashboardService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
+
+        String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, dashboard.getTitle());
+        notificationService.sendNotification(member, message);
 
         dashboard.addMember(member);
     }
