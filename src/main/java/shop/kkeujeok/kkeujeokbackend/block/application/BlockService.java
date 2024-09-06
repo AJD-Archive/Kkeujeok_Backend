@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
@@ -38,7 +39,13 @@ public class BlockService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(blockSaveReqDto.dashboardId())
                 .orElseThrow(DashboardNotFoundException::new);
-        Block block = blockRepository.save(blockSaveReqDto.toEntity(member, dashboard));
+
+        int lastSequence = blockRepository.findLastSequenceByProgress(
+                member,
+                dashboard.getId(),
+                blockSaveReqDto.progress());
+
+        Block block = blockRepository.save(blockSaveReqDto.toEntity(member, dashboard, lastSequence));
 
         return BlockInfoResDto.from(block);
     }
@@ -97,6 +104,30 @@ public class BlockService {
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
         block.statusUpdate();
+    }
+
+    // 블록 순번 변경
+    @Transactional
+    public void changeBlocksSequence(String email, BlockSequenceUpdateReqDto blockSequenceUpdateReqDto) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+
+        updateBlockSequence(blockSequenceUpdateReqDto.notStartedList());
+        updateBlockSequence(blockSequenceUpdateReqDto.inProgressList());
+        updateBlockSequence(blockSequenceUpdateReqDto.completedList());
+    }
+
+    private void updateBlockSequence(List<Long> blockIds) {
+        int sequence = blockIds.size();
+
+        for (Long blockId : blockIds) {
+            Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
+
+            if (block.getSequence() != sequence) {
+                block.sequenceUpdate(sequence);
+            }
+
+            sequence--;
+        }
     }
 
     private Progress parseProgress(String progressString) {

@@ -8,5 +8,5 @@
 include::block.adoc[]
 include::challenge.adoc[]
 
-include::peronsalDashboard.adoc[]
+include::personalDashboard.adoc[]
 include::notification.adoc[]

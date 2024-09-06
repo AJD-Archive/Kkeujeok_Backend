@@ -3,15 +3,13 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
@@ -99,15 +97,14 @@ class PersonalDashboardRepositoryTest {
     @Test
     void 개인_대시보드_전체_조회() {
         // given
-        Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<PersonalDashboard> result = personalDashboardRepository.findForPersonalDashboard(member, pageable);
+        List<PersonalDashboard> result = personalDashboardRepository.findForPersonalDashboard(member);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getTitle()).isEqualTo("title");
-        assertThat(result.getContent().get(0).getMember()).isEqualTo(member);
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getTitle()).isEqualTo("title");
+        assertThat(result.get(0).getMember()).isEqualTo(member);
     }
 
     @DisplayName("대시보드의 완료된 블록 비율을 계산합니다.")

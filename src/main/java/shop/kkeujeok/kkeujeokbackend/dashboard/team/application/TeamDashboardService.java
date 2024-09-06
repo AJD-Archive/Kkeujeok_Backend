@@ -62,7 +62,7 @@ public class TeamDashboardService {
         return TeamDashboardInfoResDto.of(member, dashboard);
     }
 
-    // 팀 대시보드 전체 조회
+    // 팀 대시보드 전체 조회(페이지네이션)
     public TeamDashboardListResDto findForTeamDashboard(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Page<TeamDashboard> teamDashboards = teamDashboardRepository.findForTeamDashboard(member, pageable);
@@ -73,6 +73,18 @@ public class TeamDashboardService {
 
         return TeamDashboardListResDto
                 .of(teamDashboardInfoResDtoList, PageInfoResDto.from(teamDashboards));
+    }
+
+    // 팀 대시보드 전체 조회(페이지네이션 X)
+    public TeamDashboardListResDto findForTeamDashboard(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        List<TeamDashboard> teamDashboards = teamDashboardRepository.findForTeamDashboard(member);
+
+        List<TeamDashboardInfoResDto> teamDashboardInfoResDtoList = teamDashboards.stream()
+                .map(t -> TeamDashboardInfoResDto.of(member, t))
+                .toList();
+
+        return TeamDashboardListResDto.from(teamDashboardInfoResDtoList);
     }
 
     // 팀 대시보드 상세 조회

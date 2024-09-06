@@ -419,6 +419,7 @@ class ChallengeControllerTest extends ControllerTest {
                 "1일 1커밋하기",
                 Progress.NOT_STARTED,
                 Type.CHALLENGE,
+                "PersonalDashboard",
                 "2024.09.31 23:59",
                 "2024.09.31 23:59",
                 "동동",
@@ -447,7 +448,9 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행도"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작기한"),
                                 fieldWithPath("data.deadLine").description("블록 마감기한"),
                                 fieldWithPath("data.nickname").description("블록 작성자"),
