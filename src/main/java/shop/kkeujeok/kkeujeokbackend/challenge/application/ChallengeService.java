@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +36,9 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
+
+    private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
+
 
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
@@ -132,7 +134,7 @@ public class ChallengeService {
 
         blockRepository.save(block);
 
-        String message = String.format("%s님이 챌린지에 참여했습니다", member.getName());
+        String message = String.format(CHALLENGE_JOIN_MESSAGE, member.getName());
         notificationService.sendNotification(challenge.getMember(), message);
 
         return BlockInfoResDto.from(block);

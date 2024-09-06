@@ -33,6 +33,7 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class TeamDashboardServiceTest {
@@ -42,6 +43,9 @@ class TeamDashboardServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private TeamDashboardService teamDashboardService;
