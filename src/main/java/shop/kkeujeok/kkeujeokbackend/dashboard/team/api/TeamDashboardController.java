@@ -89,10 +89,11 @@ public class TeamDashboardController {
 
     @GetMapping("/{dashboardId}/invite")
     public RspTemplate<Void> inviteMember(@CurrentUserEmail String inviteSendMemberEmail,
-                                          @RequestBody String inviteReceivedMemberEmail,
+                                          @RequestParam("email") String inviteReceivedMemberEmail,
                                           @PathVariable(name = "dashboardId") Long dashboardId) {
         teamDashboardService.inviteMember(inviteSendMemberEmail, inviteReceivedMemberEmail, dashboardId);
 
         return new RspTemplate<>(HttpStatus.OK, "팀 대시보드 초대");
     }
+
 }

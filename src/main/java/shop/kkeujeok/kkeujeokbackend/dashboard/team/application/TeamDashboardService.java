@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.InvalidMemberInviteException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
@@ -121,7 +122,12 @@ public class TeamDashboardService {
         return SearchMemberListResDto.from(searchMembers);
     }
 
+    @Transactional
     public void inviteMember(String inviteSendMemberEmail, String inviteReceivedMemberEmail, Long dashboardId) {
+        if (inviteSendMemberEmail.equals(inviteReceivedMemberEmail)) {
+            throw new InvalidMemberInviteException();
+        }
+
         Member inviteSendMember = memberRepository.findByEmail(inviteSendMemberEmail)
                 .orElseThrow(MemberNotFoundException::new);
         Member inviteReceivedMember = memberRepository.findByEmail(inviteReceivedMemberEmail)
