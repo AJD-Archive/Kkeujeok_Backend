@@ -27,8 +27,8 @@ public class TeamDashboard extends Dashboard {
     private List<Document> documents = new ArrayList<>();
 
     @Builder
-    private TeamDashboard(String title, String description, Member member) {
-        super(title, description, member);
+    private TeamDashboard(String title, String description, String dType, Member member) {
+        super(title, description, dType, member);
     }
 
     public void update(String updateTitle, String updateDescription) {

@@ -19,8 +19,9 @@ public class PersonalDashboard extends Dashboard {
     private String category;
 
     @Builder
-    private PersonalDashboard(String title, String description, Member member, boolean isPublic, String category) {
-        super(title, description, member);
+    private PersonalDashboard(String title, String description, String dType, Member member, boolean isPublic,
+                              String category) {
+        super(title, description, dType, member);
         this.category = category;
         this.isPublic = isPublic;
     }

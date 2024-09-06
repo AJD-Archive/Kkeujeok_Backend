@@ -37,9 +37,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
@@ -61,6 +63,7 @@ class BlockControllerTest extends ControllerTest {
     private Block block;
     private BlockSaveReqDto blockSaveReqDto;
     private BlockUpdateReqDto blockUpdateReqDto;
+    private BlockSequenceUpdateReqDto blockSequenceUpdateReqDto;
 
     @InjectMocks
     BlockController blockController;
@@ -80,6 +83,7 @@ class BlockControllerTest extends ControllerTest {
                 .member(member)
                 .title("title")
                 .description("description")
+                .dType("PersonalDashboard")
                 .isPublic(false)
                 .category("category")
                 .build();
@@ -88,7 +92,15 @@ class BlockControllerTest extends ControllerTest {
                 "2024.08.03 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.03 13:23",
                 "2024.07.28 16:40");
-        block = blockSaveReqDto.toEntity(member, dashboard);
+        block = blockSaveReqDto.toEntity(member, dashboard, 0);
+
+        ReflectionTestUtils.setField(block, "id", 1L);
+
+        blockSequenceUpdateReqDto = new BlockSequenceUpdateReqDto(
+                List.of(2L, 3L),
+                List.of(3L, 1L),
+                List.of(1L, 2L)
+        );
 
         blockController = new BlockController(blockService);
 
@@ -136,7 +148,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
@@ -181,7 +195,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
@@ -224,7 +240,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
@@ -297,9 +315,10 @@ class BlockControllerTest extends ControllerTest {
         given(blockService.findForBlockByProgress(anyString(), anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get(String.format("/api/blocks?dashboardId=%d&progress=%s", 1L, progressString))
-                        .header("Authorization", "Bearer valid-token")
-                        .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get(String.format("/api/blocks?dashboardId=%d&progress=%s&page=%d&size=%d", 1L, progressString, 0, 10))
+                                .header("Authorization", "Bearer valid-token")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/findByBlockWithProgress",
                         preprocessRequest(prettyPrint()),
@@ -308,7 +327,11 @@ class BlockControllerTest extends ControllerTest {
                                 parameterWithName("dashboardId")
                                         .description("대시보드 아이디"),
                                 parameterWithName("progress")
-                                        .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
+                                        .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)"),
+                                parameterWithName("page")
+                                        .description("페이지 번호"),
+                                parameterWithName("size")
+                                        .description("페이지 크기")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -317,7 +340,9 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockListResDto[].title").description("블록 제목"),
                                 fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
                                 fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
-                                fieldWithPath("data.blockListResDto[].type").description("블록 타입"),
+                                fieldWithPath("data.blockListResDto[].type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.blockListResDto[].dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.blockListResDto[].startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
@@ -356,11 +381,37 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.title").description("블록 제목"),
                                 fieldWithPath("data.contents").description("블록 내용"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
-                                fieldWithPath("data.type").description("블록 타입"),
+                                fieldWithPath("data.type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
                                 fieldWithPath("data.dDay").description("마감 기한")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("PATCH 블록의 순번을 변경합니다.")
+    @Test
+    void 블록_순번_변경() throws Exception {
+        // given
+        doNothing().when(blockService).changeBlocksSequence(anyString(), any());
+
+        // when & then
+        mockMvc.perform(patch("/api/blocks/change")
+                        .header("Authorization", "Bearer token")  // 필요에 따라 토큰 추가
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(blockSequenceUpdateReqDto)))
+                .andDo(print())
+                .andDo(document("block/change",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("notStartedList").description("시작 전 블록 아이디 리스트"),
+                                fieldWithPath("inProgressList").description("진행 중 블록 아이디 리스트"),
+                                fieldWithPath("completedList").description("완료 블록 아이디 리스트")
                         )
                 ))
                 .andExpect(status().isOk());
