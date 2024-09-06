@@ -477,10 +477,9 @@ class BlockControllerTest extends ControllerTest {
         // when & then
         mockMvc.perform(delete("/api/blocks/permanent/{blockId}", 1L)
                         .header("Authorization", "Bearer token")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(blockSequenceUpdateReqDto)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andDo(document("block/permanent",
+                .andDo(document("block/deletePermanentBlock",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
