@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.auth.application;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 
 public interface AuthService {
@@ -8,5 +9,5 @@ public interface AuthService {
 
     String getProvider();
 
-    JsonNode getIdToken(String code);
+    IdTokenResDto getIdToken(String code);
 }
