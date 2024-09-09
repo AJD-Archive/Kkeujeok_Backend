@@ -10,6 +10,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.TeamDocum
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.TeamDocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.FindTeamDocumentResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.TeamDocumentCategoriesResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.TeamDocumentDetailResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.TeamDocumentResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.application.TeamDocumentService;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
@@ -35,6 +36,11 @@ public class TeamDocumentController {
                                                   @PathVariable(name = "teamDocumentId") Long teamDocumentId,
                                                   @RequestBody TeamDocumentUpdateReqDto teamDocumentUpdateReqDto) {
         return new RspTemplate<>(HttpStatus.OK, "팀 문서 수정", teamDocumentService.update(email, teamDocumentId, teamDocumentUpdateReqDto));
+    }
+
+    @GetMapping("/{teamDocumentId}")
+    public RspTemplate<TeamDocumentDetailResDto> findById(@PathVariable(name = "teamDocumentId") Long teamDocumentId) {
+        return new RspTemplate<>(HttpStatus.OK, "팀 문서 상세보기", teamDocumentService.findById(teamDocumentId));
     }
 
     @GetMapping("/categories/{teamDashboardId}")

@@ -13,6 +13,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.TeamDocum
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.TeamDocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.FindTeamDocumentResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.TeamDocumentCategoriesResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.TeamDocumentDetailResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.TeamDocumentResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.domain.TeamDocument;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.domain.repository.TeamDocumentRepository;
@@ -45,6 +46,13 @@ public class TeamDocumentService {
         teamDocumentRepository.save(document);
 
         return TeamDocumentResDto.of(document);
+    }
+
+    public TeamDocumentDetailResDto findById(Long teamDocumentId) {
+        TeamDocument teamDocument = teamDocumentRepository.findById(teamDocumentId)
+                .orElseThrow(TeamDocumentNotFoundException::new);
+
+        return TeamDocumentDetailResDto.from(teamDocument);
     }
 
     @Transactional
