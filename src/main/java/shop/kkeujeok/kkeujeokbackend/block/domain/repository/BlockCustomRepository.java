@@ -10,4 +10,6 @@ public interface BlockCustomRepository {
     Page<Block> findByBlockWithProgress(Long dashboardId, Progress progress, Pageable pageable);
 
     int findLastSequenceByProgress(Member member, Long dashboardId, Progress progress);
+
+    Page<Block> findByDeletedBlocks(Long dashboardId, Pageable pageable);
 }

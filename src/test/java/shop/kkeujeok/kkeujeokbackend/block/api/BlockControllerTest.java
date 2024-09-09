@@ -315,9 +315,10 @@ class BlockControllerTest extends ControllerTest {
         given(blockService.findForBlockByProgress(anyString(), anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get(String.format("/api/blocks?dashboardId=%d&progress=%s", 1L, progressString))
-                        .header("Authorization", "Bearer valid-token")
-                        .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get(String.format("/api/blocks?dashboardId=%d&progress=%s&page=%d&size=%d", 1L, progressString, 0, 10))
+                                .header("Authorization", "Bearer valid-token")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("block/findByBlockWithProgress",
                         preprocessRequest(prettyPrint()),
@@ -326,7 +327,11 @@ class BlockControllerTest extends ControllerTest {
                                 parameterWithName("dashboardId")
                                         .description("대시보드 아이디"),
                                 parameterWithName("progress")
-                                        .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
+                                        .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)"),
+                                parameterWithName("page")
+                                        .description("페이지 번호"),
+                                parameterWithName("size")
+                                        .description("페이지 크기")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -396,7 +401,7 @@ class BlockControllerTest extends ControllerTest {
 
         // when & then
         mockMvc.perform(patch("/api/blocks/change")
-                        .header("Authorization", "Bearer token")  // 필요에 따라 토큰 추가
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(blockSequenceUpdateReqDto)))
                 .andDo(print())
@@ -411,5 +416,77 @@ class BlockControllerTest extends ControllerTest {
                 ))
                 .andExpect(status().isOk());
     }
-    
+
+    @DisplayName("GET 삭제된 블록을 조회합니다.")
+    @Test
+    void 삭제_블록_조회() throws Exception {
+        // given
+        block.statusUpdate();
+        Page<Block> blockPage = new PageImpl<>(List.of(block), PageRequest.of(0, 10), 1);
+        BlockListResDto response = BlockListResDto.from(
+                Collections.singletonList(BlockInfoResDto.from(block)),
+                PageInfoResDto.from(blockPage));
+
+        given(blockService.findDeletedBlocks(anyString(), anyLong(), any())).willReturn(response);
+
+        // when & then
+        mockMvc.perform(
+                        get(String.format("/api/blocks/deleted?dashboardId=%d&page=%d&size=%d", 1L, 0, 10))
+                                .header("Authorization", "Bearer valid-token")
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("block/findDeletedBlocks",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("dashboardId")
+                                        .description("대시보드 아이디"),
+                                parameterWithName("page")
+                                        .description("페이지 번호"),
+                                parameterWithName("size")
+                                        .description("페이지 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.blockListResDto[].blockId").description("블록 아이디"),
+                                fieldWithPath("data.blockListResDto[].title").description("블록 제목"),
+                                fieldWithPath("data.blockListResDto[].contents").description("블록 내용"),
+                                fieldWithPath("data.blockListResDto[].progress").description("블록 진행 상태"),
+                                fieldWithPath("data.blockListResDto[].type").description(
+                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
+                                fieldWithPath("data.blockListResDto[].dType").description("개인 대시보드, 팀 대시보드를 구별"),
+                                fieldWithPath("data.blockListResDto[].startDate").description("블록 시작 시간"),
+                                fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
+                                fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
+                                fieldWithPath("data.blockListResDto[].dDay").description("마감 기한"),
+                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
+                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
+                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("DELETED 블록을 영구 삭제 합니다.")
+    @Test
+    void 블록_영구_삭제() throws Exception {
+        // given
+        doNothing().when(blockService).deletePermanently(anyString(), any());
+
+        // when & then
+        mockMvc.perform(delete("/api/blocks/permanent/{blockId}", 1L)
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("block/deletePermanentBlock",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("blockId").description("블록 ID")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+  
 }

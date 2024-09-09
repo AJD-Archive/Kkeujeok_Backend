@@ -94,3 +94,26 @@ include::{snippets}/block/change/http-request.adoc[]
 ==== 응답
 
 include::{snippets}/block/change/http-response.adoc[]
+
+=== 삭제된 블록 조회
+
+==== 요청
+
+include::{snippets}/block/findDeletedBlocks/http-request.adoc[]
+include::{snippets}/block/findDeletedBlocks/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/findDeletedBlocks/http-response.adoc[]
+include::{snippets}/block/findDeletedBlocks/response-fields.adoc[]
+
+=== 블록 영구 삭제
+
+==== 요청
+
+include::{snippets}/block/deletePermanentBlock/http-request.adoc[]
+include::{snippets}/block/deletePermanentBlock/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/deletePermanentBlock/http-response.adoc[]

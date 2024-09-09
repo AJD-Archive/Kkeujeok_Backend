@@ -83,5 +83,4 @@ public class TeamDashboardController {
     public RspTemplate<SearchMemberListResDto> search(@RequestParam(name = "query") String query) {
         return new RspTemplate<>(HttpStatus.OK, "팀원 초대 리스트", teamDashboardService.searchMembers(query));
     }
-
 }

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -48,6 +49,7 @@ import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailA
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 class TeamDashboardControllerTest extends ControllerTest {
 
@@ -59,6 +61,9 @@ class TeamDashboardControllerTest extends ControllerTest {
 
     @InjectMocks
     private TeamDashboardController teamDashboardController;
+
+    @Mock
+    private NotificationService notificationService;
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
@@ -80,8 +85,9 @@ class TeamDashboardControllerTest extends ControllerTest {
                 .picture("joinPicture")
                 .build();
 
-        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description");
-        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription");
+        List<String> emails = List.of("joinEmail");
+        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", emails);
+        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription", emails);
         teamDashboard = teamDashboardSaveReqDto.toEntity(member);
 
         ReflectionTestUtils.setField(teamDashboard, "id", 1L);
@@ -121,7 +127,8 @@ class TeamDashboardControllerTest extends ControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("title").description("팀 대시보드 제목"),
-                                fieldWithPath("description").description("팀 대시보드 설명")
+                                fieldWithPath("description").description("팀 대시보드 설명"),
+                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -165,7 +172,8 @@ class TeamDashboardControllerTest extends ControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("title").description("개인 대시보드 제목"),
-                                fieldWithPath("description").description("개인 대시보드 설명")
+                                fieldWithPath("description").description("개인 대시보드 설명"),
+                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
