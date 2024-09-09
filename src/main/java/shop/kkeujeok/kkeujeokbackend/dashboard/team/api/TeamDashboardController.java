@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.team.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,12 +46,10 @@ public class TeamDashboardController {
     }
 
     @GetMapping("/")
-    public RspTemplate<TeamDashboardListResDto> findForTeamDashboard(@CurrentUserEmail String email,
-                                                                     @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                     @RequestParam(name = "size", defaultValue = "10") int size) {
+    public RspTemplate<TeamDashboardListResDto> findForTeamDashboard(@CurrentUserEmail String email) {
         return new RspTemplate<>(HttpStatus.OK,
                 "팀 대시보드 전체 조회",
-                teamDashboardService.findForTeamDashboard(email, PageRequest.of(page, size)));
+                teamDashboardService.findForTeamDashboard(email));
     }
 
     @GetMapping("/{dashboardId}")
@@ -86,5 +83,4 @@ public class TeamDashboardController {
     public RspTemplate<SearchMemberListResDto> search(@RequestParam(name = "query") String query) {
         return new RspTemplate<>(HttpStatus.OK, "팀원 초대 리스트", teamDashboardService.searchMembers(query));
     }
-
 }

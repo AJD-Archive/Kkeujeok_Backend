@@ -7,8 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
@@ -53,6 +57,7 @@ class BlockServiceTest {
     private Dashboard dashboard;
     private BlockSaveReqDto blockSaveReqDto;
     private BlockUpdateReqDto blockUpdateReqDto;
+    private BlockSequenceUpdateReqDto blockSequenceUpdateReqDto;
 
     @BeforeEach
     void setUp() {
@@ -79,6 +84,13 @@ class BlockServiceTest {
                 "2024.07.25 13:23");
         blockUpdateReqDto = new BlockUpdateReqDto("UpdateTitle", "UpdateContents", "2024.07.03 13:23",
                 "2024.07.28 16:40");
+
+        blockSequenceUpdateReqDto = new BlockSequenceUpdateReqDto(
+                List.of(1L, 2L),
+                List.of(3L, 4L),
+                List.of(5L, 6L)
+        );
+
         block = Block.builder()
                 .title(blockSaveReqDto.title())
                 .contents(blockSaveReqDto.contents())
@@ -239,6 +251,33 @@ class BlockServiceTest {
             assertThat(result.deadLine()).isEqualTo("2024.07.25 13:23");
             assertNotNull(result.nickname());
         });
+    }
+
+    @DisplayName("블록의 순번을 변경합니다.")
+    @Test
+    void 블록_순번_변경() {
+        // given
+        when(blockRepository.findById(anyLong())).thenReturn(Optional.of(block));
+
+        // when
+        blockService.changeBlocksSequence("email", blockSequenceUpdateReqDto);
+
+        // then
+        verify(blockRepository, times(6)).findById(anyLong());  // 6번 블록 조회가 이루어졌는지 검증
+    }
+
+    @DisplayName("블록을 영구 삭제 합니다.")
+    @Test
+    void 블록_영구_삭제() {
+        // given
+        Long blockId = 1L;
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(deleteBlock));
+
+        // when
+        blockService.deletePermanently("email", blockId);
+
+        // then
+        verify(blockRepository, times(1)).delete(deleteBlock);
     }
 
 }

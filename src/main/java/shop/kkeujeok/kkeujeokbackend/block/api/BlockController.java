@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
@@ -69,6 +70,32 @@ public class BlockController {
     public RspTemplate<BlockInfoResDto> findById(@CurrentUserEmail String email,
                                                  @PathVariable(name = "blockId") Long blockId) {
         return new RspTemplate<>(HttpStatus.OK, "블록 상세보기", blockService.findById(email, blockId));
+    }
+
+    @PatchMapping("/change")
+    public RspTemplate<Void> changeBlocksSequence(@CurrentUserEmail String email,
+                                                  @RequestBody BlockSequenceUpdateReqDto blockSequenceUpdateReqDto) {
+        blockService.changeBlocksSequence(email, blockSequenceUpdateReqDto);
+        return new RspTemplate<>(HttpStatus.OK, "블록 순서 변경");
+    }
+
+    @GetMapping("/deleted")
+    public RspTemplate<BlockListResDto> findDeletedBlocks(@CurrentUserEmail String email,
+                                                          @RequestParam(name = "dashboardId") Long dashboardId,
+                                                          @RequestParam(name = "page", defaultValue = "0") int page,
+                                                          @RequestParam(name = "size", defaultValue = "10") int size) {
+        BlockListResDto deletedBlocks = blockService.findDeletedBlocks(email, dashboardId, PageRequest.of(page, size));
+        return new RspTemplate<>(HttpStatus.OK,
+                "삭제된 블록 조회",
+                deletedBlocks);
+    }
+
+    @DeleteMapping("/permanent/{blockId}")
+    public RspTemplate<Void> deletePermanently(@CurrentUserEmail String email,
+                                               @PathVariable(name = "blockId") Long blockId) {
+        blockService.deletePermanently(email, blockId);
+        return new RspTemplate<>(HttpStatus.OK,
+                "블록 영구 삭제");
     }
 
 }

@@ -43,6 +43,7 @@ class BlockRepositoryTest {
     private Block block1;
     private Block block2;
     private Block block3;
+    private Block block4;
 
 
     @BeforeEach
@@ -70,6 +71,7 @@ class BlockRepositoryTest {
                 .progress(Progress.NOT_STARTED)
                 .deadLine("2024.07.27 11:03")
                 .dashboard(dashboard)
+                .sequence(1)
                 .build();
 
         block2 = Block.builder()
@@ -78,6 +80,7 @@ class BlockRepositoryTest {
                 .progress(Progress.NOT_STARTED)
                 .deadLine("2024.07.27 11:04")
                 .dashboard(dashboard)
+                .sequence(2)
                 .build();
 
         block3 = Block.builder()
@@ -86,6 +89,16 @@ class BlockRepositoryTest {
                 .progress(Progress.IN_PROGRESS)
                 .deadLine("2024.07.27 11:05")
                 .dashboard(dashboard)
+                .sequence(3)
+                .build();
+
+        block4 = Block.builder()
+                .title("title3")
+                .contents("contents3")
+                .progress(Progress.COMPLETED)
+                .deadLine("2024.09.07 12:36")
+                .dashboard(dashboard)
+                .sequence(4)
                 .build();
 
         memberRepository.save(member);
@@ -93,6 +106,9 @@ class BlockRepositoryTest {
         blockRepository.save(block1);
         blockRepository.save(block2);
         blockRepository.save(block3);
+        blockRepository.save(block4);
+
+        block4.statusUpdate();
     }
 
     @DisplayName("블록을 진행 상태별로 전체 조회합니다.")
@@ -119,6 +135,31 @@ class BlockRepositoryTest {
 
         // when
         Page<Block> blocks = blockRepository.findByBlockWithProgress(1L, progress, pageable);
+
+        // then
+        assertThat(blocks.getContent().size()).isEqualTo(1);
+    }
+
+    @DisplayName("블록의 마지막 순번을 가져옵니다.")
+    @Test
+    void 블록_마지막_순번() {
+        // given
+
+        // when
+        int lastSequence = blockRepository.findLastSequenceByProgress(member, dashboard.getId(), Progress.NOT_STARTED);
+
+        // then
+        assertThat(lastSequence).isEqualTo(2);
+    }
+
+    @DisplayName("논리적으로 삭제된 블록을 조회합니다. ")
+    @Test
+    void 삭제_블록_조회() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<Block> blocks = blockRepository.findByDeletedBlocks(dashboard.getId(), pageable);
 
         // then
         assertThat(blocks.getContent().size()).isEqualTo(1);
