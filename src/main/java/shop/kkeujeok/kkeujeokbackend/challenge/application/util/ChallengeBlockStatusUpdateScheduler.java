@@ -16,10 +16,13 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @RequiredArgsConstructor
 public class ChallengeBlockStatusUpdateScheduler {
 
-    private final BlockRepository blockRepository;
-    private final NotificationService notificationService; // NotificationService 주입
+    private static final String DAILY_CRON_EXPRESSION = "0 0 0 * * ?";
+    private static final String CHALLENGE_CREATED_MESSAGE_TEMPLATE = "%s 챌린지가 생성되었습니다";
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    private final BlockRepository blockRepository;
+    private final NotificationService notificationService;
+
+    @Scheduled(cron = DAILY_CRON_EXPRESSION)
     @Transactional
     public void updateStatuses() {
         List<Block> blocks = blockRepository.findByType(Type.CHALLENGE);
@@ -39,7 +42,7 @@ public class ChallengeBlockStatusUpdateScheduler {
                 block.updateChallengeStatus(newStatus);
 
                 Member member = block.getMember();
-                String message = String.format("%s 챌린지가 생성되었습니다", block.getChallenge().getTitle());
+                String message = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, block.getChallenge().getTitle());
 
                 notificationService.sendNotification(member, message);
             }
