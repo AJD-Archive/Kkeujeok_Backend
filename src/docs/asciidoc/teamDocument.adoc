@@ -1,0 +1,74 @@
+== Team Document API Documentation
+
+=== Team Document 생성 API
+
+==== 요청
+
+include::{snippets}/document/save/http-request.adoc[]
+include::{snippets}/document/save/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/document/update/http-response.adoc[]
+include::{snippets}/document/update/response-fields.adoc[]
+
+=== Team Document 수정 API
+
+==== 요청
+
+include::{snippets}/document/update/http-request.adoc[]
+include::{snippets}/document/update/path-parameters.adoc[]
+include::{snippets}/document/update/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/document/update/http-response.adoc[]
+include::{snippets}/document/update/response-fields.adoc[]
+
+=== Team Document 상세 조회 API
+
+==== 요청
+
+include::{snippets}/document/findById/http-request.adoc[]
+include::{snippets}/document/findById/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/document/findById/http-response.adoc[]
+include::{snippets}/document/findById/response-fields.adoc[]
+
+=== Team Document 카테고리 조회 API
+
+==== 요청
+
+include::{snippets}/document/findCategories/http-request.adoc[]
+include::{snippets}/document/findCategories/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/document/findCategories/http-response.adoc[]
+include::{snippets}/document/findCategories/response-fields.adoc[]
+
+=== Team Document 카테고리별 검색 API
+
+==== 요청
+
+include::{snippets}/document/search-by-category/http-request.adoc[]
+include::{snippets}/document/search-by-category/query-parameters.adoc[]
+include::{snippets}/document/search-by-category/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/document/search-by-category/http-response.adoc[]
+include::{snippets}/document/search-by-category/response-fields.adoc[]
+
+=== Team Document 삭제 API
+
+==== 요청
+
+include::{snippets}/document/delete/http-request.adoc[]
+include::{snippets}/document/delete/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/document/delete/http-response.adoc[]
