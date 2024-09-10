@@ -81,13 +81,13 @@ public class TeamDocumentService {
     }
 
     public FindTeamDocumentResDto findTeamDocumentByCategory(Long teamDashboardId,
-                                                             FindTeamDocumentReqDto findTeamDocumentReqDto,
+                                                             String category,
                                                              Pageable pageable) {
         TeamDashboard teamDashboard = teamDashboardRepository.findById(teamDashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
         Page<TeamDocument> teamDocuments = teamDocumentRepository.findForTeamDocumentByCategory(teamDashboard,
-                findTeamDocumentReqDto.category(),
+                category,
                 pageable);
 
         List<TeamDocumentResDto> teamDocumentResDtos = teamDocuments.stream()

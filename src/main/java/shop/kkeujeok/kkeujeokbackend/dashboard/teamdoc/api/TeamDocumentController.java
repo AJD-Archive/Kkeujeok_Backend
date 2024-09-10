@@ -59,7 +59,7 @@ public class TeamDocumentController {
         return new RspTemplate<>(HttpStatus.OK,
                 "팀 문서 카테고리로 조회",
                 teamDocumentService.findTeamDocumentByCategory(teamDashboardId,
-                        FindTeamDocumentReqDto.of(category),
+                        category,
                         PageRequest.of(page, size)));
     }
 

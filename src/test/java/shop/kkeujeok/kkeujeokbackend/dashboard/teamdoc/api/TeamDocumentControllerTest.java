@@ -244,7 +244,7 @@ class TeamDocumentControllerTest extends ControllerTest {
 
         FindTeamDocumentResDto response = FindTeamDocumentResDto.from(teamDocuments, pageInfoResDto);
 
-        given(teamDocumentService.findTeamDocumentByCategory(anyLong(), any(FindTeamDocumentReqDto.class), any(PageRequest.class)))
+        given(teamDocumentService.findTeamDocumentByCategory(anyLong(), anyString(), any(PageRequest.class)))
                 .willReturn(response);
 
         // when & then
