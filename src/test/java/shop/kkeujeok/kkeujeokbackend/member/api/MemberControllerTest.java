@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -17,6 +18,7 @@ import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailA
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 
@@ -33,11 +35,15 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.is;
+import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.requestFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
 public class MemberControllerTest extends ControllerTest {
@@ -134,4 +140,51 @@ public class MemberControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.data").exists());
     }
 
+//    @DisplayName("PATCH 내 프로필 정보 수정 테스트")
+//    @Test
+//    void 내_프로필_정보_수정() throws Exception {
+//        // given
+//        MyPageUpdateReqDto updateReqDto = new MyPageUpdateReqDto("귀여운수달", "안녕하세요?");
+//        MyPageInfoResDto updatedResDto = new MyPageInfoResDto(
+//                "picture",
+//                "chldlsgh0987@naver.com",
+//                "최인호",
+//                "귀여운수달",
+//                SocialType.KAKAO,
+//                "안녕하세요?"
+//        );
+//
+//        // mock the service behavior
+//        when(myPageService.update(anyString(), any(MyPageUpdateReqDto.class)))
+//                .thenReturn(updatedResDto);
+//
+//        // when & then
+//        mockMvc.perform(patch("/api/members/mypage")
+//                        .header("Authorization", "Bearer valid-token")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(updateReqDto)))
+//                .andDo(print())
+//                .andDo(document("member/mypage-update",
+//                        preprocessRequest(prettyPrint()),
+//                        preprocessResponse(prettyPrint()),
+//                        requestHeaders(
+//                                headerWithName("Authorization").description("JWT 토큰")
+//                        ),
+//                        requestFields(
+//                                fieldWithPath("nickname").description("변경할 닉네임"),
+//                                fieldWithPath("introduction").description("변경할 소개")
+//                        ),
+//                        responseFields(
+//                                fieldWithPath("statusCode").description("상태 코드"),
+//                                fieldWithPath("message").description("응답 메시지"),
+//                                fieldWithPath("data.picture").description("회원 사진"),
+//                                fieldWithPath("data.email").description("회원 이메일"),
+//                                fieldWithPath("data.name").description("회원 이름"),
+//                                fieldWithPath("data.nickName").description("회원 닉네임"),
+//                                fieldWithPath("data.socialType").description("회원 소셜 타입"),
+//                                fieldWithPath("data.introduction").description("회원 소개")
+//                        )
+//                ))
+//                .andExpect(status().isOk());
+//    }
 }
