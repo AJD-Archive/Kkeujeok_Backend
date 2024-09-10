@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.auth.application.AuthService;
 import shop.kkeujeok.kkeujeokbackend.global.oauth.exception.OAuthException;
@@ -42,7 +43,7 @@ public class KakaoAuthService implements AuthService {
     }
 
     @Override
-    public JsonNode getIdToken(String code) {
+    public IdTokenResDto getIdToken(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -65,7 +66,9 @@ public class KakaoAuthService implements AuthService {
             String responseBody = response.getBody();
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
-                return jsonNode.get("id_token");
+                JsonNode idToken = jsonNode.get("id_token");
+
+                return new IdTokenResDto(idToken);
             } catch (Exception e) {
                 throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
             }
