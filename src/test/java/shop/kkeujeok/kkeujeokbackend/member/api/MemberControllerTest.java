@@ -164,7 +164,7 @@ public class MemberControllerTest extends ControllerTest {
 //                        .contentType(MediaType.APPLICATION_JSON)
 //                        .content(objectMapper.writeValueAsString(updateReqDto)))
 //                .andDo(print())
-//                .andDo(document("member/mypage/update",
+//                .andDo(document("member/mypage-update",
 //                        preprocessRequest(prettyPrint()),
 //                        preprocessResponse(prettyPrint()),
 //                        requestHeaders(
