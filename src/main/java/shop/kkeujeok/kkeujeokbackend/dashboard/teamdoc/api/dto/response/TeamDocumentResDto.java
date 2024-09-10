@@ -11,7 +11,7 @@ public record TeamDocumentResDto(
         String category,
         Long teamDocumentId
 ) {
-    public static TeamDocumentResDto of(TeamDocument document) {
+    public static TeamDocumentResDto from(TeamDocument document) {
         return TeamDocumentResDto.builder()
                 .author(document.getAuthor())
                 .picture(document.getPicture())

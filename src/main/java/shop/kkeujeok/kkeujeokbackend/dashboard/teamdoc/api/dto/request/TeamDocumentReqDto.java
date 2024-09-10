@@ -5,7 +5,6 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.domain.TeamDocument;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 public record TeamDocumentReqDto(
-        String author,
         String title,
         String content,
         String category,

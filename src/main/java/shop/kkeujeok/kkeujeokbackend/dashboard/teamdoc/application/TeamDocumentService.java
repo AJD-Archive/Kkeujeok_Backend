@@ -45,7 +45,7 @@ public class TeamDocumentService {
 
         teamDocumentRepository.save(document);
 
-        return TeamDocumentResDto.of(document);
+        return TeamDocumentResDto.from(document);
     }
 
     public TeamDocumentDetailResDto findById(Long teamDocumentId) {
@@ -68,7 +68,7 @@ public class TeamDocumentService {
                 teamDocumentUpdateReqDto.category()
         );
 
-        return TeamDocumentResDto.of(teamDocument);
+        return TeamDocumentResDto.from(teamDocument);
     }
 
     public TeamDocumentCategoriesResDto findTeamDocumentCategory(Long teamDashboardId) {
@@ -91,7 +91,7 @@ public class TeamDocumentService {
                 pageable);
 
         List<TeamDocumentResDto> teamDocumentResDtos = teamDocuments.stream()
-                .map(TeamDocumentResDto::of)
+                .map(TeamDocumentResDto::from)
                 .toList();
 
         return FindTeamDocumentResDto.from(teamDocumentResDtos, PageInfoResDto.from(teamDocuments));
