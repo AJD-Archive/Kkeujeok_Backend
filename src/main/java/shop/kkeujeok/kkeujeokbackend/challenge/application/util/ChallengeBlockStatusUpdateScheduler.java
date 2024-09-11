@@ -22,30 +22,41 @@ public class ChallengeBlockStatusUpdateScheduler {
     private final BlockRepository blockRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = DAILY_CRON_EXPRESSION)
     @Transactional
+    @Scheduled(cron = DAILY_CRON_EXPRESSION)
     public void updateStatuses() {
         List<Block> blocks = blockRepository.findByType(Type.CHALLENGE);
+        blocks.forEach(this::updateBlockStatus);
+    }
 
-        blocks.forEach(block -> {
-            Status previousStatus = block.getStatus();
-            Status newStatus;
+    private void updateBlockStatus(Block block) {
+        Status newStatus = determineNewStatus(block);
+        if (shouldSendNotification(block, newStatus)) {
+            block.updateChallengeStatus(newStatus);
+            sendChallengeCreatedNotification(block);
+        }
+    }
 
-            if (!ChallengeBlockStatusUtil.isChallengeBlockActiveToday(block.getChallenge().getCycle(),
-                    block.getChallenge().getCycleDetails())) {
-                newStatus = Status.UN_ACTIVE;
-            } else {
-                newStatus = Status.ACTIVE;
-            }
+    private Status determineNewStatus(Block block) {
+        boolean isActive = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(
+                block.getChallenge().getCycle(),
+                block.getChallenge().getCycleDetails()
+        );
 
-            if (newStatus == Status.ACTIVE && previousStatus != Status.ACTIVE) {
-                block.updateChallengeStatus(newStatus);
+        if (isActive) {
+            return Status.ACTIVE;
+        }
+        return Status.UN_ACTIVE;
+    }
 
-                Member member = block.getMember();
-                String message = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, block.getChallenge().getTitle());
+    private boolean shouldSendNotification(Block block, Status newStatus) {
+        Status previousStatus = block.getStatus();
+        return newStatus == Status.ACTIVE && previousStatus != Status.ACTIVE;
+    }
 
-                notificationService.sendNotification(member, message);
-            }
-        });
+    private void sendChallengeCreatedNotification(Block block) {
+        Member member = block.getMember();
+        String message = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, block.getChallenge().getTitle());
+        notificationService.sendNotification(member, message);
     }
 }
