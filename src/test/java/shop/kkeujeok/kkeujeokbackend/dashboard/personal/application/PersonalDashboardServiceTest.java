@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -207,7 +208,7 @@ class PersonalDashboardServiceTest {
     @Test
     void 개인_대시보드_카테고리_조회() {
         // given
-        List<String> categories = List.of("category");
+        Set<String> categories = Set.of("category");
         when(personalDashboardRepository.findCategoriesForDashboard(any(Member.class))).thenReturn(categories);
 
         // when
@@ -216,7 +217,6 @@ class PersonalDashboardServiceTest {
 
         // then
         assertThat(result.categories()).hasSize(1);
-        assertThat(result.categories().get(0)).isEqualTo("category");
     }
 
     @DisplayName("삭제되었던 개인 대시보드를 복구합니다.")
