@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.auth.application.AuthService;
 import shop.kkeujeok.kkeujeokbackend.global.oauth.exception.OAuthException;
@@ -38,7 +39,7 @@ public class GoogleAuthService implements AuthService {
     }
 
     @Override
-    public JsonNode getIdToken(String code) {
+    public IdTokenResDto getIdToken(String code) {
         Map<String, String> params = Map.of(
                 "code", code,
                 "scope", "https://www.googleapis.com/auth/userinfo.profile " +
@@ -71,12 +72,14 @@ public class GoogleAuthService implements AuthService {
         }
     }
 
-    private JsonNode parseGoogleIdToken(ResponseEntity<String> responseEntity) {
+    private IdTokenResDto parseGoogleIdToken(ResponseEntity<String> responseEntity) {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = responseEntity.getBody();
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
-                return jsonNode.get("id_token");
+                JsonNode idToken = jsonNode.get("id_token");
+
+                return new IdTokenResDto(idToken);
             } catch (Exception e) {
                 throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
             }

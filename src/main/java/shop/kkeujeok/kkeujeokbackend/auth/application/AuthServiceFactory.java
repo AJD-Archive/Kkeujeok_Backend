@@ -13,9 +13,9 @@ public class AuthServiceFactory {
     private final Map<String, AuthService> authServiceMap;
 
     @Autowired
-    public AuthServiceFactory(List<AuthService> authServiceList) {
+    public AuthServiceFactory(List<AuthService> authServices) {
         authServiceMap = new HashMap<>();
-        for (AuthService authService : authServiceList) {
+        for (AuthService authService : authServices) {
             authServiceMap.put(authService.getProvider(), authService);
         }
     }

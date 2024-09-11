@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.auth.application.AuthMemberService;
@@ -29,16 +30,11 @@ public class AuthController {
     private final AuthMemberService memberService;
     private final TokenService tokenService;
 
-    @GetMapping("oauth2/callback/google")
-    public JsonNode googleCallback(@RequestParam(name = "code") String code) {
-        AuthService googleAuthService = authServiceFactory.getAuthService("google");
-        return googleAuthService.getIdToken(code);
-    }
-
-    @GetMapping("oauth2/callback/kakao")
-    public JsonNode kakaoCallback(@RequestParam(name = "code") String code) {
-        AuthService kakaoAuthService = authServiceFactory.getAuthService("kakao");
-        return kakaoAuthService.getIdToken(code);
+    @GetMapping("oauth2/callback/{provider}")
+    public IdTokenResDto callback(@PathVariable(name = "provider") String provider,
+                                  @RequestParam(name = "code") String code) {
+        AuthService authService = authServiceFactory.getAuthService(provider);
+        return authService.getIdToken(code);
     }
 
     @PostMapping("/{provider}/token")

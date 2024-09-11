@@ -130,6 +130,27 @@ public class BlockService {
         }
     }
 
+    // 삭제된 블록 조회
+    public BlockListResDto findDeletedBlocks(String email, Long dashboardId, Pageable pageable) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Page<Block> deletedBlocks = blockRepository.findByDeletedBlocks(dashboardId, pageable);
+
+        List<BlockInfoResDto> blockInfoResDtoList = deletedBlocks.stream()
+                .map(BlockInfoResDto::from)
+                .toList();
+
+        return BlockListResDto.from(blockInfoResDtoList, PageInfoResDto.from(deletedBlocks));
+    }
+
+    // 블록 영구 삭제
+    @Transactional
+    public void deletePermanently(String email, Long blockId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
+
+        blockRepository.delete(block);
+    }
+
     private Progress parseProgress(String progressString) {
         try {
             return Progress.valueOf(progressString);
