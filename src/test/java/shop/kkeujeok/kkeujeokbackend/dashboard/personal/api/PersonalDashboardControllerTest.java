@@ -27,6 +27,7 @@ import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.resp
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -268,9 +269,9 @@ class PersonalDashboardControllerTest extends ControllerTest {
     @Test
     void 개인_대시보드_카테고리_조회() throws Exception {
         // given
-        PersonalDashboardCategoriesResDto response = PersonalDashboardCategoriesResDto.from(List.of("category"));
+        PersonalDashboardCategoriesResDto response = PersonalDashboardCategoriesResDto.from(Set.of("category"));
 
-        given(personalDashboardService.findForPersonalDashboardByCategories(anyString())).willReturn(response);
+        given(personalDashboardService.findCategoriesForDashboard(anyString())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/api/dashboards/personal/categories")

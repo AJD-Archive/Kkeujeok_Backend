@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.InvalidMemberInviteException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.UnauthorizedAccessException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
@@ -92,13 +94,24 @@ public class TeamDashboardService {
 
     // 팀 대시보드 상세 조회
     public TeamDashboardInfoResDto findById(String email, Long dashboardId) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByEmail("email").orElseThrow(MemberNotFoundException::new);
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         double blockProgress = teamDashboardRepository.calculateCompletionPercentage(dashboard.getId());
 
         return TeamDashboardInfoResDto.detailOf(member, dashboard, blockProgress);
+    }
+
+    private void validateDashboardAccess(TeamDashboard dashboard, Member member) {
+        boolean isMemberInDashboard = dashboard.getTeamDashboardMemberMappings().stream()
+                .anyMatch(mapping -> mapping.getMember().equals(member));
+
+        if (!dashboard.getMember().equals(member) && !isMemberInDashboard) {
+            throw new UnauthorizedAccessException();
+        }
     }
 
     // 팀 대시보드 삭제 유무 업데이트 (논리 삭제)
