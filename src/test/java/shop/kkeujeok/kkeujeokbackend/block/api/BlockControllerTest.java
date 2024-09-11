@@ -154,6 +154,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
+                                fieldWithPath("data.picture").description("회원 사진"),
                                 fieldWithPath("data.dDay").description("마감 기한")
                         )
                 ))
@@ -201,6 +202,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
+                                fieldWithPath("data.picture").description("회원 사진"),
                                 fieldWithPath("data.dDay").description("마감 기한")
                         )
                 ))
@@ -245,6 +247,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.progress").description("블록 진행 상태"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
+                                fieldWithPath("data.picture").description("회원 사진"),
                                 fieldWithPath("data.dDay").description("마감 기한")
                         )
                 ))
@@ -346,6 +349,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockListResDto[].startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
+                                fieldWithPath("data.blockListResDto[].picture").description("회원 사진"),
                                 fieldWithPath("data.blockListResDto[].dDay").description("마감 기한"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
@@ -387,6 +391,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.nickname").description("회원 닉네임"),
+                                fieldWithPath("data.picture").description("회원 사진"),
                                 fieldWithPath("data.dDay").description("마감 기한")
                         )
                 ))
@@ -459,6 +464,7 @@ class BlockControllerTest extends ControllerTest {
                                 fieldWithPath("data.blockListResDto[].startDate").description("블록 시작 시간"),
                                 fieldWithPath("data.blockListResDto[].deadLine").description("블록 마감 시간"),
                                 fieldWithPath("data.blockListResDto[].nickname").description("회원 닉네임"),
+                                fieldWithPath("data.blockListResDto[].picture").description("회원 사진"),
                                 fieldWithPath("data.blockListResDto[].dDay").description("마감 기한"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
