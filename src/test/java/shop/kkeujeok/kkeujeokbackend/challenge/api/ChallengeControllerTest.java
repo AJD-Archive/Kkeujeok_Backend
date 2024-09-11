@@ -88,7 +88,8 @@ class ChallengeControllerTest extends ControllerTest {
                 .nickname("동동")
                 .build();
 
-        challengeSaveReqDto = new ChallengeSaveReqDto("1일 1커밋",
+        challengeSaveReqDto = new ChallengeSaveReqDto(
+                "1일 1커밋",
                 "1일 1커밋하기",
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
@@ -151,7 +152,8 @@ class ChallengeControllerTest extends ControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
-                        requestFields(fieldWithPath("title").description("챌린지 제목"),
+                        requestFields(
+                                fieldWithPath("title").description("챌린지 제목"),
                                 fieldWithPath("contents").description("챌린지 내용"),
                                 fieldWithPath("category").description("챌린지 카테고리"),
                                 fieldWithPath("cycle").description("챌린지 주기"),
@@ -159,8 +161,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("startDate").description("시작 날짜"),
                                 fieldWithPath("endDate").description("종료 날짜"),
                                 fieldWithPath("representImage").description("대표 사진")),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.challengeId").description("챌린지 id"),
                                 fieldWithPath("data.title").description("챌린지 제목"),
                                 fieldWithPath("data.contents").description("챌린지 내용"),
                                 fieldWithPath("data.category").description("챌린지 카테고리"),
@@ -203,7 +207,8 @@ class ChallengeControllerTest extends ControllerTest {
                         preprocessResponse(prettyPrint()),
                         requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
                         pathParameters(parameterWithName("challengeId").description("챌린지 ID")),
-                        requestFields(fieldWithPath("title").description("챌린지 제목"),
+                        requestFields(
+                                fieldWithPath("title").description("챌린지 제목"),
                                 fieldWithPath("contents").description("챌린지 내용"),
                                 fieldWithPath("category").description("챌린지 카테고리"),
                                 fieldWithPath("cycle").description("챌린지 주기"),
@@ -211,8 +216,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("startDate").description("시작 날짜"),
                                 fieldWithPath("endDate").description("종료 날짜"),
                                 fieldWithPath("representImage").description("대표 사진")),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.challengeId").description("챌린지 id"),
                                 fieldWithPath("data.title").description("챌린지 제목"),
                                 fieldWithPath("data.contents").description("챌린지 내용"),
                                 fieldWithPath("data.category").description("챌린지 카테고리"),
@@ -247,8 +254,10 @@ class ChallengeControllerTest extends ControllerTest {
                 .andDo(document("challenge/findAll",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
                                 fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
                                 fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
                                 fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
@@ -287,8 +296,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("challenge/search", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
                                 fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
                                 fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
                                 fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
@@ -331,8 +342,10 @@ class ChallengeControllerTest extends ControllerTest {
                 .andDo(print())
                 .andDo(document("challenge/category", preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
                                 fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
                                 fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
                                 fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
@@ -369,8 +382,10 @@ class ChallengeControllerTest extends ControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(parameterWithName("challengeId").description("챌린지 ID")),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.challengeId").description("챌린지 id"),
                                 fieldWithPath("data.title").description("챌린지 제목"),
                                 fieldWithPath("data.contents").description("챌린지 내용"),
                                 fieldWithPath("data.category").description("챌린지 카테고리"),

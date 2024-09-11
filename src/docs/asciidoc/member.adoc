@@ -23,3 +23,16 @@ include::{snippets}/member/team-challenges/request-headers.adoc[]
 
 include::{snippets}/member/team-challenges/http-response.adoc[]
 include::{snippets}/member/team-challenges/response-fields.adoc[]
+
+=== 내 프로필 정보 수정 API
+
+==== 요청
+
+include::{snippets}/member/mypage-update/http-request.adoc[]
+include::{snippets}/member/mypage-update/request-headers.adoc[]
+include::{snippets}/member/mypage-update/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/member/mypage/http-response.adoc[]
+include::{snippets}/member/mypage/response-fields.adoc[]
