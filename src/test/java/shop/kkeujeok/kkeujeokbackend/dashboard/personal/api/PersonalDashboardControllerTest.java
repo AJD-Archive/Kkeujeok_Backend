@@ -270,7 +270,7 @@ class PersonalDashboardControllerTest extends ControllerTest {
         // given
         PersonalDashboardCategoriesResDto response = PersonalDashboardCategoriesResDto.from(List.of("category"));
 
-        given(personalDashboardService.findForPersonalDashboardByCategories(anyString())).willReturn(response);
+        given(personalDashboardService.findCategoriesForDashboard(anyString())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/api/dashboards/personal/categories")

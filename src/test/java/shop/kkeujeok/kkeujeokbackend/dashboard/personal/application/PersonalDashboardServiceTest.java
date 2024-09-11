@@ -208,10 +208,10 @@ class PersonalDashboardServiceTest {
     void 개인_대시보드_카테고리_조회() {
         // given
         List<String> categories = List.of("category");
-        when(personalDashboardRepository.findForPersonalDashboardByCategory(any(Member.class))).thenReturn(categories);
+        when(personalDashboardRepository.findCategoriesForDashboard(any(Member.class))).thenReturn(categories);
 
         // when
-        PersonalDashboardCategoriesResDto result = personalDashboardService.findForPersonalDashboardByCategories(
+        PersonalDashboardCategoriesResDto result = personalDashboardService.findCategoriesForDashboard(
                 member.getEmail());
 
         // then
