@@ -28,7 +28,7 @@ public class TeamDocumentController {
                                                 @RequestBody TeamDocumentReqDto documentReqDto) {
         return new RspTemplate<>(HttpStatus.OK,
                 "팀 문서 생성",
-                teamDocumentService.save(email,documentReqDto));
+                teamDocumentService.save(email, documentReqDto));
     }
 
     @PatchMapping("/{teamDocumentId}")
@@ -53,9 +53,9 @@ public class TeamDocumentController {
     // 카테고리 선택해서 그걸로 찾기(쿼리)
     @GetMapping("/search/{teamDashboardId}")
     public RspTemplate<FindTeamDocumentResDto> findTeamDocumentByCategory(@PathVariable(name = "teamDashboardId") Long teamDashboardId,
-                                                                          @RequestParam(name = "category") String category,
+                                                                          @RequestParam(defaultValue = "", name = "category") String category,
                                                                           @RequestParam(defaultValue = "0", name = "page") int page,
-                                                                          @RequestParam(defaultValue = "10", name = "size") int size){
+                                                                          @RequestParam(defaultValue = "10", name = "size") int size) {
         return new RspTemplate<>(HttpStatus.OK,
                 "팀 문서 카테고리로 조회",
                 teamDocumentService.findTeamDocumentByCategory(teamDashboardId,

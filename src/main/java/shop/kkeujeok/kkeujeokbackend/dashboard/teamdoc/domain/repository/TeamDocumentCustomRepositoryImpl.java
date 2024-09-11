@@ -53,7 +53,7 @@ public class TeamDocumentCustomRepositoryImpl implements TeamDocumentCustomRepos
     }
 
     private BooleanExpression categoryEq(String category) {
-        return category != null && !category.trim().isEmpty() ? teamDocument.category.eq(category) : null;
+        return (category == null || category.trim().isEmpty()) ? null : teamDocument.category.eq(category);
     }
 
     @Override
