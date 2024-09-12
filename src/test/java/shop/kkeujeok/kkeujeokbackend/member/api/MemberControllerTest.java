@@ -43,6 +43,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -131,13 +133,19 @@ public class MemberControllerTest extends ControllerTest {
         when(tokenProvider.getUserEmailFromToken(any(TokenReqDto.class))).thenReturn("email");
 
         mockMvc.perform(get("/api/members/mypage/dashboard-challenges")
-                        .header("Authorization", "Bearer valid-token"))
+                        .header("Authorization", "Bearer valid-token")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andDo(document("member/team-challenges",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
                                 headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호 (기본값: 0)"),
+                                parameterWithName("size").description("페이지 당 항목 수 (기본값: 10)")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),

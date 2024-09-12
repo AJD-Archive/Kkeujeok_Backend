@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.member.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +35,9 @@ public class MemberController {
 
     @GetMapping("/mypage/dashboard-challenges")
     public RspTemplate<TeamDashboardsAndChallengesResDto> getTeamDashboardsAndChallenges(@CurrentUserEmail String email,
-                                                                                         Pageable pageable) {
-        TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, pageable);
+                                                                                         @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                                         @RequestParam(name = "size", defaultValue = "10") int size) {
+        TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, PageRequest.of(page, size));
         return new RspTemplate<>(HttpStatus.OK, "팀 대시보드와 챌린지 정보 조회", response);
     }
 }
