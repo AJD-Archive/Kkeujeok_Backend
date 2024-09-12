@@ -236,7 +236,7 @@ class TeamDashboardServiceTest {
             assertThat(result.title()).isEqualTo("title");
             assertThat(result.description()).isEqualTo("description");
             assertThat(result.blockProgress()).isEqualTo(0.0);
-            assertThat(result.joinMembers().size()).isEqualTo(1);
+            assertThat(result.joinMembers().size()).isEqualTo(2);
         });
     }
 
@@ -257,7 +257,7 @@ class TeamDashboardServiceTest {
             assertThat(result.title()).isEqualTo("title");
             assertThat(result.description()).isEqualTo("description");
             assertThat(result.blockProgress()).isEqualTo(0.0);
-            assertThat(result.joinMembers().size()).isEqualTo(0);
+            assertThat(result.joinMembers().size()).isEqualTo(1);
         });
     }
 
