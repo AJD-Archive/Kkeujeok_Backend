@@ -1,0 +1,74 @@
+== Team Document API Documentation
+
+=== Team Document 생성 API
+
+==== 요청
+
+include::{snippets}/teamDocument/save/http-request.adoc[]
+include::{snippets}/teamDocument/save/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/teamDocument/update/http-response.adoc[]
+include::{snippets}/teamDocument/update/response-fields.adoc[]
+
+=== Team Document 수정 API
+
+==== 요청
+
+include::{snippets}/teamDocument/update/http-request.adoc[]
+include::{snippets}/teamDocument/update/path-parameters.adoc[]
+include::{snippets}/teamDocument/update/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/teamDocument/update/http-response.adoc[]
+include::{snippets}/teamDocument/update/response-fields.adoc[]
+
+=== Team Document 상세 조회 API
+
+==== 요청
+
+include::{snippets}/teamDocument/findById/http-request.adoc[]
+include::{snippets}/teamDocument/findById/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/teamDocument/findById/http-response.adoc[]
+include::{snippets}/teamDocument/findById/response-fields.adoc[]
+
+=== Team Document 카테고리 조회 API
+
+==== 요청
+
+include::{snippets}/teamDocument/findCategories/http-request.adoc[]
+include::{snippets}/teamDocument/findCategories/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/teamDocument/findCategories/http-response.adoc[]
+include::{snippets}/teamDocument/findCategories/response-fields.adoc[]
+
+=== Team Document 카테고리별 검색 API
+
+==== 요청
+
+include::{snippets}/teamDocument/search-by-category/http-request.adoc[]
+include::{snippets}/teamDocument/search-by-category/query-parameters.adoc[]
+include::{snippets}/teamDocument/search-by-category/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/teamDocument/search-by-category/http-response.adoc[]
+include::{snippets}/teamDocument/search-by-category/response-fields.adoc[]
+
+=== Team Document 삭제 API
+
+==== 요청
+
+include::{snippets}/teamDocument/delete/http-request.adoc[]
+include::{snippets}/teamDocument/delete/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/teamDocument/delete/http-response.adoc[]

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
@@ -14,6 +15,8 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
+import shop.kkeujeok.kkeujeokbackend.member.tag.application.TagService;
 
 import java.util.Optional;
 
@@ -23,11 +26,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class AuthMemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private NicknameService nicknameService;
+
+    @Mock
+    private TagService tagService;
 
     @InjectMocks
     private AuthMemberService authMemberService;
@@ -41,7 +51,7 @@ class AuthMemberServiceTest {
         userInfo = new UserInfo("이메일", "이름", "사진", "닉네임");
         provider = SocialType.GOOGLE;
         member = Member.builder()
-                .status(Status.A)
+                .status(Status.ACTIVE)
                 .email(userInfo.email())
                 .name(userInfo.name())
                 .picture(userInfo.picture())
@@ -49,6 +59,7 @@ class AuthMemberServiceTest {
                 .role(Role.ROLE_USER)
                 .firstLogin(true)
                 .nickname(userInfo.nickname())
+                .tag("#0000")
                 .build();
     }
 
@@ -75,7 +86,7 @@ class AuthMemberServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.findMember().getEmail()).isEqualTo(userInfo.email());
-        assertThat(result.findMember().getName()).isEqualTo(userInfo.name());
+        assertThat(result.findMember().getName()).isEqualTo(userInfo.nickname());
         verify(memberRepository).findByEmail(userInfo.email());
         verify(memberRepository).save(any(Member.class));
     }

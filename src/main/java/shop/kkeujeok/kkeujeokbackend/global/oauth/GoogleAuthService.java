@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.auth.application.AuthService;
 import shop.kkeujeok.kkeujeokbackend.global.oauth.exception.OAuthException;
@@ -21,31 +22,31 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class GoogleAuthService implements AuthService {
 
-    private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private static final String JWT_DELIMITER = "\\.";
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     @Value("${google.client.id}")
     private String google_client_id;
     @Value("${google.client.secret}")
     private String google_client_secret;
     @Value("${google.redirect.uri}")
-    private String GOOGLE_REDIRECT_URI;
-    private static final String JWT_DELIMITER = "\\.";
+    private String google_redirect_uri;
 
-    private final ObjectMapper objectMapper;
-
-    public GoogleAuthService(ObjectMapper objectMapper) {
+    public GoogleAuthService(ObjectMapper objectMapper, RestTemplate restTemplate) {
         this.objectMapper = objectMapper;
+        this.restTemplate = restTemplate;
     }
 
-
-    public JsonNode getGoogleIdToken(String code) {
-        RestTemplate restTemplate = new RestTemplate();
+    @Override
+    public IdTokenResDto getIdToken(String code) {
         Map<String, String> params = Map.of(
                 "code", code,
                 "scope", "https://www.googleapis.com/auth/userinfo.profile " +
                         "https://www.googleapis.com/auth/userinfo.email",
                 "client_id", google_client_id,
                 "client_secret", google_client_secret,
-                "redirect_uri", GOOGLE_REDIRECT_URI,
+                "redirect_uri", google_redirect_uri,
                 "grant_type", "authorization_code"
         );
 
@@ -71,12 +72,14 @@ public class GoogleAuthService implements AuthService {
         }
     }
 
-    private JsonNode parseGoogleIdToken(ResponseEntity<String> responseEntity) {
+    private IdTokenResDto parseGoogleIdToken(ResponseEntity<String> responseEntity) {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = responseEntity.getBody();
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
-                return jsonNode.get("id_token");
+                JsonNode idToken = jsonNode.get("id_token");
+
+                return new IdTokenResDto(idToken);
             } catch (Exception e) {
                 throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
             }

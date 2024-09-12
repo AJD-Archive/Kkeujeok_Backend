@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
 import shop.kkeujeok.kkeujeokbackend.auth.application.AuthService;
 import shop.kkeujeok.kkeujeokbackend.global.oauth.exception.OAuthException;
@@ -22,29 +23,27 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
-@Slf4j
 public class KakaoAuthService implements AuthService {
 
-    private final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
+    private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
+    private static final String JWT_DELIMITER = "\\.";
+    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
     @Value("${oauth.kakao.rest-api-key}")
     private String restApiKey;
     @Value("${oauth.kakao.redirect-url}")
     private String redirectUri;
 
-    private static final String JWT_DELIMITER = "\\.";
-
-    private final ObjectMapper objectMapper;
-
-    public KakaoAuthService(ObjectMapper objectMapper) {
+    public KakaoAuthService(ObjectMapper objectMapper, RestTemplate restTemplate) {
         this.objectMapper = objectMapper;
+        this.restTemplate = restTemplate;
     }
 
-
-    public JsonNode getKakaoAccessToken(String code) {
-        RestTemplate rt = new RestTemplate();
-
+    @Override
+    public IdTokenResDto getIdToken(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -56,25 +55,25 @@ public class KakaoAuthService implements AuthService {
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
-            ResponseEntity<String> response = rt.exchange(
-                    KAKAO_TOKEN_URL,
-                    HttpMethod.POST,
-                    kakaoTokenRequest,
-                    String.class
-            );
+        ResponseEntity<String> response = restTemplate.exchange(
+                KAKAO_TOKEN_URL,
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );
 
+        if (response.getStatusCode().is2xxSuccessful()) {
+            String responseBody = response.getBody();
+            try {
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+                JsonNode idToken = jsonNode.get("id_token");
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                String responseBody = response.getBody();
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(responseBody);
-                    return jsonNode.get("id_token");
-                } catch (Exception e) {
-                    throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
-                }
+                return new IdTokenResDto(idToken);
+            } catch (Exception e) {
+                throw new RuntimeException("ID 토큰을 파싱하는데 실패했습니다.", e);
             }
-            throw new RuntimeException("구글 엑세스 토큰을 가져오는데 실패했습니다.");
-
+        }
+        throw new RuntimeException("구글 엑세스 토큰을 가져오는데 실패했습니다.");
     }
 
     @Override

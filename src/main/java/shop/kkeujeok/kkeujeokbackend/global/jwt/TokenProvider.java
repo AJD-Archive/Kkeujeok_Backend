@@ -1,22 +1,24 @@
 package shop.kkeujeok.kkeujeokbackend.global.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
 
 import java.security.Key;
 import java.util.Date;
 
 @Slf4j
-@RequiredArgsConstructor
+@Getter
 @Component
+@NoArgsConstructor
 public class TokenProvider {
 
     @Value("${token.expire.time.access}")
@@ -27,6 +29,7 @@ public class TokenProvider {
 
     @Value("${jwt.secret}")
     private String secret;
+
     private Key key;
 
     public TokenProvider(String accessTokenExpireTime, String refreshTokenExpireTime, String secret, Key key) {
@@ -38,8 +41,17 @@ public class TokenProvider {
 
     @PostConstruct
     public void init() {
-        byte[] key = Decoders.BASE64URL.decode(secret);
-        this.key = Keys.hmacShaKeyFor(key);
+        byte[] keyBytes = hexStringToByteArray(secret);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String getUserEmailFromToken(TokenReqDto tokenReqDto) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(tokenReqDto.authCode())
+                .getBody();
+        return claims.getSubject(); // 토큰의 subject를 사용자 ID로 간주
     }
 
     public boolean validateToken(String token) {
@@ -106,18 +118,13 @@ public class TokenProvider {
                 .compact();
     }
 
-// 시큐리티 규현 고민 중..
-//    public Authentication getAuthentication(String token) {
-//        Claims claims = Jwts.parserBuilder()
-//                .setSigningKey(key)
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody();
-//
-//        Member member = memberRepository.findByEmail(claims.getSubject()).orElseThrow();
-//
-//        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(member.getRole().toString()));
-//
-//        return new UsernamePasswordAuthenticationToken(member, "", authorities);
-//    }
+    private byte[] hexStringToByteArray(String secret) {
+        int len = secret.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(secret.charAt(i), 16) << 4)
+                    + Character.digit(secret.charAt(i + 1), 16));
+        }
+        return data;
+    }
 }

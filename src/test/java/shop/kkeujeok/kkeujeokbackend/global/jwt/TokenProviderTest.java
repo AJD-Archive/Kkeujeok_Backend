@@ -6,10 +6,12 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
 import java.security.Key;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 public class TokenProviderTest {
 
     private final String accessTokenExpireTime = "3600";
