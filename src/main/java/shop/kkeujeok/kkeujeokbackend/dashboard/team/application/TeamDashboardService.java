@@ -94,7 +94,7 @@ public class TeamDashboardService {
 
     // 팀 대시보드 상세 조회
     public TeamDashboardInfoResDto findById(String email, Long dashboardId) {
-        Member member = memberRepository.findByEmail("email").orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
