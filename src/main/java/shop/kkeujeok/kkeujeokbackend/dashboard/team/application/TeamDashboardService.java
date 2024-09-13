@@ -28,6 +28,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 public class TeamDashboardService {
 
     private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.";
+    private static final String TEAM_JOIN_ACCEPT_MESSAGE = "%s님이 초대를 수락하였습니다.";
 
 
     private final TeamDashboardRepository teamDashboardRepository;
@@ -120,6 +121,9 @@ public class TeamDashboardService {
                 .orElseThrow(DashboardNotFoundException::new);
 
         dashboard.addMember(member);
+
+        String message = String.format(TEAM_JOIN_ACCEPT_MESSAGE, member.getEmail());
+        notificationService.sendNotification(dashboard.getMember(), message);
     }
 
     @Transactional
@@ -139,16 +143,20 @@ public class TeamDashboardService {
 
     private void inviteMember(Member member, TeamDashboard teamDashboard, List<String> invitedEmails) {
         for (String email : invitedEmails) {
-            verifyIsSameEmail(member.getEmail(), email);
+            try {
+                verifyIsSameEmail(member.getEmail(), email);
 
-            Member inviteReceivedMember = memberRepository.findByEmail(email)
-                    .orElseThrow(MemberNotFoundException::new);
+                Member inviteReceivedMember = memberRepository.findByEmail(email)
+                        .orElseThrow(MemberNotFoundException::new);
 
-            String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
-                    teamDashboard.getTitle());
-            notificationService.sendNotification(inviteReceivedMember, message);
+                String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
+                        teamDashboard.getTitle());
+                notificationService.sendNotification(inviteReceivedMember, message);
+            } catch (MemberNotFoundException ignored) {
+            }
         }
     }
+
 
     private void verifyIsSameEmail(String email, String otherEmail) {
         if (email.equals(otherEmail)) {
