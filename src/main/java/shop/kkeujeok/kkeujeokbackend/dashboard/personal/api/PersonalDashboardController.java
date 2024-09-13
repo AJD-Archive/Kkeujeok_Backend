@@ -58,11 +58,10 @@ public class PersonalDashboardController {
     }
 
     @GetMapping("/categories")
-    public RspTemplate<PersonalDashboardCategoriesResDto> findForPersonalDashboardByCategories(
-            @CurrentUserEmail String email) {
+    public RspTemplate<PersonalDashboardCategoriesResDto> findCategoriesForDashboard(@CurrentUserEmail String email) {
         return new RspTemplate<>(HttpStatus.OK,
                 "개인 대시보드 카테고리 조회",
-                personalDashboardService.findForPersonalDashboardByCategories(email));
+                personalDashboardService.findCategoriesForDashboard(email));
     }
 
     @DeleteMapping("/{dashboardId}")

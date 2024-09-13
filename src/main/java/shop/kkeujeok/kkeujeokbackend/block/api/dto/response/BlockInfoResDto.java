@@ -20,6 +20,7 @@ public record BlockInfoResDto(
         String startDate,
         String deadLine,
         String nickname,
+        String picture,
         int dDay
 ) {
     public static BlockInfoResDto from(Block block) {
@@ -33,6 +34,7 @@ public record BlockInfoResDto(
                 .startDate(block.getStartDate())
                 .deadLine(block.getDeadLine())
                 .nickname(block.getMember().getNickname())
+                .picture(block.getMember().getPicture())
                 .dDay(calculateDDay(block.getDeadLine()))
                 .build();
     }

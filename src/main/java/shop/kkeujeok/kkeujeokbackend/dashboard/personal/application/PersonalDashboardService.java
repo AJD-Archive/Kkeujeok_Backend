@@ -1,10 +1,12 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.personal.application;
 
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.UnauthorizedAccessException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
@@ -73,16 +75,24 @@ public class PersonalDashboardService {
         PersonalDashboard dashboard = personalDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        validateDashboardAccess(dashboard, member);
+
         double blockProgress = personalDashboardRepository.calculateCompletionPercentage(dashboard.getId());
 
         return PersonalDashboardInfoResDto.detailOf(member, dashboard, blockProgress);
     }
 
+    private void validateDashboardAccess(PersonalDashboard dashboard, Member member) {
+        if (!dashboard.getMember().equals(member)) {
+            throw new UnauthorizedAccessException();
+        }
+    }
+
     // 개인 대시보드 카테고리 조회
-    public PersonalDashboardCategoriesResDto findForPersonalDashboardByCategories(String email) {
+    public PersonalDashboardCategoriesResDto findCategoriesForDashboard(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
-        List<String> categories = personalDashboardRepository.findForPersonalDashboardByCategory(member);
+        Set<String> categories = personalDashboardRepository.findCategoriesForDashboard(member);
 
         return PersonalDashboardCategoriesResDto.from(categories);
     }

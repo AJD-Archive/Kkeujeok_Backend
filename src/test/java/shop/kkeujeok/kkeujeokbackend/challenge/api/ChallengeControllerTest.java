@@ -438,6 +438,7 @@ class ChallengeControllerTest extends ControllerTest {
                 "2024.09.31 23:59",
                 "2024.09.31 23:59",
                 "동동",
+                "picture",
                 0);
 
         given(challengeService.addChallengeToPersonalDashboard(anyString(), anyLong(), anyLong()))
@@ -468,7 +469,8 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
                                 fieldWithPath("data.startDate").description("블록 시작기한"),
                                 fieldWithPath("data.deadLine").description("블록 마감기한"),
-                                fieldWithPath("data.nickname").description("블록 작성자"),
+                                fieldWithPath("data.nickname").description("블록 작성자 닉네임"),
+                                fieldWithPath("data.picture").description("블록 작성자 사진"),
                                 fieldWithPath("data.dDay").description("블록 디데이")
                         ))
                 )

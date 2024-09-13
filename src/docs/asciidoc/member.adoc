@@ -18,6 +18,8 @@ include::{snippets}/member/mypage/response-fields.adoc[]
 
 include::{snippets}/member/team-challenges/http-request.adoc[]
 include::{snippets}/member/team-challenges/request-headers.adoc[]
+include::{snippets}/member/team-challenges/query-parameters.adoc[]
+
 
 ==== 응답
 

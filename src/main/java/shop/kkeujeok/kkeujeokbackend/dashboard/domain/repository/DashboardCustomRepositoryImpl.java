@@ -7,6 +7,8 @@ import static shop.kkeujeok.kkeujeokbackend.member.domain.QMember.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -38,15 +40,15 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
                 .fetch();
     }
 
-
     @Override
-    public List<String> findForPersonalDashboardByCategory(Member member) {
+    public Set<String> findCategoriesForDashboard(Member member) {
         return queryFactory
                 .select(personalDashboard.category)
                 .from(personalDashboard)
-                .where(personalDashboard._super.member.eq(member))
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE)))
                 .stream()
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @Override
