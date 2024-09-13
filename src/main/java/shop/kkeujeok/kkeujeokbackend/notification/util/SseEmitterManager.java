@@ -33,7 +33,6 @@ public class SseEmitterManager {
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name(EMITTER_NAME)
                         .data(message));
             } catch (Exception e) {
                 emitter.completeWithError(e);
