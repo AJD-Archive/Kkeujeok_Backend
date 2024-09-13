@@ -17,6 +17,9 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboa
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
@@ -27,6 +30,7 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -39,6 +43,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +57,8 @@ public class MemberControllerTest extends ControllerTest {
     @InjectMocks
     private MemberController memberController;
 
+    private Member member;
+
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         memberController = new MemberController(myPageService);
@@ -59,6 +67,17 @@ public class MemberControllerTest extends ControllerTest {
                 .apply(documentationConfiguration(restDocumentation))
                 .setCustomArgumentResolvers(new CurrentUserEmailArgumentResolver(tokenProvider),
                         new PageableHandlerMethodArgumentResolver()) // 추가
+                .build();
+
+        member = Member.builder()
+                .status(Status.ACTIVE)
+                .email("kkeujeok@gmail.com")
+                .name("김동균")
+                .picture("기본 프로필")
+                .socialType(SocialType.GOOGLE)
+                .role(Role.ROLE_USER)
+                .firstLogin(true)
+                .nickname("동동")
                 .build();
     }
 
@@ -114,13 +133,19 @@ public class MemberControllerTest extends ControllerTest {
         when(tokenProvider.getUserEmailFromToken(any(TokenReqDto.class))).thenReturn("email");
 
         mockMvc.perform(get("/api/members/mypage/dashboard-challenges")
-                        .header("Authorization", "Bearer valid-token"))
+                        .header("Authorization", "Bearer valid-token")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andDo(document("member/team-challenges",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
                                 headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호 (기본값: 0)"),
+                                parameterWithName("size").description("페이지 당 항목 수 (기본값: 10)")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -145,18 +170,13 @@ public class MemberControllerTest extends ControllerTest {
 //    void 내_프로필_정보_수정() throws Exception {
 //        // given
 //        MyPageUpdateReqDto updateReqDto = new MyPageUpdateReqDto("귀여운수달", "안녕하세요?");
-//        MyPageInfoResDto updatedResDto = new MyPageInfoResDto(
-//                "picture",
-//                "chldlsgh0987@naver.com",
-//                "최인호",
-//                "귀여운수달",
-//                SocialType.KAKAO,
-//                "안녕하세요?"
-//        );
 //
-//        // mock the service behavior
-//        when(myPageService.update(anyString(), any(MyPageUpdateReqDto.class)))
-//                .thenReturn(updatedResDto);
+//       member.update(updateReqDto.nickname(), updateReqDto.introduction());
+//
+//       MyPageInfoResDto myPageInfoResDto = MyPageInfoResDto.From(member);
+//
+//        given(myPageService.update(anyString(), any(MyPageUpdateReqDto.class)))
+//                .willReturn(myPageInfoResDto);
 //
 //        // when & then
 //        mockMvc.perform(patch("/api/members/mypage")

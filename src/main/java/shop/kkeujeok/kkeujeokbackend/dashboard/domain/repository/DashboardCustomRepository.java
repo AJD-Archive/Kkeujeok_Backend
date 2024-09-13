@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository;
 
 import java.util.List;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
@@ -11,7 +12,7 @@ public interface DashboardCustomRepository {
 
     List<PersonalDashboard> findForPersonalDashboard(Member member);
 
-    List<String> findForPersonalDashboardByCategory(Member member);
+    Set<String> findCategoriesForDashboard(Member member);
 
     Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable);
 

@@ -104,7 +104,7 @@ class TeamDocumentControllerTest extends ControllerTest {
 //                        .content(objectMapper.writeValueAsString(request)))
 //                .andDo(print())
 //                .andExpect(status().isOk())
-//                .andDo(document("document/save",
+//                .andDo(document("teamDocument/save",
 //                        preprocessRequest(prettyPrint()),
 //                        preprocessResponse(prettyPrint()),
 //                        requestHeaders(
@@ -145,7 +145,7 @@ class TeamDocumentControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("document/update",
+                .andDo(document("teamDocument/update",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
@@ -183,7 +183,7 @@ class TeamDocumentControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isNotEmpty())
-                .andDo(document("document/findById",
+                .andDo(document("teamDocument/findById",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
@@ -217,7 +217,7 @@ class TeamDocumentControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isNotEmpty())
-                .andDo(document("document/findCategories",
+                .andDo(document("teamDocument/findCategories",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
@@ -256,7 +256,7 @@ class TeamDocumentControllerTest extends ControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("document/search-by-category",
+                .andDo(document("teamDocument/search-by-category",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
@@ -295,7 +295,7 @@ class TeamDocumentControllerTest extends ControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("document/delete",
+                .andDo(document("teamDocument/delete",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
