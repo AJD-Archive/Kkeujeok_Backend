@@ -9,8 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @Component
 public class SseEmitterManager {
-    private static final String EMITTER_NAME = "message";
-    private static final String DUMMY_MESSAGE = "연결 성공";
+    private static final String EMITTER_NAME = "notification";
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
@@ -22,8 +21,6 @@ public class SseEmitterManager {
         emitter.onTimeout(() -> emitters.remove(memberId));
         emitter.onError((e) -> emitters.remove(memberId));
 
-        sendNotification(memberId, DUMMY_MESSAGE);
-
         return emitter;
     }
 
@@ -33,6 +30,7 @@ public class SseEmitterManager {
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
+                        .name(EMITTER_NAME)
                         .data(message));
             } catch (Exception e) {
                 emitter.completeWithError(e);
