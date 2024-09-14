@@ -15,7 +15,6 @@ import shop.kkeujeok.kkeujeokbackend.notification.api.dto.response.NotificationI
 import shop.kkeujeok.kkeujeokbackend.notification.api.dto.response.NotificationListResDto;
 import shop.kkeujeok.kkeujeokbackend.notification.domain.Notification;
 import shop.kkeujeok.kkeujeokbackend.notification.domain.repository.NotificationRepository;
-import shop.kkeujeok.kkeujeokbackend.notification.exception.NotificationNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.notification.util.SseEmitterManager;
 
 @Service
@@ -57,14 +56,14 @@ public class NotificationService {
         return NotificationListResDto.of(notificationList, PageInfoResDto.from(notifications));
     }
 
-    @Transactional
+    /*@Transactional
     public NotificationInfoResDto findByNotificationId(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(NotificationNotFoundException::new);
         notification.markAsRead();
 
         return NotificationInfoResDto.from(notification);
-    }
+    }*/
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
