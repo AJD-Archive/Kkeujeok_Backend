@@ -24,22 +24,29 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
     public Page<Notification> findAllNotifications(Member member, Pageable pageable) {
         QNotification notification = QNotification.notification;
 
-        long total = Optional.ofNullable(
+        long total = getTotal(notification, member);
+        List<Notification> notifications = getNotifications(notification, member, pageable);
+
+        return new PageImpl<>(notifications, pageable, total);
+    }
+
+    private long getTotal(QNotification notification, Member member) {
+        return Optional.ofNullable(
                 queryFactory
                         .select(notification.count())
                         .from(notification)
                         .where(notification.receiver.eq(member))
                         .fetchOne()
         ).orElse(0L);
+    }
 
-        List<Notification> notifications = queryFactory
+    private List<Notification> getNotifications(QNotification notification, Member member, Pageable pageable) {
+        return queryFactory
                 .selectFrom(notification)
                 .where(notification.receiver.eq(member))
                 .orderBy(notification.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
-        return new PageImpl<>(notifications, pageable, total);
     }
 }
