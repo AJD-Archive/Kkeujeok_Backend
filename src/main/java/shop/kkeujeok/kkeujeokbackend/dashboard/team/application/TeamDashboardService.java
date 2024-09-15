@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.InvalidMemberInviteException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.UnauthorizedAccessException;
-import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
