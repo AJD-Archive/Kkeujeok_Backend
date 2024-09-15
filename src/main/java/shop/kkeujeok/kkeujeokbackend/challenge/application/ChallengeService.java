@@ -168,10 +168,12 @@ public class ChallengeService {
     }
 
     private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
-        if (!ChallengeBlockStatusUtil.isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
+        if (!ChallengeBlockStatusUtil.getInstance()
+                .isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
             block.updateChallengeStatus(Status.UN_ACTIVE);
         }
     }
+
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)

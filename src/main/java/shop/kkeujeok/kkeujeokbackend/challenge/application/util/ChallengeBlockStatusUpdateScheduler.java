@@ -38,7 +38,7 @@ public class ChallengeBlockStatusUpdateScheduler {
     }
 
     private Status determineNewStatus(Block block) {
-        boolean isActive = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(
+        boolean isActive = ChallengeBlockStatusUtil.getInstance().isChallengeBlockActiveToday(
                 block.getChallenge().getCycle(),
                 block.getChallenge().getCycleDetails()
         );
