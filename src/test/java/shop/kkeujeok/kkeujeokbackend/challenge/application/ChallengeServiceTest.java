@@ -104,9 +104,9 @@ class ChallengeServiceTest {
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
-                LocalDate.now(),
                 LocalDate.now().plusDays(30),
-                "대표 이미지"
+                "대표 이미지",
+                "1일 1커밋"
         );
 
         challenge = Challenge.builder()
@@ -114,7 +114,7 @@ class ChallengeServiceTest {
                 .contents(challengeSaveReqDto.contents())
                 .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
-                .startDate(challengeSaveReqDto.startDate())
+                .startDate(LocalDate.now())
                 .endDate(challengeSaveReqDto.endDate())
                 .representImage(challengeSaveReqDto.representImage())
                 .member(member)
@@ -126,9 +126,9 @@ class ChallengeServiceTest {
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
-                LocalDate.now(),
                 LocalDate.now().plusDays(30),
-                "업데이트 이미지"
+                "업데이트 이미지",
+                "1일 1커밋"
         );
 
         block = Block.builder()
@@ -191,8 +191,8 @@ class ChallengeServiceTest {
                 Cycle.MONTHLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
-                LocalDate.now().plusDays(30),
-                "대표 이미지"
+                "대표 이미지",
+                "1일 1커밋"
         );
 
         // when & then
@@ -230,7 +230,6 @@ class ChallengeServiceTest {
             assertThat(result.title()).isEqualTo("업데이트 제목");
             assertThat(result.contents()).isEqualTo("업데이트 내용");
             assertThat(result.cycleDetails()).containsExactly(CycleDetail.MON);
-            assertThat(result.startDate()).isEqualTo(LocalDate.now());
             assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
             assertThat(result.representImage()).isEqualTo("업데이트 이미지");
         });

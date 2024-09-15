@@ -65,9 +65,9 @@ public class ChallengeService {
         challenge.update(challengeSaveReqDto.title(),
                 challengeSaveReqDto.contents(),
                 challengeSaveReqDto.cycleDetails(),
-                challengeSaveReqDto.startDate(),
                 challengeSaveReqDto.endDate(),
-                challengeSaveReqDto.representImage());
+                challengeSaveReqDto.representImage(),
+                challengeSaveReqDto.blockName());
 
         return ChallengeInfoResDto.from(challenge);
     }

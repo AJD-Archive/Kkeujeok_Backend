@@ -39,6 +39,7 @@ class ChallengeTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .representImage("대표 사진")
                 .member(member)
+                .blockName("블록 이름")
                 .build();
     }
 
@@ -50,13 +51,13 @@ class ChallengeTest {
         String updateContents = "수정된 내용";
         Cycle updateCycle = Cycle.WEEKLY;
         List<CycleDetail> updateCycleDetails = List.of(CycleDetail.WED, CycleDetail.THU);
-        LocalDate updateStartDate = LocalDate.now().plusDays(1);
         LocalDate updateEndDate = LocalDate.now().plusDays(31);
         String updateRepresentImage = "수정된 대표 사진";
+        String updateBlockName = "수정된 블록 이름";
 
         // when
-        challenge.update(updateTitle, updateContents, updateCycleDetails, updateStartDate, updateEndDate,
-                updateRepresentImage);
+        challenge.update(updateTitle, updateContents, updateCycleDetails, updateEndDate,
+                updateRepresentImage, updateBlockName);
 
         // then
         assertAll(() -> {
@@ -64,9 +65,9 @@ class ChallengeTest {
             assertThat(challenge.getContents()).isEqualTo(updateContents);
             assertThat(challenge.getCycle()).isEqualTo(updateCycle);
             assertThat(challenge.getCycleDetails()).isEqualTo(updateCycleDetails);
-            assertThat(challenge.getStartDate()).isEqualTo(updateStartDate);
             assertThat(challenge.getEndDate()).isEqualTo(updateEndDate);
             assertThat(challenge.getRepresentImage()).isEqualTo(updateRepresentImage);
+            assertThat(challenge.getBlockName()).isEqualTo(updateBlockName);
         });
     }
 
@@ -77,17 +78,17 @@ class ChallengeTest {
         String updateTitle = "수정된 제목";
 
         // when
-        challenge.update(updateTitle, challenge.getContents(), challenge.getCycleDetails(), challenge.getStartDate(),
-                challenge.getEndDate(), challenge.getRepresentImage());
+        challenge.update(updateTitle, challenge.getContents(), challenge.getCycleDetails(),
+                challenge.getEndDate(), challenge.getRepresentImage(), challenge.getBlockName());
 
         // then
         assertAll(() -> {
             assertThat(challenge.getTitle()).isEqualTo(updateTitle);
             assertThat(challenge.getContents()).isEqualTo("내용");
             assertThat(challenge.getCycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
-            assertThat(challenge.getStartDate()).isEqualTo(LocalDate.now());
             assertThat(challenge.getEndDate()).isEqualTo(LocalDate.now().plusDays(30));
             assertThat(challenge.getRepresentImage()).isEqualTo("대표 사진");
+            assertThat(challenge.getBlockName()).isEqualTo("블록 이름");
         });
     }
 
@@ -98,15 +99,14 @@ class ChallengeTest {
         String updateContents = "수정된 내용";
 
         // when
-        challenge.update(challenge.getTitle(), updateContents, challenge.getCycleDetails(), challenge.getStartDate(),
-                challenge.getEndDate(), challenge.getRepresentImage());
+        challenge.update(challenge.getTitle(), updateContents, challenge.getCycleDetails(),
+                challenge.getEndDate(), challenge.getRepresentImage(), challenge.getBlockName());
 
         // then
         assertAll(() -> {
             assertThat(challenge.getTitle()).isEqualTo("제목");
             assertThat(challenge.getContents()).isEqualTo(updateContents);
             assertThat(challenge.getCycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
-            assertThat(challenge.getStartDate()).isEqualTo(LocalDate.now());
             assertThat(challenge.getEndDate()).isEqualTo(LocalDate.now().plusDays(30));
             assertThat(challenge.getRepresentImage()).isEqualTo("대표 사진");
         });
@@ -120,14 +120,13 @@ class ChallengeTest {
 
         // when
         challenge.update(challenge.getTitle(), challenge.getContents(), challenge.getCycleDetails(),
-                challenge.getStartDate(), updateEndDate, challenge.getRepresentImage());
+                updateEndDate, challenge.getRepresentImage(), challenge.getBlockName());
 
         // then
         assertAll(() -> {
             assertThat(challenge.getTitle()).isEqualTo("제목");
             assertThat(challenge.getContents()).isEqualTo("내용");
             assertThat(challenge.getCycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
-            assertThat(challenge.getStartDate()).isEqualTo(LocalDate.now());
             assertThat(challenge.getEndDate()).isEqualTo(updateEndDate);
             assertThat(challenge.getRepresentImage()).isEqualTo("대표 사진");
         });

@@ -56,6 +56,8 @@ public class Challenge extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private String blockName;
+
     @Builder
     private Challenge(Status status,
                       String title,
@@ -66,7 +68,8 @@ public class Challenge extends BaseEntity {
                       LocalDate startDate,
                       LocalDate endDate,
                       String representImage,
-                      Member member) {
+                      Member member,
+                      String blockName) {
         validateCycleDetails(cycle, cycleDetails);
 
         this.status = status;
@@ -79,20 +82,21 @@ public class Challenge extends BaseEntity {
         this.endDate = endDate;
         this.representImage = representImage;
         this.member = member;
+        this.blockName = blockName;
     }
 
     public void update(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
-                       LocalDate updateStartDate, LocalDate updateEndDate, String updateRepresentImage) {
+                       LocalDate updateEndDate, String updateRepresentImage, String updateBlockName) {
         validateCycleDetails(cycle, cycleDetails);
 
-        if (hasChanges(updateTitle, updateContents, updateCycleDetails, updateStartDate, updateEndDate,
-                updateRepresentImage)) {
+        if (hasChanges(updateTitle, updateContents, updateCycleDetails, updateEndDate,
+                updateRepresentImage, updateBlockName)) {
             this.title = updateTitle;
             this.contents = updateContents;
             this.cycleDetails = updateCycleDetails;
-            this.startDate = updateStartDate;
             this.endDate = updateEndDate;
             this.representImage = updateRepresentImage;
+            this.blockName = updateBlockName;
         }
     }
 
@@ -118,13 +122,13 @@ public class Challenge extends BaseEntity {
     }
 
     private boolean hasChanges(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
-                               LocalDate updateStartDate, LocalDate updateEndDate, String updateRepresentImage) {
+                               LocalDate updateEndDate, String updateRepresentImage, String blockName) {
         return !this.title.equals(updateTitle) ||
                 !this.contents.equals(updateContents) ||
                 !this.cycleDetails.equals(updateCycleDetails) ||
-                !this.startDate.equals(updateStartDate) ||
                 !this.endDate.equals(updateEndDate) ||
-                !this.representImage.equals(updateRepresentImage);
+                !this.representImage.equals(updateRepresentImage) ||
+                !this.blockName.equals(blockName);
     }
 
     public void updateStatus() {
