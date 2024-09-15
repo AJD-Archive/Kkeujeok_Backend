@@ -22,13 +22,16 @@ public record TeamDashboardInfoResDto(
     }
 
     public static TeamDashboardInfoResDto detailOf(Member member, TeamDashboard dashboard, double blockProgress) {
+        List<JoinMemberInfoResDto> joinMemberInfoResDtos = new java.util.ArrayList<>();
+        joinMemberInfoResDtos.add(JoinMemberInfoResDto.from(dashboard.getMember()));
+
+        joinMemberInfoResDtos.addAll(dashboard.getTeamDashboardMemberMappings().stream()
+                .map(mapping -> JoinMemberInfoResDto.from(mapping.getMember()))
+                .toList());
+
         return commonBuilder(member, dashboard)
                 .blockProgress(blockProgress)
-                .joinMembers(dashboard.getTeamDashboardMemberMappings().stream()
-                        .map(teamDashboardMemberMapping -> {
-                            return JoinMemberInfoResDto.from(teamDashboardMemberMapping.getMember());
-                        })
-                        .toList())
+                .joinMembers(joinMemberInfoResDtos)
                 .build();
     }
 

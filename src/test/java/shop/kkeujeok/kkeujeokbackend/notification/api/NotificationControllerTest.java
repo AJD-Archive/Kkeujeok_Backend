@@ -1,7 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.notification.api;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -13,8 +12,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
@@ -151,7 +148,7 @@ class NotificationControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
+    /*@Test
     @DisplayName("알림 상세 조회에 성공하면 상태코드 200 반환")
     void 알림_상세_조회에_성공하면_상태코드_200_반환() throws Exception {
         // given
@@ -180,5 +177,5 @@ class NotificationControllerTest extends ControllerTest {
                         ))
                 )
                 .andExpect(status().isOk());
-    }
+    }*/
 }

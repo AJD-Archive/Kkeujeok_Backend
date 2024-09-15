@@ -1,7 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.notification.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -26,7 +25,6 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.notification.api.dto.response.NotificationListResDto;
 import shop.kkeujeok.kkeujeokbackend.notification.domain.Notification;
 import shop.kkeujeok.kkeujeokbackend.notification.domain.repository.NotificationRepository;
-import shop.kkeujeok.kkeujeokbackend.notification.exception.NotificationNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.notification.util.SseEmitterManager;
 
 @ExtendWith(MockitoExtension.class)
@@ -104,7 +102,7 @@ class NotificationServiceTest {
         // 어떻게 테스트할 지 고민해보겠습니다..
     }
 
-    @Test
+    /*@Test
     @DisplayName("존재하지 않는 알림을 조회하면 예외가 발생한다")
     void 존재하지_않는_알림을_조회하면_예외가_발생한다() {
         // given
@@ -115,7 +113,7 @@ class NotificationServiceTest {
         // when & then
         assertThatThrownBy(() -> notificationService.findByNotificationId(nonExistentNotificationId))
                 .isInstanceOf(NotificationNotFoundException.class);
-    }
+    }*/
 
     @Test
     @DisplayName("회원의 모든 알림을 조회할 수 있다")

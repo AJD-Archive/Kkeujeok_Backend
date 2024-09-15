@@ -1,30 +1,10 @@
 package shop.kkeujeok.kkeujeokbackend.auth.api;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
-import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
-import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
-import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
-import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
-import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
-import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
-import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,6 +13,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.requestFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.MemberLoginResDto;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.UserInfo;
+import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
+import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
+import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
 public class AuthControllerTest extends ControllerTest {
 
