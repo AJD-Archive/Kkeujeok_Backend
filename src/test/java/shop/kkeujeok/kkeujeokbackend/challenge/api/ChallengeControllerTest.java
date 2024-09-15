@@ -101,6 +101,7 @@ class ChallengeControllerTest extends ControllerTest {
         challenge = Challenge.builder()
                 .title(challengeSaveReqDto.title())
                 .contents(challengeSaveReqDto.title())
+                .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
                 .startDate(challengeSaveReqDto.startDate())
                 .endDate(challengeSaveReqDto.endDate())

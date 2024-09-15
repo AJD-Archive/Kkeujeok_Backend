@@ -33,6 +33,7 @@ class ChallengeTest {
                 .status(Status.ACTIVE)
                 .title("제목")
                 .contents("내용")
+                .cycle(Cycle.WEEKLY)
                 .cycleDetails(List.of(CycleDetail.MON, CycleDetail.TUE))
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(30))
@@ -47,6 +48,7 @@ class ChallengeTest {
         // given
         String updateTitle = "수정된 제목";
         String updateContents = "수정된 내용";
+        Cycle updateCycle = Cycle.WEEKLY;
         List<CycleDetail> updateCycleDetails = List.of(CycleDetail.WED, CycleDetail.THU);
         LocalDate updateStartDate = LocalDate.now().plusDays(1);
         LocalDate updateEndDate = LocalDate.now().plusDays(31);
@@ -60,6 +62,7 @@ class ChallengeTest {
         assertAll(() -> {
             assertThat(challenge.getTitle()).isEqualTo(updateTitle);
             assertThat(challenge.getContents()).isEqualTo(updateContents);
+            assertThat(challenge.getCycle()).isEqualTo(updateCycle);
             assertThat(challenge.getCycleDetails()).isEqualTo(updateCycleDetails);
             assertThat(challenge.getStartDate()).isEqualTo(updateStartDate);
             assertThat(challenge.getEndDate()).isEqualTo(updateEndDate);
@@ -149,4 +152,3 @@ class ChallengeTest {
         assertThat(challenge.getStatus()).isEqualTo(Status.ACTIVE);
     }
 }
-
