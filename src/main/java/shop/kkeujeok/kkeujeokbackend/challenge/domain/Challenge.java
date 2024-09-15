@@ -8,12 +8,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.challenge.converter.CycleDetailsConverter;
+import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -64,6 +67,8 @@ public class Challenge extends BaseEntity {
                       LocalDate endDate,
                       String representImage,
                       Member member) {
+        validateCycleDetails(cycle, cycleDetails);
+
         this.status = status;
         this.title = title;
         this.contents = contents;
@@ -78,6 +83,8 @@ public class Challenge extends BaseEntity {
 
     public void update(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
                        LocalDate updateStartDate, LocalDate updateEndDate, String updateRepresentImage) {
+        validateCycleDetails(cycle, cycleDetails);
+
         if (hasChanges(updateTitle, updateContents, updateCycleDetails, updateStartDate, updateEndDate,
                 updateRepresentImage)) {
             this.title = updateTitle;
@@ -86,6 +93,27 @@ public class Challenge extends BaseEntity {
             this.startDate = updateStartDate;
             this.endDate = updateEndDate;
             this.representImage = updateRepresentImage;
+        }
+    }
+
+    private void validateCycleDetails(Cycle cycle, List<CycleDetail> cycleDetails) {
+        Set<CycleDetail> distinctCycleDetails = new HashSet<>();
+
+        cycleDetails.forEach(cycleDetail -> {
+            validateCycleDetailUniqueness(distinctCycleDetails, cycleDetail);
+            validateCycleDetailMatch(cycle, cycleDetail);
+        });
+    }
+
+    private void validateCycleDetailUniqueness(Set<CycleDetail> seenDetails, CycleDetail cycleDetail) {
+        if (!seenDetails.add(cycleDetail)) {
+            throw InvalidCycleException.forDuplicateDetail();
+        }
+    }
+
+    private void validateCycleDetailMatch(Cycle cycle, CycleDetail cycleDetail) {
+        if (cycleDetail.getCycle() != cycle) {
+            throw InvalidCycleException.forMismatchDetail();
         }
     }
 

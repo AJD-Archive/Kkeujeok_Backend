@@ -2,14 +2,11 @@ package shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
-import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
@@ -38,7 +35,6 @@ public record ChallengeSaveReqDto(
         String representImage
 ) {
     public Challenge toEntity(Member member) {
-        validateCycleDetails();
         return Challenge.builder()
                 .status(Status.ACTIVE)
                 .title(title)
@@ -51,26 +47,5 @@ public record ChallengeSaveReqDto(
                 .representImage(representImage)
                 .member(member)
                 .build();
-    }
-
-    private void validateCycleDetails() {
-        Set<CycleDetail> distinctCycleDetails = new HashSet<>();
-
-        cycleDetails.forEach(cycleDetail -> {
-            validateCycleDetailUniqueness(distinctCycleDetails, cycleDetail);
-            validateCycleDetailMatch(cycleDetail);
-        });
-    }
-
-    private void validateCycleDetailUniqueness(Set<CycleDetail> seenDetails, CycleDetail cycleDetail) {
-        if (!seenDetails.add(cycleDetail)) {
-            throw InvalidCycleException.forDuplicateDetail();
-        }
-    }
-
-    private void validateCycleDetailMatch(CycleDetail cycleDetail) {
-        if (cycleDetail.getCycle() != cycle) {
-            throw InvalidCycleException.forMismatchDetail();
-        }
     }
 }
