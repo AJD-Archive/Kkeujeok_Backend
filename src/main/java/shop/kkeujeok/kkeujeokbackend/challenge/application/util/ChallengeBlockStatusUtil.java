@@ -7,6 +7,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 
 public class ChallengeBlockStatusUtil {
+
     @Getter
     private static final ChallengeBlockStatusUtil instance = new ChallengeBlockStatusUtil();
 
