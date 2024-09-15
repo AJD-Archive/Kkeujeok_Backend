@@ -20,7 +20,8 @@ public record ChallengeInfoResDto(
         LocalDate endDate,
         String representImage,
         String authorName,
-        String authorProfileImage
+        String authorProfileImage,
+        String blockName
 ) {
     public static ChallengeInfoResDto from(Challenge challenge) {
         return ChallengeInfoResDto.builder()
@@ -35,6 +36,7 @@ public record ChallengeInfoResDto(
                 .representImage(challenge.getRepresentImage())
                 .authorName(challenge.getMember().getNickname())
                 .authorProfileImage(challenge.getMember().getPicture())
+                .blockName(challenge.getBlockName())
                 .build();
     }
 }

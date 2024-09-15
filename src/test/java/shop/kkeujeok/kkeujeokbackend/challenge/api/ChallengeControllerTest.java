@@ -89,23 +89,24 @@ class ChallengeControllerTest extends ControllerTest {
                 .build();
 
         challengeSaveReqDto = new ChallengeSaveReqDto(
-                "1일 1커밋",
-                "1일 1커밋하기",
+                "챌린지 제목",
+                "챌린지 내용",
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
-                LocalDate.now().plusDays(30),
-                "대표 이미지");
+                "대표 이미지",
+                "블록 이름");
 
         challenge = Challenge.builder()
                 .title(challengeSaveReqDto.title())
                 .contents(challengeSaveReqDto.title())
+                .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
-                .startDate(challengeSaveReqDto.startDate())
                 .endDate(challengeSaveReqDto.endDate())
                 .representImage(challengeSaveReqDto.representImage())
                 .member(member)
+                .blockName(challengeSaveReqDto.blockName())
                 .build();
 
         challengeUpdateReqDto = new ChallengeSaveReqDto(
@@ -115,10 +116,10 @@ class ChallengeControllerTest extends ControllerTest {
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
                 LocalDate.now(),
-                LocalDate.now().plusDays(30),
-                "업데이트 이미지");
+                "업데이트 이미지",
+                "1일 1커밋");
 
-        challengeSearchReqDto = new ChallengeSearchReqDto("1일");
+        challengeSearchReqDto = new ChallengeSearchReqDto("챌린지");
 
         challengeController = new ChallengeController(challengeService);
 
@@ -158,9 +159,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("category").description("챌린지 카테고리"),
                                 fieldWithPath("cycle").description("챌린지 주기"),
                                 fieldWithPath("cycleDetails").description("주기 상세정보"),
-                                fieldWithPath("startDate").description("시작 날짜"),
                                 fieldWithPath("endDate").description("종료 날짜"),
-                                fieldWithPath("representImage").description("대표 사진")),
+                                fieldWithPath("representImage").description("대표 사진"),
+                                fieldWithPath("blockName").description("블록 이름")
+                        ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
@@ -174,7 +176,8 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.endDate").description("종료 날짜"),
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지")
+                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.blockName").description("블록 이름")
                         ))
                 )
                 .andExpect(status().isOk());
@@ -187,9 +190,9 @@ class ChallengeControllerTest extends ControllerTest {
         challenge.update(challengeUpdateReqDto.title(),
                 challengeUpdateReqDto.contents(),
                 challengeUpdateReqDto.cycleDetails(),
-                challengeUpdateReqDto.startDate(),
                 challengeUpdateReqDto.endDate(),
-                challengeUpdateReqDto.representImage());
+                challengeUpdateReqDto.representImage(),
+                challengeUpdateReqDto.blockName());
         ChallengeInfoResDto response = ChallengeInfoResDto.from(challenge);
         given(challengeService.update(anyString(), anyLong(), any(ChallengeSaveReqDto.class)))
                 .willReturn(response);
@@ -213,9 +216,11 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("category").description("챌린지 카테고리"),
                                 fieldWithPath("cycle").description("챌린지 주기"),
                                 fieldWithPath("cycleDetails").description("주기 상세정보"),
-                                fieldWithPath("startDate").description("시작 날짜"),
                                 fieldWithPath("endDate").description("종료 날짜"),
-                                fieldWithPath("representImage").description("대표 사진")),
+                                fieldWithPath("representImage").description("대표 사진"),
+                                fieldWithPath("blockName").description("블록 이름")
+
+                        ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
@@ -229,7 +234,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.endDate").description("종료 날짜"),
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"))))
+                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.blockName").description("블록 이름")
+                        )
+                ))
                 .andExpect(status().isOk());
     }
 
@@ -269,6 +277,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
                                 fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description(
                                         "챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
@@ -311,6 +320,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
                                 fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
                                         .description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
@@ -357,6 +367,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
                                 fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
                                         .description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
@@ -395,7 +406,8 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.endDate").description("종료 날짜"),
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지")
+                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.blockName").description("블록 이름")
                         ))
                 )
                 .andExpect(status().isOk());

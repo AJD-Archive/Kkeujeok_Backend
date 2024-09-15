@@ -65,9 +65,9 @@ public class ChallengeService {
         challenge.update(challengeSaveReqDto.title(),
                 challengeSaveReqDto.contents(),
                 challengeSaveReqDto.cycleDetails(),
-                challengeSaveReqDto.startDate(),
                 challengeSaveReqDto.endDate(),
-                challengeSaveReqDto.representImage());
+                challengeSaveReqDto.representImage(),
+                challengeSaveReqDto.blockName());
 
         return ChallengeInfoResDto.from(challenge);
     }
@@ -168,10 +168,12 @@ public class ChallengeService {
     }
 
     private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
-        if (!ChallengeBlockStatusUtil.isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
+        if (!ChallengeBlockStatusUtil.getInstance()
+                .isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
             block.updateChallengeStatus(Status.UN_ACTIVE);
         }
     }
+
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
