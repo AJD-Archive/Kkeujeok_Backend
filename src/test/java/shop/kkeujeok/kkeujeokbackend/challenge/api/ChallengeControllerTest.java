@@ -291,8 +291,9 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
-
-                                ))).andExpect(status().isOk());
+                                )
+                        )
+                ).andExpect(status().isOk());
     }
 
     @Test
@@ -346,8 +347,8 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
-
-                                ))
+                                )
+                        )
                 )
                 .andExpect(status().isOk());
     }
