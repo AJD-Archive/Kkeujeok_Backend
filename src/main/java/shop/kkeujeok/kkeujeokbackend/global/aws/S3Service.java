@@ -16,7 +16,7 @@ public class S3Service {
 
     private final S3Client s3Client;
     private static final String bucketName = "kkeujeok-image-bucket";
-    private static final String urlImage = "https://" + bucketName + ".s3.amazonaws.com/challenge-images/key.jpg";
+    private static final String url = "https://" + bucketName + ".s3.amazonaws.com/challenge-images/";
 
     // 파일 업로드 메서드
     public String uploadChallengeImage(MultipartFile file) {
@@ -29,7 +29,7 @@ public class S3Service {
                             .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
-            return urlImage;
+            return url + key + "jpg";
         } catch (IOException e) {
             throw new InvalidImageUploadException();
         }
