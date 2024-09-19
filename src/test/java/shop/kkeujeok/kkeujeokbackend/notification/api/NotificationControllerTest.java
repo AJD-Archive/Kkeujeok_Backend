@@ -23,18 +23,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
-import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -80,6 +77,8 @@ class NotificationControllerTest extends ControllerTest {
                 .isRead(false)
                 .build();
 
+        ReflectionTestUtils.setField(notification, "id", 1L);
+        
         mockMvc = MockMvcBuilders.standaloneSetup(notificationController)
                 .apply(documentationConfiguration(restDocumentation))
                 .setCustomArgumentResolvers(new CurrentUserEmailArgumentResolver(tokenProvider))
@@ -115,11 +114,9 @@ class NotificationControllerTest extends ControllerTest {
     void 알림_전체_조회에_성공하면_상태코드_200_반환() throws Exception {
         // given
         NotificationInfoResDto notificationInfoResDto = NotificationInfoResDto.from(notification);
-        Page<Notification> notificationPage = new PageImpl<>(List.of(notification), PageRequest.of(0, 10), 1);
-        NotificationListResDto response = NotificationListResDto.of(List.of(notificationInfoResDto),
-                PageInfoResDto.from(notificationPage));
+        NotificationListResDto response = NotificationListResDto.of(List.of(notificationInfoResDto));
 
-        given(notificationService.findAllNotificationsFromMember(member.getEmail(), PageRequest.of(0, 10)))
+        given(notificationService.findAllNotificationsFromMember(member.getEmail()))
                 .willReturn(response);
 
         // when & then
@@ -139,10 +136,7 @@ class NotificationControllerTest extends ControllerTest {
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.notificationInfoResDto[].id").description("알림 아이디"),
                                 fieldWithPath("data.notificationInfoResDto[].message").description("알림 메시지"),
-                                fieldWithPath("data.notificationInfoResDto[].isRead").description("알림 읽은 여부"),
-                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 개수")
+                                fieldWithPath("data.notificationInfoResDto[].isRead").description("알림 읽은 여부")
                         ))
                 )
                 .andExpect(status().isOk());

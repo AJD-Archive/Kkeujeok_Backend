@@ -41,6 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
@@ -112,6 +113,8 @@ class ChallengeControllerTest extends ControllerTest {
                 .representImage("대표 이미지")
                 .build();
 
+        ReflectionTestUtils.setField(challenge, "id", 1L);
+        
         challengeUpdateReqDto = new ChallengeSaveReqDto(
                 "업데이트 제목",
                 "업데이트 내용",
