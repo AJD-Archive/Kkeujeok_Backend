@@ -15,6 +15,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
 class ChallengeTest {
     private Challenge challenge;
+    private final String imageUrl = "대표 사진";
 
     @BeforeEach
     void setUp() {
@@ -56,8 +57,8 @@ class ChallengeTest {
         String updateBlockName = "수정된 블록 이름";
 
         // when
-        challenge.update(updateTitle, updateContents, updateCycleDetails, updateEndDate,
-                updateRepresentImage, updateBlockName);
+        challenge.update(updateTitle, updateContents, updateCycleDetails, updateEndDate, updateBlockName,
+                updateRepresentImage);
 
         // then
         assertAll(() -> {
@@ -68,6 +69,7 @@ class ChallengeTest {
             assertThat(challenge.getEndDate()).isEqualTo(updateEndDate);
             assertThat(challenge.getRepresentImage()).isEqualTo(updateRepresentImage);
             assertThat(challenge.getBlockName()).isEqualTo(updateBlockName);
+            assertThat(challenge.getRepresentImage()).isEqualTo(updateRepresentImage);
         });
     }
 
@@ -79,7 +81,7 @@ class ChallengeTest {
 
         // when
         challenge.update(updateTitle, challenge.getContents(), challenge.getCycleDetails(),
-                challenge.getEndDate(), challenge.getRepresentImage(), challenge.getBlockName());
+                challenge.getEndDate(), challenge.getBlockName(), imageUrl);
 
         // then
         assertAll(() -> {
@@ -100,7 +102,7 @@ class ChallengeTest {
 
         // when
         challenge.update(challenge.getTitle(), updateContents, challenge.getCycleDetails(),
-                challenge.getEndDate(), challenge.getRepresentImage(), challenge.getBlockName());
+                challenge.getEndDate(), challenge.getBlockName(), imageUrl);
 
         // then
         assertAll(() -> {
@@ -120,7 +122,7 @@ class ChallengeTest {
 
         // when
         challenge.update(challenge.getTitle(), challenge.getContents(), challenge.getCycleDetails(),
-                updateEndDate, challenge.getRepresentImage(), challenge.getBlockName());
+                updateEndDate, challenge.getBlockName(), imageUrl);
 
         // then
         assertAll(() -> {
