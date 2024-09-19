@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
@@ -43,6 +44,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
@@ -78,6 +80,12 @@ class ChallengeServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private MultipartFile multipartFile;
+
+    @Mock
+    private S3Service s3Service;
+
     @InjectMocks
     private ChallengeService challengeService;
 
@@ -105,7 +113,6 @@ class ChallengeServiceTest {
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now().plusDays(30),
-                "대표 이미지",
                 "1일 1커밋"
         );
 
@@ -116,7 +123,7 @@ class ChallengeServiceTest {
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
                 .startDate(LocalDate.now())
                 .endDate(challengeSaveReqDto.endDate())
-                .representImage(challengeSaveReqDto.representImage())
+                .representImage("대표 이미지")
                 .member(member)
                 .build();
 
@@ -127,7 +134,6 @@ class ChallengeServiceTest {
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
                 LocalDate.now().plusDays(30),
-                "업데이트 이미지",
                 "1일 1커밋"
         );
 
@@ -158,14 +164,15 @@ class ChallengeServiceTest {
     }
 
     @Test
-    @DisplayName("인증된 회원은 챌린지를 생성할 수 있다")
-    void 인증된_회원은_챌린지를_생성할_수_있다() {
-
+    @DisplayName("챌린지를 생성할 때 이미지를 업로드할 수 있다")
+    void 챌린지를_생성할_때_이미지를_업로드할_수_있다() {
         // given
-        when(challengeRepository.save(any(Challenge.class)))
-                .thenReturn(challenge);
+        String imageUrl = "https://example.com/image.jpg";
+        when(s3Service.uploadChallengeImage(any(MultipartFile.class)))
+                .thenReturn(imageUrl);
+
         // when
-        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto);
+        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto, multipartFile);
 
         // then
         assertAll(() -> {
@@ -174,7 +181,30 @@ class ChallengeServiceTest {
             assertThat(result.cycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
             assertThat(result.startDate()).isEqualTo(LocalDate.now());
             assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
-            assertThat(result.representImage()).isEqualTo("대표 이미지");
+            assertThat(result.authorName()).isEqualTo("동동");
+            assertThat(result.authorProfileImage()).isEqualTo("기본 프로필");
+            assertThat(result.representImage()).isEqualTo(imageUrl);
+        });
+    }
+
+    @Test
+    @DisplayName("이미지 업로드 없이 챌린지를 생성할 수 있다")
+    void 이미지_업로드_없이_챌린지를_생성할_수_있다() {
+
+        // given
+        when(challengeRepository.save(any(Challenge.class)))
+                .thenReturn(challenge);
+        // when
+        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto, multipartFile);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.title()).isEqualTo("1일 1커밋");
+            assertThat(result.contents()).isEqualTo("1일 1커밋하기");
+            assertThat(result.cycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
+            assertThat(result.startDate()).isEqualTo(LocalDate.now());
+            assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
+            assertThat(result.representImage()).isEqualTo(null);
             assertThat(result.authorName()).isEqualTo("동동");
             assertThat(result.authorProfileImage()).isEqualTo("기본 프로필");
         });
@@ -191,12 +221,12 @@ class ChallengeServiceTest {
                 Cycle.MONTHLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
-                "대표 이미지",
                 "1일 1커밋"
         );
 
         // when & then
-        assertThatThrownBy(() -> challengeService.save(member.getEmail(), wrongChallengeSaveReqDto))
+        assertThatThrownBy(
+                () -> challengeService.save(member.getEmail(), wrongChallengeSaveReqDto, any(MultipartFile.class)))
                 .isInstanceOf(InvalidCycleException.class);
     }
 
@@ -210,7 +240,7 @@ class ChallengeServiceTest {
                 .thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> challengeService.save(errorEmail, challengeSaveReqDto))
+        assertThatThrownBy(() -> challengeService.save(errorEmail, challengeSaveReqDto, multipartFile))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -223,7 +253,7 @@ class ChallengeServiceTest {
                 .thenReturn(Optional.of(challenge));
 
         // when
-        ChallengeInfoResDto result = challengeService.update(member.getEmail(), challengeId, updateDto);
+        ChallengeInfoResDto result = challengeService.update(member.getEmail(), challengeId, updateDto, multipartFile);
 
         // then
         assertAll(() -> {
@@ -231,7 +261,6 @@ class ChallengeServiceTest {
             assertThat(result.contents()).isEqualTo("업데이트 내용");
             assertThat(result.cycleDetails()).containsExactly(CycleDetail.MON);
             assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
-            assertThat(result.representImage()).isEqualTo("업데이트 이미지");
         });
     }
 
@@ -257,7 +286,8 @@ class ChallengeServiceTest {
                 .thenReturn(Optional.of(otherMember));
 
         // when & then
-        assertThatThrownBy(() -> challengeService.update("other@example.com", challengeId, updateDto))
+        assertThatThrownBy(
+                () -> challengeService.update("other@example.com", challengeId, updateDto, any(MultipartFile.class)))
                 .isInstanceOf(ChallengeAccessDeniedException.class);
     }
 

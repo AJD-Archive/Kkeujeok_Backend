@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
@@ -31,16 +32,19 @@ public class ChallengeController {
 
     @PostMapping
     public RspTemplate<ChallengeInfoResDto> save(@CurrentUserEmail String email,
-                                                 @Valid @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
-        return new RspTemplate<>(HttpStatus.CREATED, "챌린지 생성 성공", challengeService.save(email, challengeSaveReqDto));
+                                                 @Valid @RequestPart ChallengeSaveReqDto challengeSaveReqDto,
+                                                 @RequestPart(value = "representImage", required = false) MultipartFile representImage) {
+        return new RspTemplate<>(HttpStatus.CREATED, "챌린지 생성 성공",
+                challengeService.save(email, challengeSaveReqDto, representImage));
     }
 
     @PatchMapping("/{challengeId}")
     public RspTemplate<ChallengeInfoResDto> update(@CurrentUserEmail String email,
                                                    @PathVariable(name = "challengeId") Long challengeId,
-                                                   @Valid @RequestBody ChallengeSaveReqDto challengeSaveReqDto) {
+                                                   @Valid @RequestPart ChallengeSaveReqDto challengeSaveReqDto,
+                                                   @RequestPart(value = "representImage", required = false) MultipartFile representImage) {
         return new RspTemplate<>(HttpStatus.OK, "챌린지 수정 성공",
-                challengeService.update(email, challengeId, challengeSaveReqDto));
+                challengeService.update(email, challengeId, challengeSaveReqDto, representImage));
     }
 
     @GetMapping

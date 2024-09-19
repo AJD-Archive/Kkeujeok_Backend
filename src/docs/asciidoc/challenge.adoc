@@ -187,7 +187,7 @@
 === 요청
 
 include::{snippets}/challenge/save/http-request.adoc[]
-include::{snippets}/challenge/save/request-fields.adoc[]
+include::{snippets}/challenge/save/request-parts.adoc[]
 
 === 응답
 
@@ -200,7 +200,7 @@ include::{snippets}/challenge/save/response-fields.adoc[]
 
 include::{snippets}/challenge/update/http-request.adoc[]
 include::{snippets}/challenge/update/path-parameters.adoc[]
-include::{snippets}/challenge/update/request-fields.adoc[]
+include::{snippets}/challenge/update/request-parts.adoc[]
 
 === 응답
 

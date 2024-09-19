@@ -29,12 +29,10 @@ public record ChallengeSaveReqDto(
         @NotNull(message = "종료 날짜는 필수 입력값입니다.")
         LocalDate endDate,
 
-        String representImage,
         @NotNull(message = "블록 이름은 필수 입력값입니다.")
-
         String blockName
 ) {
-    public Challenge toEntity(Member member) {
+    public Challenge toEntity(Member member, String representImage) {
         return Challenge.builder()
                 .status(Status.ACTIVE)
                 .title(title)
