@@ -49,7 +49,7 @@ public class Challenge extends BaseEntity {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "represent_image")
+    @Column(name = "represent_image", columnDefinition = "TEXT")
     private String representImage;
 
     @ManyToOne
@@ -86,18 +86,18 @@ public class Challenge extends BaseEntity {
     }
 
     public void update(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
-                       LocalDate updateEndDate, String updateRepresentImage, String updateBlockName) {
+                       LocalDate updateEndDate, String updateBlockName, String updateRepresentImage) {
         validateCycleDetails(cycle, cycleDetails);
 
         if (hasChanges(updateTitle, updateContents, updateCycleDetails, updateEndDate,
-                updateRepresentImage, updateBlockName)) {
+                updateBlockName)) {
             this.title = updateTitle;
             this.contents = updateContents;
             this.cycleDetails = updateCycleDetails;
             this.endDate = updateEndDate;
-            this.representImage = updateRepresentImage;
             this.blockName = updateBlockName;
         }
+        this.representImage = updateRepresentImage;
     }
 
     private void validateCycleDetails(Cycle cycle, List<CycleDetail> cycleDetails) {
@@ -122,12 +122,11 @@ public class Challenge extends BaseEntity {
     }
 
     private boolean hasChanges(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
-                               LocalDate updateEndDate, String updateRepresentImage, String blockName) {
+                               LocalDate updateEndDate, String blockName) {
         return !this.title.equals(updateTitle) ||
                 !this.contents.equals(updateContents) ||
                 !this.cycleDetails.equals(updateCycleDetails) ||
                 !this.endDate.equals(updateEndDate) ||
-                !this.representImage.equals(updateRepresentImage) ||
                 !this.blockName.equals(blockName);
     }
 
