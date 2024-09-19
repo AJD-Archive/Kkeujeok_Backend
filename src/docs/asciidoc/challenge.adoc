@@ -187,7 +187,7 @@
 === 요청
 
 include::{snippets}/challenge/save/http-request.adoc[]
-include::{snippets}/challenge/save/request-fields.adoc[]
+include::{snippets}/challenge/save/request-parts.adoc[]
 
 === 응답
 
@@ -200,7 +200,7 @@ include::{snippets}/challenge/save/response-fields.adoc[]
 
 include::{snippets}/challenge/update/http-request.adoc[]
 include::{snippets}/challenge/update/path-parameters.adoc[]
-include::{snippets}/challenge/update/request-fields.adoc[]
+include::{snippets}/challenge/update/request-parts.adoc[]
 
 === 응답
 
@@ -212,7 +212,7 @@ include::{snippets}/challenge/update/response-fields.adoc[]
 === 요청
 
 include::{snippets}/challenge/findAll/http-request.adoc[]
-include::{snippets}/challenge/findAll/response-fields.adoc[]
+include::{snippets}/challenge/findAll/query-parameters.adoc[]
 
 === 응답
 
@@ -224,12 +224,24 @@ include::{snippets}/challenge/findAll/response-fields.adoc[]
 === 요청
 
 include::{snippets}/challenge/search/http-request.adoc[]
-include::{snippets}/challenge/search/response-fields.adoc[]
+include::{snippets}/challenge/search/query-parameters.adoc[]
 
 === 응답
 
 include::{snippets}/challenge/search/http-response.adoc[]
 include::{snippets}/challenge/search/response-fields.adoc[]
+
+== 챌린지 카테고리 별 검색 API
+
+=== 요청
+
+include::{snippets}/challenge/category/http-request.adoc[]
+include::{snippets}/challenge/category/query-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/category/http-response.adoc[]
+include::{snippets}/challenge/category/response-fields.adoc[]
 
 == 챌린지 상세 조회 API
 

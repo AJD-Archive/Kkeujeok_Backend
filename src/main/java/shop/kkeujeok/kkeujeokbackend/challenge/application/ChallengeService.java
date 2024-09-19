@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
@@ -26,6 +27,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundExcept
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -39,17 +41,24 @@ public class ChallengeService {
 
     private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
 
-
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
     private final PersonalDashboardRepository personalDashboardRepository;
     private final BlockRepository blockRepository;
     private final NotificationService notificationService;
+    private final S3Service s3Service;
 
     @Transactional
-    public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto) {
+    public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto,
+                                    MultipartFile representImage) {
         Member member = findMemberByEmail(email);
-        Challenge challenge = challengeSaveReqDto.toEntity(member);
+
+        String imageUrl = null;
+        if (representImage != null && !representImage.isEmpty()) {
+            imageUrl = s3Service.uploadChallengeImage(representImage);
+        }
+
+        Challenge challenge = challengeSaveReqDto.toEntity(member, imageUrl);
 
         challengeRepository.save(challenge);
 
@@ -57,17 +66,23 @@ public class ChallengeService {
     }
 
     @Transactional
-    public ChallengeInfoResDto update(String email, Long challengeId, ChallengeSaveReqDto challengeSaveReqDto) {
+    public ChallengeInfoResDto update(String email, Long challengeId, ChallengeSaveReqDto challengeSaveReqDto,
+                                      MultipartFile representImage) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
         verifyMemberIsAuthor(challenge, member);
 
+        String imageUrl = null;
+        if (representImage != null && !representImage.isEmpty()) {
+            imageUrl = s3Service.uploadChallengeImage(representImage);
+        }
+
         challenge.update(challengeSaveReqDto.title(),
                 challengeSaveReqDto.contents(),
                 challengeSaveReqDto.cycleDetails(),
-                challengeSaveReqDto.startDate(),
                 challengeSaveReqDto.endDate(),
-                challengeSaveReqDto.representImage());
+                challengeSaveReqDto.blockName(),
+                imageUrl);
 
         return ChallengeInfoResDto.from(challenge);
     }
@@ -168,10 +183,12 @@ public class ChallengeService {
     }
 
     private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
-        if (!ChallengeBlockStatusUtil.isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
+        if (!ChallengeBlockStatusUtil.getInstance()
+                .isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
             block.updateChallengeStatus(Status.UN_ACTIVE);
         }
     }
+
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)

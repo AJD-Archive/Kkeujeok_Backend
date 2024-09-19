@@ -12,17 +12,19 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.requestFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
 import java.time.LocalDate;
@@ -36,9 +38,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
@@ -89,23 +93,23 @@ class ChallengeControllerTest extends ControllerTest {
                 .build();
 
         challengeSaveReqDto = new ChallengeSaveReqDto(
-                "1일 1커밋",
-                "1일 1커밋하기",
+                "챌린지 제목",
+                "챌린지 내용",
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
-                LocalDate.now().plusDays(30),
-                "대표 이미지");
+                "블록 이름");
 
         challenge = Challenge.builder()
                 .title(challengeSaveReqDto.title())
                 .contents(challengeSaveReqDto.title())
+                .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
-                .startDate(challengeSaveReqDto.startDate())
                 .endDate(challengeSaveReqDto.endDate())
-                .representImage(challengeSaveReqDto.representImage())
                 .member(member)
+                .blockName(challengeSaveReqDto.blockName())
+                .representImage("대표 이미지")
                 .build();
 
         challengeUpdateReqDto = new ChallengeSaveReqDto(
@@ -115,10 +119,9 @@ class ChallengeControllerTest extends ControllerTest {
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
                 LocalDate.now(),
-                LocalDate.now().plusDays(30),
-                "업데이트 이미지");
+                "1일 1커밋");
 
-        challengeSearchReqDto = new ChallengeSearchReqDto("1일");
+        challengeSearchReqDto = new ChallengeSearchReqDto("챌린지");
 
         challengeController = new ChallengeController(challengeService);
 
@@ -131,36 +134,42 @@ class ChallengeControllerTest extends ControllerTest {
                 .thenReturn("kkeujeok@gmail.com");
     }
 
+
     @Test
     @DisplayName("챌린지 생성 성공 시 상태코드 201 반환")
     void 챌린지_생성_성공_시_상태코드_201_반환() throws Exception {
         // given
         ChallengeInfoResDto response = ChallengeInfoResDto.from(challenge);
-        given(challengeService.save(anyString(), any(ChallengeSaveReqDto.class)))
+
+        given(challengeService.save(anyString(), any(ChallengeSaveReqDto.class), any(MultipartFile.class)))
                 .willReturn(response);
+
+        MockMultipartFile file = new MockMultipartFile("representImage", "test-image.jpg", "image/jpeg",
+                "test image content".getBytes());
+
+        String challengeDtoJson = objectMapper.writeValueAsString(challengeSaveReqDto);
+
+        MockMultipartFile dtoPart = new MockMultipartFile("challengeSaveReqDto", "challengeSaveReqDto.json",
+                "application/json", challengeDtoJson.getBytes());
 
         // when & then
         mockMvc.perform(
-                        post("/api/challenges")
-                                .header(AUTHORIZATION_HEADER_NAME,
-                                        AUTHORIZATION_HEADER_VALUE)
+                        multipart("/api/challenges")
+                                .file(file)
+                                .file(dtoPart)
+                                .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(challengeSaveReqDto)))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                )
                 .andDo(print())
                 .andDo(document("challenge/save",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
-                        requestFields(
-                                fieldWithPath("title").description("챌린지 제목"),
-                                fieldWithPath("contents").description("챌린지 내용"),
-                                fieldWithPath("category").description("챌린지 카테고리"),
-                                fieldWithPath("cycle").description("챌린지 주기"),
-                                fieldWithPath("cycleDetails").description("주기 상세정보"),
-                                fieldWithPath("startDate").description("시작 날짜"),
-                                fieldWithPath("endDate").description("종료 날짜"),
-                                fieldWithPath("representImage").description("대표 사진")),
+                        requestParts(
+                                partWithName("challengeSaveReqDto").description("챌린지 DTO"),
+                                partWithName("representImage").description("대표 이미지")
+                        ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
@@ -174,48 +183,52 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.endDate").description("종료 날짜"),
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지")
+                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.blockName").description("블록 이름")
                         ))
                 )
                 .andExpect(status().isOk());
     }
 
+
     @Test
-    @DisplayName("블록 수정에 성공하면 상태코드 200 반환")
-    void 블록_수정에_성공하면_상태코드_200_반환() throws Exception {
+    @DisplayName("챌린지 수정에 성공하면 상태코드 200 반환")
+    void 챌린지_수정에_성공하면_상태코드_200_반환() throws Exception {
         // given
-        challenge.update(challengeUpdateReqDto.title(),
-                challengeUpdateReqDto.contents(),
-                challengeUpdateReqDto.cycleDetails(),
-                challengeUpdateReqDto.startDate(),
-                challengeUpdateReqDto.endDate(),
-                challengeUpdateReqDto.representImage());
+        MockMultipartFile file = new MockMultipartFile("representImage", "test-image.jpg", "image/jpeg",
+                "test image content".getBytes());
+
+        String challengeDtoJson = objectMapper.writeValueAsString(challengeUpdateReqDto);
+
+        MockMultipartFile dtoPart = new MockMultipartFile("challengeSaveReqDto", "challengeSaveReqDto.json",
+                "application/json", challengeDtoJson.getBytes());
+
         ChallengeInfoResDto response = ChallengeInfoResDto.from(challenge);
-        given(challengeService.update(anyString(), anyLong(), any(ChallengeSaveReqDto.class)))
+        given(challengeService.update(anyString(), anyLong(), any(ChallengeSaveReqDto.class), any(MultipartFile.class)))
                 .willReturn(response);
 
         // when & then
-        mockMvc.perform(
-                        patch("/api/challenges/{challengeId}", 1L)
-                                .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(challengeSaveReqDto)))
+        mockMvc.perform(multipart("/api/challenges/{challengeId}", 1L)
+                        .file(file) // 이미지 파일 포함
+                        .file(dtoPart) // DTO 포함
+                        .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(request -> {
+                            request.setMethod("PATCH");
+                            return request;
+                        })
+                )
                 .andDo(print())
                 .andDo(document("challenge/update",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
                         pathParameters(parameterWithName("challengeId").description("챌린지 ID")),
-                        requestFields(
-                                fieldWithPath("title").description("챌린지 제목"),
-                                fieldWithPath("contents").description("챌린지 내용"),
-                                fieldWithPath("category").description("챌린지 카테고리"),
-                                fieldWithPath("cycle").description("챌린지 주기"),
-                                fieldWithPath("cycleDetails").description("주기 상세정보"),
-                                fieldWithPath("startDate").description("시작 날짜"),
-                                fieldWithPath("endDate").description("종료 날짜"),
-                                fieldWithPath("representImage").description("대표 사진")),
+                        requestParts(
+                                partWithName("challengeSaveReqDto").description("챌린지 DTO"),
+                                partWithName("representImage").description("대표 이미지")
+                        ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
@@ -229,9 +242,13 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.endDate").description("종료 날짜"),
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"))))
+                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.blockName").description("블록 이름")
+                        ))
+                )
                 .andExpect(status().isOk());
     }
+
 
     @Test
     @DisplayName("챌린지 전체 조회에 성공하면 상태코드 200 반환")
@@ -248,32 +265,43 @@ class ChallengeControllerTest extends ControllerTest {
         // when & then
         mockMvc.perform(
                         get("/api/challenges")
+                                .param("page", "0")
+                                .param("size", "10")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andDo(document("challenge/findAll",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        responseFields(
-                                fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
-                                fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
-                                fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
-                                fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
-                                fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
-                                fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description("주기 상세정보"),
-                                fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
-                                fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
-                                fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
-                                fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description(
-                                        "챌린지 작성자 프로필 이미지"),
-                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
-
-                        ))).andExpect(status().isOk());
+                .andDo(
+                        document("challenge/findAll",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                queryParameters(
+                                        parameterWithName("page").description("페이지 번호"),
+                                        parameterWithName("size").description("페이지 크기")
+                                ),
+                                responseFields(
+                                        fieldWithPath("statusCode").description("상태 코드"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
+                                        fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
+                                        fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
+                                        fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
+                                        fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description(
+                                                "주기 상세정보"),
+                                        fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
+                                        fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
+                                        fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
+                                        fieldWithPath("data.challengeInfoResDto[].authorName").description(
+                                                "챌린지 작성자 이름"),
+                                        fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description(
+                                                "챌린지 작성자 프로필 이미지"),
+                                        fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
+                                        fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
+                                        fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
+                                        fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
+                                )
+                        )
+                ).andExpect(status().isOk());
     }
 
     @Test
@@ -290,32 +318,45 @@ class ChallengeControllerTest extends ControllerTest {
 
         // when & then
         mockMvc.perform(
-                        get("/api/challenges/search?keyword=%s",
-                                challengeSearchReqDto.keyWord())
+                        get("/api/challenges/search")
+                                .param("keyword", challengeSearchReqDto.keyWord())
+                                .param("page", "0")
+                                .param("size", "10")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andDo(document("challenge/search", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
-                        responseFields(
-                                fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
-                                fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
-                                fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
-                                fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
-                                fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
-                                fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description("주기 상세정보"),
-                                fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
-                                fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
-                                fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
-                                fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
-                                        .description("챌린지 작성자 프로필 이미지"),
-                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
-
-                        ))
+                .andDo(
+                        document("challenge/search",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                queryParameters(
+                                        parameterWithName("keyword").description("검색 키워드"),
+                                        parameterWithName("page").description("페이지 번호"),
+                                        parameterWithName("size").description("페이지 크기")
+                                ),
+                                responseFields(
+                                        fieldWithPath("statusCode").description("상태 코드"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
+                                        fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
+                                        fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
+                                        fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
+                                        fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description(
+                                                "주기 상세정보"),
+                                        fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
+                                        fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
+                                        fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
+                                        fieldWithPath("data.challengeInfoResDto[].authorName").description(
+                                                "챌린지 작성자 이름"),
+                                        fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
+                                                .description("챌린지 작성자 프로필 이미지"),
+                                        fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
+                                        fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
+                                        fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
+                                        fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
+                                )
+                        )
                 )
                 .andExpect(status().isOk());
     }
@@ -335,13 +376,21 @@ class ChallengeControllerTest extends ControllerTest {
 
         // when & then
         mockMvc.perform(
-                        get("/api/challenges/find?category=%s",
-                                Category.CREATIVITY_AND_ARTS)
+                        get("/api/challenges/find")
+                                .param("category", String.valueOf(Category.CREATIVITY_AND_ARTS))
+                                .param("page", "0")
+                                .param("size", "10")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andDo(document("challenge/category", preprocessRequest(prettyPrint()),
+                .andDo(document("challenge/category",
+                        preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("category").description("카테고리"),
+                                parameterWithName("page").description("페이지 번호"),
+                                parameterWithName("size").description("페이지 크기")
+                        ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
@@ -357,6 +406,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
                                 fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
                                         .description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
@@ -395,7 +445,8 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.endDate").description("종료 날짜"),
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지")
+                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                fieldWithPath("data.blockName").description("블록 이름")
                         ))
                 )
                 .andExpect(status().isOk());
