@@ -155,6 +155,20 @@ public class ChallengeService {
         return BlockInfoResDto.from(block);
     }
 
+    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
+        return Block.builder()
+                .title(challenge.getTitle())
+                .contents(challenge.getContents())
+                .progress(Progress.NOT_STARTED)
+                .type(Type.CHALLENGE)
+                .deadLine(LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
+                .member(member)
+                .dashboard(personalDashboard)
+                .challenge(challenge)
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
@@ -168,18 +182,12 @@ public class ChallengeService {
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
-    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
-        return Block.builder()
-                .title(challenge.getTitle())
-                .contents(challenge.getContents())
-                .progress(Progress.NOT_STARTED)
-                .type(Type.CHALLENGE)
-                .deadLine(LocalDate.now()
-                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
-                .member(member)
-                .dashboard(personalDashboard)
-                .challenge(challenge)
-                .build();
+    public ChallengeListResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                                  Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
+                pageable);
+
+        return null;
     }
 
     private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {

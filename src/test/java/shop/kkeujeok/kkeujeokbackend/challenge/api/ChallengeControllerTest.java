@@ -121,7 +121,7 @@ class ChallengeControllerTest extends ControllerTest {
                 LocalDate.now(),
                 "1일 1커밋");
 
-        challengeSearchReqDto = new ChallengeSearchReqDto("챌린지");
+        challengeSearchReqDto = new ChallengeSearchReqDto("챌린지", "CREATIVITY_AND_ARTS");
 
         challengeController = new ChallengeController(challengeService);
 

@@ -14,4 +14,6 @@ public interface ChallengeCustomRepository {
     Page<Challenge> findChallengesByEmail(Member member, Pageable pageable);
 
     Page<Challenge> findChallengesByCategory(String category, Pageable pageable);
+
+    Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto, Pageable pageable);
 }

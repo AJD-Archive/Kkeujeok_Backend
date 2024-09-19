@@ -104,4 +104,29 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
                 .fetch();
         return new PageImpl<>(challenges, pageable, total);
     }
+
+    @Override
+    public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                              Pageable pageable) {
+        long total = Optional.ofNullable(
+                queryFactory
+                        .select(challenge.count())
+                        .from(challenge)
+                        .where(challenge.status.eq(Status.ACTIVE),
+                                challenge.title.containsIgnoreCase(challengeSearchReqDto.keyWord())
+                                        .and(challenge.category.eq(Category.valueOf(challengeSearchReqDto.category()))))
+                        .fetchOne()
+        ).orElse(0L);
+
+        List<Challenge> challenges = queryFactory
+                .selectFrom(challenge)
+                .where(challenge.status.eq(Status.ACTIVE),
+                        challenge.title.containsIgnoreCase(challengeSearchReqDto.keyWord())
+                                .and(challenge.category.eq(Category.valueOf(challengeSearchReqDto.category()))))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(challenges, pageable, total);
+    }
 }
