@@ -21,7 +21,6 @@ public class S3Service {
     private static final String S3_URL_FORMAT = "https://%s.s3.amazonaws.com/%s";
 
     public String uploadChallengeImage(MultipartFile file) {
-        // 고유한 파일명을 위한 UUID 생성
         String key = IMAGE_PATH + UUID.randomUUID() + ".jpg";
         try {
             // S3에 파일 업로드
