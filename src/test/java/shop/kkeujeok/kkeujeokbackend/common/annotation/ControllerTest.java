@@ -22,6 +22,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDash
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.application.DocumentService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.application.FileService;
+import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
@@ -92,4 +93,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected SseEmitterManager sseEmitterManager;
+
+    @MockBean
+    S3Service s3Service;
 }
