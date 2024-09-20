@@ -105,6 +105,7 @@ class ChallengeControllerTest extends ControllerTest {
         challenge = Challenge.builder()
                 .title(challengeSaveReqDto.title())
                 .contents(challengeSaveReqDto.title())
+                .category(challengeSaveReqDto.category())
                 .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
                 .endDate(challengeSaveReqDto.endDate())
@@ -114,6 +115,7 @@ class ChallengeControllerTest extends ControllerTest {
                 .build();
 
         ReflectionTestUtils.setField(challenge, "id", 1L);
+        ReflectionTestUtils.setField(challenge, "startDate", LocalDate.now());
 
         challengeUpdateReqDto = new ChallengeSaveReqDto(
                 "업데이트 제목",
@@ -307,21 +309,23 @@ class ChallengeControllerTest extends ControllerTest {
                 ).andExpect(status().isOk());
     }
 
-/*    @Test
-    @DisplayName("검색에 성공하면 상태코드 200 반환")
-    void 검색에_성공하면_상태코드_200_반환() throws Exception {
+    @Test
+    @DisplayName("카테고리 별 검색에 성공하면 상태코드 200 반환")
+    void 카테고리_별_검색에_성공하면_상태코드_200_반환() throws Exception {
         // given
         ChallengeInfoResDto challengeInfoResDto = ChallengeInfoResDto.from(challenge);
         Page<Challenge> challengePage = new PageImpl<>(List.of(challenge),
                 PageRequest.of(0, 10), 1);
         ChallengeListResDto response = ChallengeListResDto.of(List.of(challengeInfoResDto),
                 PageInfoResDto.from(challengePage));
-        given(challengeService.findChallengesByKeyWord(any(ChallengeSearchReqDto.class), any(PageRequest.class)))
+        given(challengeService.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
+                any(PageRequest.class)))
                 .willReturn(response);
 
         // when & then
         mockMvc.perform(
                         get("/api/challenges/search")
+                                .param("category", challengeSearchReqDto.category())
                                 .param("keyword", challengeSearchReqDto.keyWord())
                                 .param("page", "0")
                                 .param("size", "10")
@@ -333,6 +337,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 queryParameters(
+                                        parameterWithName("category").description("카테고리"),
                                         parameterWithName("keyword").description("검색 키워드"),
                                         parameterWithName("page").description("페이지 번호"),
                                         parameterWithName("size").description("페이지 크기")
@@ -362,7 +367,7 @@ class ChallengeControllerTest extends ControllerTest {
                         )
                 )
                 .andExpect(status().isOk());
-    }*/
+    }
 
 
     @Test
