@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -120,17 +118,15 @@ class NotificationServiceTest {
     void 회원의_모든_알림을_조회할_수_있다() {
         // given
         List<Notification> notifications = List.of(notification);
-        when(notificationRepository.findAllNotifications(any(Member.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(notifications));
+        when(notificationRepository.findAllByReceiver(any(Member.class)))
+                .thenReturn(notifications);
         when(memberRepository.findByEmail(anyString()))
                 .thenReturn(Optional.of(member));
 
         // when
-        NotificationListResDto result = notificationService.findAllNotificationsFromMember(member.getEmail(),
-                Pageable.unpaged());
+        NotificationListResDto result = notificationService.findAllNotificationsFromMember(member.getEmail());
 
         // then
         assertThat(result.notificationInfoResDto()).isNotEmpty();
-        assertThat(result.pageInfoResDto().totalItems()).isEqualTo(notifications.size());
     }
 }

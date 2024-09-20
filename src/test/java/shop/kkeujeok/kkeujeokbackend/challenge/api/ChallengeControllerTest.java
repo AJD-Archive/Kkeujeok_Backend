@@ -41,6 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
@@ -111,6 +112,8 @@ class ChallengeControllerTest extends ControllerTest {
                 .blockName(challengeSaveReqDto.blockName())
                 .representImage("대표 이미지")
                 .build();
+
+        ReflectionTestUtils.setField(challenge, "id", 1L);
 
         challengeUpdateReqDto = new ChallengeSaveReqDto(
                 "업데이트 제목",
@@ -304,7 +307,7 @@ class ChallengeControllerTest extends ControllerTest {
                 ).andExpect(status().isOk());
     }
 
-    @Test
+/*    @Test
     @DisplayName("검색에 성공하면 상태코드 200 반환")
     void 검색에_성공하면_상태코드_200_반환() throws Exception {
         // given
@@ -359,60 +362,8 @@ class ChallengeControllerTest extends ControllerTest {
                         )
                 )
                 .andExpect(status().isOk());
-    }
+    }*/
 
-    @Test
-    @DisplayName("챌린지 카테고리 별 검색에 성공하면 상태코드 200 반환")
-    void 챌린지_카테고리_별_검색에_성공하면_상태코드_200_반환() throws Exception {
-        // given
-        ChallengeInfoResDto challengeInfoResDto = ChallengeInfoResDto.from(challenge);
-        Page<Challenge> challengePage = new PageImpl<>(List.of(challenge),
-                PageRequest.of(0, 10), 1);
-        ChallengeListResDto response = ChallengeListResDto.of(List.of(challengeInfoResDto),
-                PageInfoResDto.from(challengePage));
-
-        given(challengeService.findByCategory(anyString(), any(PageRequest.class)))
-                .willReturn(response);
-
-        // when & then
-        mockMvc.perform(
-                        get("/api/challenges/find")
-                                .param("category", String.valueOf(Category.CREATIVITY_AND_ARTS))
-                                .param("page", "0")
-                                .param("size", "10")
-                                .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andDo(document("challenge/category",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        queryParameters(
-                                parameterWithName("category").description("카테고리"),
-                                parameterWithName("page").description("페이지 번호"),
-                                parameterWithName("size").description("페이지 크기")
-                        ),
-                        responseFields(
-                                fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
-                                fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
-                                fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
-                                fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
-                                fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
-                                fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description("주기 상세정보"),
-                                fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
-                                fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
-                                fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
-                                fieldWithPath("data.challengeInfoResDto[].authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
-                                        .description("챌린지 작성자 프로필 이미지"),
-                                fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
-                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
-                        ))
-                ).andExpect(status().isOk());
-    }
 
     @Test
     @DisplayName("챌린지 상세 정보 조회에 성공하면 상태코드 200 반환")

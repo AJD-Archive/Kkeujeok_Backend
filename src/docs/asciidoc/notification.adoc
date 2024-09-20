@@ -22,14 +22,3 @@ include::{snippets}/notification/findAll/request-headers.adoc[]
 
 include::{snippets}/notification/findAll/http-response.adoc[]
 include::{snippets}/notification/findAll/response-fields.adoc[]
-
-=== 알림 상세 조회
-
-==== 요청
-
-include::{snippets}/notification/findById/http-request.adoc[]
-
-==== 응답
-
-include::{snippets}/notification/findById/http-response.adoc[]
-include::{snippets}/notification/findById/response-fields.adoc[]
