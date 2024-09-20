@@ -16,7 +16,6 @@ public class S3Service {
 
     private final S3Client s3Client;
 
-    // S3 버킷 이름과 이미지 경로를 상수로 정의
     private static final String BUCKET_NAME = "kkeujeok-image-bucket";
     private static final String IMAGE_PATH = "challenge-images/";
     private static final String S3_URL_FORMAT = "https://%s.s3.amazonaws.com/%s";

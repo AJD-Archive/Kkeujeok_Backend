@@ -99,29 +99,6 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeListResDto findChallengesByKeyWord(ChallengeSearchReqDto challengeSearchReqDto,
-                                                       Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findChallengesByKeyWord(challengeSearchReqDto, pageable);
-
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .toList();
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
-    }
-
-    @Transactional(readOnly = true)
-    public ChallengeListResDto findByCategory(String category, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findChallengesByCategory(category, pageable);
-
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .toList();
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
-    }
-
-    @Transactional(readOnly = true)
     public ChallengeInfoResDto findById(Long challengeId) {
         Challenge challenge = findChallengeById(challengeId);
 
@@ -155,6 +132,20 @@ public class ChallengeService {
         return BlockInfoResDto.from(block);
     }
 
+    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
+        return Block.builder()
+                .title(challenge.getTitle())
+                .contents(challenge.getContents())
+                .progress(Progress.NOT_STARTED)
+                .type(Type.CHALLENGE)
+                .deadLine(LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
+                .member(member)
+                .dashboard(personalDashboard)
+                .challenge(challenge)
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
@@ -168,18 +159,17 @@ public class ChallengeService {
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
-    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
-        return Block.builder()
-                .title(challenge.getTitle())
-                .contents(challenge.getContents())
-                .progress(Progress.NOT_STARTED)
-                .type(Type.CHALLENGE)
-                .deadLine(LocalDate.now()
-                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
-                .member(member)
-                .dashboard(personalDashboard)
-                .challenge(challenge)
-                .build();
+    @Transactional(readOnly = true)
+    public ChallengeListResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                                  Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
+                pageable);
+
+        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
+                .map(ChallengeInfoResDto::from)
+                .toList();
+
+        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
     private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
