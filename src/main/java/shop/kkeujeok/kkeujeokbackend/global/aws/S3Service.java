@@ -15,24 +15,27 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class S3Service {
 
     private final S3Client s3Client;
-    private static final String bucketName = "kkeujeok-image-bucket";
-    private static final String urlImage = "https://" + bucketName + ".s3.amazonaws.com/challenge-images/key.jpg";
 
-    // 파일 업로드 메서드
+    // S3 버킷 이름과 이미지 경로를 상수로 정의
+    private static final String BUCKET_NAME = "kkeujeok-image-bucket";
+    private static final String IMAGE_PATH = "challenge-images/";
+    private static final String S3_URL_FORMAT = "https://%s.s3.amazonaws.com/%s";
+    private static final String IMAGE_EXTENSION = ".jpg";
+
+
     public String uploadChallengeImage(MultipartFile file) {
-        String key = UUID.randomUUID().toString();
+        String key = IMAGE_PATH + UUID.randomUUID() + IMAGE_EXTENSION;
         try {
             s3Client.putObject(
                     PutObjectRequest.builder()
-                            .bucket(bucketName)
+                            .bucket(BUCKET_NAME)
                             .key(key)
                             .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
-            return urlImage;
+            return String.format(S3_URL_FORMAT, BUCKET_NAME, key);
         } catch (IOException e) {
             throw new InvalidImageUploadException();
         }
     }
 }
-
