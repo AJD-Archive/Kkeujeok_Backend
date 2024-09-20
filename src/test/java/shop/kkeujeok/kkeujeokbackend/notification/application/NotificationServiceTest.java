@@ -129,4 +129,21 @@ class NotificationServiceTest {
         // then
         assertThat(result.notificationInfoResDto()).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("모든 알림을 읽음으로 처리할 수 있다")
+    void 모든_알림을_읽음으로_처리할_수_있다() {
+        // given
+        List<Notification> notifications = List.of(notification);
+        when(memberRepository.findByEmail(anyString()))
+                .thenReturn(Optional.of(member));
+        when(notificationRepository.findAllByReceiver(any(Member.class)))
+                .thenReturn(notifications);
+
+        // when
+        notificationService.markAllNotificationsAsRead(member.getEmail());
+
+        // then
+        assertThat(notification.getIsRead()).isTrue();
+    }
 }
