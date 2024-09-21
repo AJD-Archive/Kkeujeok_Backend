@@ -12,6 +12,8 @@ public interface DashboardCustomRepository {
 
     List<PersonalDashboard> findForPersonalDashboard(Member member);
 
+    Page<PersonalDashboard> findForPersonalDashboard(Member member, Pageable pageable);
+
     Set<String> findCategoriesForDashboard(Member member);
 
     Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable);
@@ -22,4 +24,5 @@ public interface DashboardCustomRepository {
 
     double calculateCompletionPercentage(Long dashboardId);
 
+    Page<PersonalDashboard> findPublicPersonalDashboard(Member member, Pageable pageable);
 }
