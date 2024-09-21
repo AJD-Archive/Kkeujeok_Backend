@@ -5,14 +5,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardPageListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
@@ -21,16 +19,13 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
-import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -49,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.is;
-import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.requestFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
 public class MemberControllerTest extends ControllerTest {
@@ -121,19 +115,24 @@ public class MemberControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.data").exists());
     }
 
-    @DisplayName("팀 대시보드와 챌린지 정보를 가져옵니다.")
+    @DisplayName("대시보드와 챌린지 정보를 가져옵니다.")
     @Test
     void 팀_대시보드와_챌린지_정보를_가져옵니다() throws Exception {
+        // Given
         TeamDashboardsAndChallengesResDto resDto = new TeamDashboardsAndChallengesResDto(
+                new PersonalDashboardPageListResDto(new ArrayList<>(), new PageInfoResDto(0, 0, 0)),
                 new TeamDashboardListResDto(new ArrayList<>(), new PageInfoResDto(0, 0, 0)),
                 new ChallengeListResDto(new ArrayList<>(), new PageInfoResDto(0, 0, 0))
         );
 
-        when(myPageService.findTeamDashboardsAndChallenges(anyString(), any())).thenReturn(resDto);
-        when(tokenProvider.getUserEmailFromToken(any(TokenReqDto.class))).thenReturn("email");
+        when(myPageService.findTeamDashboardsAndChallenges(anyString(), anyString(), any(PageRequest.class)))
+                .thenReturn(resDto);
+
+        when(tokenProvider.getUserEmailFromToken(any(TokenReqDto.class))).thenReturn("test@example.com");
 
         mockMvc.perform(get("/api/members/mypage/dashboard-challenges")
                         .header("Authorization", "Bearer valid-token")
+                        .param("requestEmail", "request@example.com")
                         .param("page", "0")
                         .param("size", "10"))
                 .andDo(print())
@@ -144,12 +143,17 @@ public class MemberControllerTest extends ControllerTest {
                                 headerWithName("Authorization").description("JWT 토큰")
                         ),
                         queryParameters(
+                                parameterWithName("requestEmail").description("조회할 사용자의 이메일"),
                                 parameterWithName("page").description("페이지 번호 (기본값: 0)"),
                                 parameterWithName("size").description("페이지 당 항목 수 (기본값: 10)")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.personalDashboardList.personalDashboardInfoResDto").description("개인 대시보드 정보 목록"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalPages").description("총 페이지 수"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalItems").description("총 항목 수"),
                                 fieldWithPath("data.teamDashboardList.teamDashboardInfoResDto").description("팀 대시보드 정보 목록"),
                                 fieldWithPath("data.teamDashboardList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.teamDashboardList.pageInfoResDto.totalPages").description("총 페이지 수"),
@@ -161,7 +165,7 @@ public class MemberControllerTest extends ControllerTest {
                         )
                 ))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", is("팀 대시보드와 챌린지 정보 조회")))
+                .andExpect(jsonPath("$.message", is("대시보드와 챌린지 정보 조회")))
                 .andExpect(jsonPath("$.data").exists());
     }
 
