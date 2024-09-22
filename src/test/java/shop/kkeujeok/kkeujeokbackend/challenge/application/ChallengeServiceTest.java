@@ -25,7 +25,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
@@ -392,19 +391,18 @@ class ChallengeServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
         when(challengeRepository.findById(anyLong())).thenReturn(Optional.of(challenge));
         when(personalDashboardRepository.findById(anyLong())).thenReturn(Optional.of(personalDashboard));
-        when(blockRepository.save(any(Block.class))).thenReturn(block);
 
         // when
-        BlockInfoResDto result = challengeService.addChallengeToPersonalDashboard(member.getEmail(),
-                personalDashboardId, challengeId);
+        challengeService.addChallengeToPersonalDashboard(member.getEmail(), personalDashboardId, challengeId);
 
         // then
         assertAll(() -> {
-            assertThat(result.title()).isEqualTo("1일 1커밋");
-            assertThat(result.contents()).isEqualTo("1일 1커밋하기");
-            assertThat(result.progress()).isEqualTo(Progress.NOT_STARTED);
-            assertThat(result.deadLine()).isEqualTo(
+            assertThat(block.getTitle()).isEqualTo("1일 1커밋");
+            assertThat(block.getContents()).isEqualTo("1일 1커밋하기");
+            assertThat(block.getProgress()).isEqualTo(Progress.NOT_STARTED);
+            assertThat(block.getDeadLine()).isEqualTo(
                     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")));
         });
     }
+
 }

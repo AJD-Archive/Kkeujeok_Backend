@@ -9,11 +9,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 public interface ChallengeCustomRepository {
     Page<Challenge> findAllChallenges(Pageable pageable);
 
-    Page<Challenge> findChallengesByKeyWord(ChallengeSearchReqDto challengeSearchReqDto, Pageable pageable);
-
     Page<Challenge> findChallengesByEmail(Member member, Pageable pageable);
-
-    Page<Challenge> findChallengesByCategory(String category, Pageable pageable);
 
     Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto, Pageable pageable);
 }

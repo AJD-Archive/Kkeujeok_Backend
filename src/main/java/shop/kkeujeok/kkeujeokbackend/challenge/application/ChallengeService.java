@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
@@ -21,7 +20,6 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchRe
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUtil;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
@@ -29,21 +27,21 @@ import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedEx
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
-
 
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
 
     private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
+    private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
 
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
@@ -63,7 +61,6 @@ public class ChallengeService {
         }
 
         Challenge challenge = challengeSaveReqDto.toEntity(member, imageUrl);
-
         challengeRepository.save(challenge);
 
         return ChallengeInfoResDto.from(challenge);
@@ -127,7 +124,6 @@ public class ChallengeService {
                 .collect(Collectors.toSet());
     }
 
-
     @Transactional
     public void delete(String email, Long challengeId) {
         Member member = findMemberByEmail(email);
@@ -138,24 +134,26 @@ public class ChallengeService {
     }
 
     @Transactional
-    public BlockInfoResDto addChallengeToPersonalDashboard(String email, Long personalDashboardId, Long challengeId) {
+    public void addChallengeToPersonalDashboard(String email, Long personalDashboardId, Long challengeId) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
-        Dashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
+        PersonalDashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
-        challenge.addParticipant(member);
+        challenge.addParticipant(member, personalDashboard);
+        createBlockIfActiveToday(challenge, member, personalDashboard);
 
-        Block block = createBlock(challenge, member, personalDashboard);
-        updateBlockStatusIfNotActive(block, challenge);
-
-        blockRepository.save(block);
         challengeRepository.save(challenge);
 
         String message = String.format(CHALLENGE_JOIN_MESSAGE, member.getName());
         notificationService.sendNotification(challenge.getMember(), message);
+    }
 
-        return BlockInfoResDto.from(block);
+    private void createBlockIfActiveToday(Challenge challenge, Member member, Dashboard personalDashboard) {
+        if (challenge.isActiveToday()) {
+            Block block = createBlock(challenge, member, personalDashboard);
+            blockRepository.save(block);
+        }
     }
 
     private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
@@ -165,7 +163,7 @@ public class ChallengeService {
                 .progress(Progress.NOT_STARTED)
                 .type(Type.CHALLENGE)
                 .deadLine(LocalDate.now()
-                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
+                        .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT)))
                 .member(member)
                 .dashboard(personalDashboard)
                 .challenge(challenge)
@@ -198,14 +196,6 @@ public class ChallengeService {
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
-    private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
-        if (!ChallengeBlockStatusUtil.getInstance()
-                .isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
-            block.updateChallengeStatus(Status.UN_ACTIVE);
-        }
-    }
-
-
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(MemberNotFoundException::new);
@@ -215,7 +205,6 @@ public class ChallengeService {
         return challengeRepository.findById(challengeId)
                 .orElseThrow(ChallengeNotFoundException::new);
     }
-
 
     private void verifyMemberIsAuthor(Challenge challenge, Member member) {
         if (!challenge.getMember().equals(member)) {
