@@ -28,8 +28,8 @@ public class TeamDocument extends BaseEntity {
     private String category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TeamDashboard_id")
-    private TeamDashboard TeamDashboard;
+    @JoinColumn(name = "team_dashboard_id")
+    private TeamDashboard teamDashboard;
 
     @Builder
     private TeamDocument(String author,
@@ -44,7 +44,7 @@ public class TeamDocument extends BaseEntity {
         this.title = title;
         this.content = content;
         this.category = category;
-        this.TeamDashboard = teamDashboard;
+        this.teamDashboard = teamDashboard;
     }
 
     public void update(String updateTitle, String updateContent, String updateCategory) {
