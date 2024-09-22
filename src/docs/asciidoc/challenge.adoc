@@ -256,6 +256,8 @@ include::{snippets}/challenge/delete/http-response.adoc[]
 
 == 챌린지 참여 API
 
+=== 요청
+
 include::{snippets}/challenge/addChallengeToPersonalDashboard/http-request.adoc[]
 include::{snippets}/challenge/addChallengeToPersonalDashboard/path-parameters.adoc[]
 
@@ -263,4 +265,11 @@ include::{snippets}/challenge/addChallengeToPersonalDashboard/path-parameters.ad
 
 include::{snippets}/challenge/addChallengeToPersonalDashboard/http-response.adoc[]
 
+== 챌린지 삭제 API
 
+include::{snippets}/challenge/withdraw/http-request.adoc[]
+include::{snippets}/challenge/withdraw/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/challenge/withdraw/http-response.adoc[]

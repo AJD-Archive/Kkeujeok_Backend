@@ -196,6 +196,21 @@ public class ChallengeService {
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
+    @Transactional
+    public void withdrawFromChallenge(String email, Long challengeId) {
+        Member member = findMemberByEmail(email);
+        Challenge challenge = findChallengeById(challengeId);
+
+        ChallengeMemberMapping mapping = challenge.getParticipants().stream()
+                .filter(participant -> participant.getMember().equals(member))
+                .findFirst()
+                .orElseThrow(() -> new ChallengeAccessDeniedException("이 챌린지에 참여하지 않았습니다."));
+
+        challenge.removeParticipant(mapping);
+        challengeRepository.save(challenge);
+    }
+
+
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(MemberNotFoundException::new);

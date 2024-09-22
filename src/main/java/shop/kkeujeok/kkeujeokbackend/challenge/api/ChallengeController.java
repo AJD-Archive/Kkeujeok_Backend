@@ -90,4 +90,12 @@ public class ChallengeController {
                 challengeService.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
                         PageRequest.of(page, size)));
     }
+
+    @DeleteMapping("/{challengeId}/withdraw")
+    public RspTemplate<Void> withdrawFromChallenge(@CurrentUserEmail String email,
+                                                   @PathVariable(name = "challengeId") Long challengeId) {
+        challengeService.withdrawFromChallenge(email, challengeId);
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 탈퇴 성공");
+    }
+
 }
