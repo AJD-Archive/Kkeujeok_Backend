@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboardMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 public interface DashboardCustomRepository {

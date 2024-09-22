@@ -50,4 +50,9 @@ public class TeamDashboard extends Dashboard {
         teamDashboardMemberMappings.removeIf(mapping -> mapping.getMember().equals(member));
     }
 
+    public boolean hasMember(Member member) {
+        return teamDashboardMemberMappings.stream()
+                .anyMatch(mapping -> mapping.getMember().equals(member));
+    }
+
 }
