@@ -56,8 +56,9 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}")
-    public RspTemplate<ChallengeInfoResDto> findById(@PathVariable(name = "challengeId") Long challengeId) {
-        return new RspTemplate<>(HttpStatus.OK, "챌린지 상세보기", challengeService.findById(challengeId));
+    public RspTemplate<ChallengeInfoResDto> findById(@CurrentUserEmail String email,
+                                                     @PathVariable(name = "challengeId") Long challengeId) {
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 상세보기", challengeService.findById(email, challengeId));
     }
 
     @DeleteMapping("/{challengeId}")

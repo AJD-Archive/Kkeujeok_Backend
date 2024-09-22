@@ -1,5 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -7,10 +8,12 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,8 +42,8 @@ public class Challenge extends BaseEntity {
 
     private Cycle cycle;
 
-    @Convert(converter = CycleDetailsConverter.class)
     @Column(name = "cycle_details")
+    @Convert(converter = CycleDetailsConverter.class)
     private List<CycleDetail> cycleDetails;
 
     @Column(name = "start_date")
@@ -57,6 +60,9 @@ public class Challenge extends BaseEntity {
     private Member member;
 
     private String blockName;
+
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChallengeMemberMapping> participants = new HashSet<>();
 
     @Builder
     private Challenge(Status status,
@@ -132,5 +138,20 @@ public class Challenge extends BaseEntity {
 
     public void updateStatus() {
         this.status = (this.status == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE;
+    }
+
+    public List<Member> getParticipants() {
+        return this.participants.stream()
+                .map(ChallengeMemberMapping::getMember)
+                .collect(Collectors.toList());
+    }
+
+    public int getParticipantsCount() {
+        return participants.size();
+    }
+
+    public void addParticipant(Member member) {
+        ChallengeMemberMapping mapping = new ChallengeMemberMapping(this, member);
+        this.participants.add(mapping);
     }
 }

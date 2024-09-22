@@ -342,7 +342,7 @@ class ChallengeServiceTest {
         when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
 
         // when
-        ChallengeInfoResDto result = challengeService.findById(challengeId);
+        ChallengeInfoResDto result = challengeService.findById(anyString(), challengeId);
 
         // then
         assertAll(() -> {
