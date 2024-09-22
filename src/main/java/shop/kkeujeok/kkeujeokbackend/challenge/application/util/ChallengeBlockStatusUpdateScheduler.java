@@ -50,7 +50,6 @@ public class ChallengeBlockStatusUpdateScheduler {
     private void createNewBlock(ChallengeMemberMapping mapping) {
         PersonalDashboard dashboard = mapping.getPersonalDashboard();
 
-        // 새로운 블록 생성
         Block newBlock = Block.builder()
                 .title(mapping.getChallenge().getTitle())
                 .contents(mapping.getChallenge().getContents())
@@ -63,14 +62,11 @@ public class ChallengeBlockStatusUpdateScheduler {
                 .challenge(mapping.getChallenge())
                 .build();
 
-        // 블록 저장
         blockRepository.save(newBlock);
 
-        // 알림 전송
         sendChallengeCreatedNotification(mapping.getMember(), mapping.getChallenge());
     }
 
-    // 챌린지 생성 알림 전송
     private void sendChallengeCreatedNotification(Member member, Challenge challenge) {
         String message = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, challenge.getTitle());
         notificationService.sendNotification(member, message);

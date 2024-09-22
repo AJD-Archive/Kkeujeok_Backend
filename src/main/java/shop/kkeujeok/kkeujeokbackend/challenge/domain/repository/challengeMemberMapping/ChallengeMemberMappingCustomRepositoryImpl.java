@@ -21,7 +21,7 @@ public class ChallengeMemberMappingCustomRepositoryImpl implements ChallengeMemb
     public List<ChallengeMemberMapping> findActiveMappings() {
         return queryFactory
                 .selectFrom(challengeMemberMapping)
-                .where(challengeMemberMapping.challenge.status.eq(Status.ACTIVE))  // 활성화된 상태만 조회
+                .where(challengeMemberMapping.challenge.status.eq(Status.ACTIVE))
                 .fetch();
     }
 }
