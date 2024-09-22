@@ -475,8 +475,7 @@ class ChallengeControllerTest extends ControllerTest {
                 "picture",
                 0);
 
-        given(challengeService.addChallengeToPersonalDashboard(anyString(), anyLong(), anyLong()))
-                .willReturn(blockInfoResDto);
+        willDoNothing().given(challengeService).addChallengeToPersonalDashboard(anyString(), anyLong(), anyLong());
 
         // when & then
         mockMvc.perform(post("/api/challenges/{challengeId}/{dashboardId}", 1L, 1L)
@@ -487,26 +486,12 @@ class ChallengeControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(blockInfoResDto)))
                 .andDo(print())
                 .andDo(document("challenge/addChallengeToPersonalDashboard",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
-                        pathParameters(parameterWithName("challengeId").description("챌린지 ID"),
-                                parameterWithName("dashboardId").description("대시보드 ID")),
-                        responseFields(fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.blockId").description("블록 ID"),
-                                fieldWithPath("data.title").description("블록 제목"),
-                                fieldWithPath("data.contents").description("블록 내용"),
-                                fieldWithPath("data.progress").description("블록 진행도"),
-                                fieldWithPath("data.type").description(
-                                        "블록 타입(일반(General) 블록인지 챌린지(Challenge) 블록인지 구별)"),
-                                fieldWithPath("data.dType").description("개인 대시보드, 팀 대시보드를 구별"),
-                                fieldWithPath("data.startDate").description("블록 시작기한"),
-                                fieldWithPath("data.deadLine").description("블록 마감기한"),
-                                fieldWithPath("data.nickname").description("블록 작성자 닉네임"),
-                                fieldWithPath("data.picture").description("블록 작성자 사진"),
-                                fieldWithPath("data.dDay").description("블록 디데이")
-                        ))
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
+                                pathParameters(parameterWithName("challengeId").description("챌린지 ID"),
+                                        parameterWithName("dashboardId").description("대시보드 ID"))
+                        )
                 )
                 .andExpect(status().isOk());
     }

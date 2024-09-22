@@ -18,8 +18,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUtil;
 import shop.kkeujeok.kkeujeokbackend.challenge.converter.CycleDetailsConverter;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -145,8 +147,8 @@ public class Challenge extends BaseEntity {
         return participants.size();
     }
 
-    public void addParticipant(Member member) {
-        ChallengeMemberMapping mapping = ChallengeMemberMapping.of(this, member);
+    public void addParticipant(Member member, PersonalDashboard dashboard) {
+        ChallengeMemberMapping mapping = ChallengeMemberMapping.of(this, member, dashboard);
         this.participants.add(mapping);
     }
 
@@ -162,5 +164,10 @@ public class Challenge extends BaseEntity {
                 .filter(p -> p.getMember().equals(member))
                 .findFirst()
                 .orElseThrow(MemberNotFoundException::new);
+    }
+
+    public boolean isActiveToday() {
+        return ChallengeBlockStatusUtil.getInstance()
+                .isChallengeBlockActiveToday(this.getCycle(), this.getCycleDetails());
     }
 }
