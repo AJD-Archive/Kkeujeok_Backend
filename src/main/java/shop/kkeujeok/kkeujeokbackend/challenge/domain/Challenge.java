@@ -170,4 +170,9 @@ public class Challenge extends BaseEntity {
         return ChallengeBlockStatusUtil.getInstance()
                 .isChallengeBlockActiveToday(this.getCycle(), this.getCycleDetails());
     }
+
+    public void removeParticipant(ChallengeMemberMapping mapping) {
+        participants.remove(mapping);
+    }
+
 }

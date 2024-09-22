@@ -495,4 +495,26 @@ class ChallengeControllerTest extends ControllerTest {
                 )
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("챌린지 탈퇴에 성공하면 상태코드 200 반환")
+    void 챌린지_탈퇴에_성공하면_상태코드_200_반환() throws Exception {
+        // given
+        willDoNothing().given(challengeService).withdrawFromChallenge(anyString(), anyLong());
+
+        // when & then
+        mockMvc.perform(delete("/api/challenges/{challengeId}/withdraw", 1L)
+                        .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("challenge/withdraw",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
+                        pathParameters(parameterWithName("challengeId").description("챌린지 ID"))
+                ))
+                .andExpect(status().isOk());
+    }
+
 }
