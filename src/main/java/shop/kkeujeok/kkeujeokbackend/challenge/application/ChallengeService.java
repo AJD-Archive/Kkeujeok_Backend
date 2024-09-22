@@ -134,7 +134,7 @@ public class ChallengeService {
     }
 
     @Transactional
-    public void addChallengeToPersonalDashboard(String email, Long personalDashboardId, Long challengeId) {
+    public void addChallengeToPersonalDashboard(String email, Long challengeId, Long personalDashboardId) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
         PersonalDashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
