@@ -32,7 +32,7 @@ public class TeamDocumentCustomRepositoryImpl implements TeamDocumentCustomRepos
         List<TeamDocument> results = queryFactory
                 .selectFrom(teamDocument)
                 .where(
-                        teamDocument.TeamDashboard.eq(teamDashboard),
+                        teamDocument.teamDashboard.eq(teamDashboard),
                         categoryEq(category),
                         teamDocument.status.eq(Status.ACTIVE)
                 )
@@ -43,7 +43,7 @@ public class TeamDocumentCustomRepositoryImpl implements TeamDocumentCustomRepos
         long total = queryFactory
                 .selectFrom(teamDocument)
                 .where(
-                        teamDocument.TeamDashboard.eq(teamDashboard),
+                        teamDocument.teamDashboard.eq(teamDashboard),
                         categoryEq(category),
                         teamDocument.status.eq(Status.ACTIVE)
                 )
@@ -61,7 +61,7 @@ public class TeamDocumentCustomRepositoryImpl implements TeamDocumentCustomRepos
         Set<String> uniqueCategories = queryFactory
                 .select(teamDocument.category)
                 .from(teamDocument)
-                .where(teamDocument.TeamDashboard.eq(teamDashboard)
+                .where(teamDocument.teamDashboard.eq(teamDashboard)
                         ,teamDocument.status.eq(Status.ACTIVE))
                 .stream()
                 .collect(Collectors.toSet());

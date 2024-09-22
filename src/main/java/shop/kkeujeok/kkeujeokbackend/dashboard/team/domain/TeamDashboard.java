@@ -10,8 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
-import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.Document;
-import shop.kkeujeok.kkeujeokbackend.dashboard.teamdocument.domain.File;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.domain.TeamDocument;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
@@ -23,8 +22,8 @@ public class TeamDashboard extends Dashboard {
     @OneToMany(mappedBy = "teamDashboard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamDashboardMemberMapping> teamDashboardMemberMappings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "teamDashboard", cascade = CascadeType.ALL)
-    private List<Document> documents = new ArrayList<>();
+    @OneToMany(mappedBy = "teamDashboard", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamDocument> documents = new ArrayList<>();
 
     @Builder
     private TeamDashboard(String title, String description, String dType, Member member) {
