@@ -168,33 +168,36 @@ class ChallengeControllerTest extends ControllerTest {
                 )
                 .andDo(print())
                 .andDo(document("challenge/save",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
-                        requestParts(
-                                partWithName("challengeSaveReqDto").description("챌린지 DTO"),
-                                partWithName("representImage").description("대표 이미지")
-                        ),
-                        responseFields(
-                                fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.challengeId").description("챌린지 id"),
-                                fieldWithPath("data.title").description("챌린지 제목"),
-                                fieldWithPath("data.contents").description("챌린지 내용"),
-                                fieldWithPath("data.category").description("챌린지 카테고리"),
-                                fieldWithPath("data.cycle").description("챌린지 주기"),
-                                fieldWithPath("data.cycleDetails").description("주기 상세정보"),
-                                fieldWithPath("data.startDate").description("시작 날짜"),
-                                fieldWithPath("data.endDate").description("종료 날짜"),
-                                fieldWithPath("data.representImage").description("대표 사진"),
-                                fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
-                                fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
-                                fieldWithPath("data.blockName").description("블록 이름")
-                        ))
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
+                                requestParts(
+                                        partWithName("challengeSaveReqDto").description("챌린지 DTO"),
+                                        partWithName("representImage").description("대표 이미지")
+                                ),
+                                responseFields(
+                                        fieldWithPath("statusCode").description("상태 코드"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("data.challengeId").description("챌린지 id"),
+                                        fieldWithPath("data.title").description("챌린지 제목"),
+                                        fieldWithPath("data.contents").description("챌린지 내용"),
+                                        fieldWithPath("data.category").description("챌린지 카테고리"),
+                                        fieldWithPath("data.cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.cycleDetails").description("주기 상세정보"),
+                                        fieldWithPath("data.startDate").description("시작 날짜"),
+                                        fieldWithPath("data.endDate").description("종료 날짜"),
+                                        fieldWithPath("data.representImage").description("대표 사진"),
+                                        fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
+                                        fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
+                                        fieldWithPath("data.blockName").description("블록 이름"),
+                                        fieldWithPath("data.participantCount").description("참여자 수"),
+                                        fieldWithPath("data.isParticipant").description("참여 여부"),
+                                        fieldWithPath("data.isAuthor").description("작성자 여부")
+                                )
+                        )
                 )
                 .andExpect(status().isOk());
     }
-
 
     @Test
     @DisplayName("챌린지 수정에 성공하면 상태코드 200 반환")
@@ -248,7 +251,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
                                 fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
-                                fieldWithPath("data.blockName").description("블록 이름")
+                                fieldWithPath("data.blockName").description("블록 이름"),
+                                fieldWithPath("data.participantCount").description("참여자 수"),
+                                fieldWithPath("data.isParticipant").description("참여 여부"),
+                                fieldWithPath("data.isAuthor").description("작성자 여부")
                         ))
                 )
                 .andExpect(status().isOk());
@@ -300,6 +306,10 @@ class ChallengeControllerTest extends ControllerTest {
                                                 "챌린지 작성자 이름"),
                                         fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description(
                                                 "챌린지 작성자 프로필 이미지"),
+                                        fieldWithPath("data.challengeInfoResDto[].participantCount").description(
+                                                "참여자 수"),
+                                        fieldWithPath("data.challengeInfoResDto[].isParticipant").description("참여 여부"),
+                                        fieldWithPath("data.challengeInfoResDto[].isAuthor").description("작성자 여부"),
                                         fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
@@ -360,6 +370,10 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
                                                 .description("챌린지 작성자 프로필 이미지"),
                                         fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
+                                        fieldWithPath("data.challengeInfoResDto[].participantCount").description(
+                                                "참여자 수"),
+                                        fieldWithPath("data.challengeInfoResDto[].isParticipant").description("참여 여부"),
+                                        fieldWithPath("data.challengeInfoResDto[].isAuthor").description("작성자 여부"),
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
@@ -375,18 +389,20 @@ class ChallengeControllerTest extends ControllerTest {
     void 챌린지_상세_조회에_성공하면_상태코드_200_반환() throws Exception {
         // given
         ChallengeInfoResDto response = ChallengeInfoResDto.from(challenge);
-        given(challengeService.findById(anyLong()))
+        given(challengeService.findById(anyString(), anyLong()))
                 .willReturn(response);
 
         // when & then
         mockMvc.perform(
                         get("/api/challenges/{challengeId}", 1L)
+                                .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("challenge/findById",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰")),
                         pathParameters(parameterWithName("challengeId").description("챌린지 ID")),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -402,7 +418,10 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.representImage").description("대표 사진"),
                                 fieldWithPath("data.authorName").description("챌린지 작성자 이름"),
                                 fieldWithPath("data.authorProfileImage").description("챌린지 작성자 프로필 이미지"),
-                                fieldWithPath("data.blockName").description("블록 이름")
+                                fieldWithPath("data.blockName").description("블록 이름"),
+                                fieldWithPath("data.participantCount").description("참여자 수"),
+                                fieldWithPath("data.isParticipant").description("참여 여부"),
+                                fieldWithPath("data.isAuthor").description("작성자 여부")
                         ))
                 )
                 .andExpect(status().isOk());

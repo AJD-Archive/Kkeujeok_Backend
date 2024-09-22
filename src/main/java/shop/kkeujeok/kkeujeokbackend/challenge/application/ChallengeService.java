@@ -99,11 +99,18 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeInfoResDto findById(Long challengeId) {
+    public ChallengeInfoResDto findById(String email, Long challengeId) {
+        Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
 
-        return ChallengeInfoResDto.from(challenge);
+        boolean isParticipant = challenge.getParticipants().stream()
+                .anyMatch(mapping -> mapping.equals(member));
+
+        boolean isAuthor = member.equals(challenge.getMember());
+
+        return ChallengeInfoResDto.of(challenge, isParticipant, isAuthor);
     }
+
 
     @Transactional
     public void delete(String email, Long challengeId) {
@@ -121,10 +128,13 @@ public class ChallengeService {
         Dashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        challenge.addParticipant(member);
+
         Block block = createBlock(challenge, member, personalDashboard);
         updateBlockStatusIfNotActive(block, challenge);
 
         blockRepository.save(block);
+        challengeRepository.save(challenge);
 
         String message = String.format(CHALLENGE_JOIN_MESSAGE, member.getName());
         notificationService.sendNotification(challenge.getMember(), message);

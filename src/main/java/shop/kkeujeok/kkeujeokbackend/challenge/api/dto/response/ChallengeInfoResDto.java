@@ -21,7 +21,10 @@ public record ChallengeInfoResDto(
         String representImage,
         String authorName,
         String authorProfileImage,
-        String blockName
+        String blockName,
+        int participantCount,
+        boolean isParticipant,
+        boolean isAuthor
 ) {
     public static ChallengeInfoResDto from(Challenge challenge) {
         return ChallengeInfoResDto.builder()
@@ -37,6 +40,29 @@ public record ChallengeInfoResDto(
                 .authorName(challenge.getMember().getNickname())
                 .authorProfileImage(challenge.getMember().getPicture())
                 .blockName(challenge.getBlockName())
+                .participantCount(challenge.getParticipantsCount())
+                .isAuthor(true)
+                .isParticipant(false)
+                .build();
+    }
+
+    public static ChallengeInfoResDto of(Challenge challenge, boolean isParticipant, boolean isAuthor) {
+        return ChallengeInfoResDto.builder()
+                .challengeId(challenge.getId())
+                .title(challenge.getTitle())
+                .contents(challenge.getContents())
+                .category(challenge.getCategory())
+                .cycle(challenge.getCycle())
+                .cycleDetails(challenge.getCycleDetails())
+                .startDate(challenge.getStartDate())
+                .endDate(challenge.getEndDate())
+                .representImage(challenge.getRepresentImage())
+                .authorName(challenge.getMember().getNickname())
+                .authorProfileImage(challenge.getMember().getPicture())
+                .blockName(challenge.getBlockName())
+                .participantCount(challenge.getParticipantsCount())
+                .isParticipant(isParticipant)
+                .isAuthor(isAuthor)
                 .build();
     }
 }
