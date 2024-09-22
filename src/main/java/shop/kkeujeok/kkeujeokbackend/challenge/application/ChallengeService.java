@@ -73,7 +73,7 @@ public class ChallengeService {
         Challenge challenge = findChallengeById(challengeId);
         verifyMemberIsAuthor(challenge, member);
 
-        String imageUrl = null;
+        String imageUrl = challenge.getRepresentImage();
         if (representImage != null && !representImage.isEmpty()) {
             imageUrl = s3Service.uploadChallengeImage(representImage);
         }
