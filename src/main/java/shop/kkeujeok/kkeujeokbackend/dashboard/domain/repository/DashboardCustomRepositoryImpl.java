@@ -41,6 +41,25 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     }
 
     @Override
+    public Page<PersonalDashboard> findForPersonalDashboard(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE)))
+                .fetchCount();
+
+        List<PersonalDashboard> dashboards = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(dashboards, pageable, total);
+    }
+
+    @Override
     public Set<String> findCategoriesForDashboard(Member member) {
         return queryFactory
                 .select(personalDashboard.category)
@@ -117,5 +136,26 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
         }
 
         return (double) completedBlocks / totalBlocks * 100;
+    }
+
+    @Override
+    public Page<PersonalDashboard> findPublicPersonalDashboard(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE))
+                        .and(personalDashboard.isPublic.eq(true))) // isPublic이 true인 경우
+                .fetchCount();
+
+        List<PersonalDashboard> dashboards = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE))
+                        .and(personalDashboard.isPublic.eq(true)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(dashboards, pageable, total);
     }
 }

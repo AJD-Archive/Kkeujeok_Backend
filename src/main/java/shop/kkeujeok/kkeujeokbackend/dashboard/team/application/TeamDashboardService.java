@@ -28,7 +28,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @Transactional(readOnly = true)
 public class TeamDashboardService {
 
-    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.";
+    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.%d";
     private static final String TEAM_JOIN_ACCEPT_MESSAGE = "%s님이 초대를 수락하였습니다.";
 
 
@@ -152,7 +152,7 @@ public class TeamDashboardService {
 
         return SearchMemberListResDto.from(searchMembers);
     }
-    
+
     private void inviteMember(Member member, TeamDashboard teamDashboard, List<String> invitedEmails) {
         for (String email : invitedEmails) {
             try {
@@ -162,7 +162,7 @@ public class TeamDashboardService {
                         .orElseThrow(MemberNotFoundException::new);
 
                 String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
-                        teamDashboard.getTitle());
+                        teamDashboard.getTitle(), teamDashboard.getId());
                 notificationService.sendNotification(inviteReceivedMember, message);
             } catch (MemberNotFoundException ignored) {
             }

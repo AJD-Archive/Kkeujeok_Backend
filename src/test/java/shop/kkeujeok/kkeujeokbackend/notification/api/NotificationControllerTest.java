@@ -2,12 +2,14 @@ package shop.kkeujeok.kkeujeokbackend.notification.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -78,7 +80,7 @@ class NotificationControllerTest extends ControllerTest {
                 .build();
 
         ReflectionTestUtils.setField(notification, "id", 1L);
-        
+
         mockMvc = MockMvcBuilders.standaloneSetup(notificationController)
                 .apply(documentationConfiguration(restDocumentation))
                 .setCustomArgumentResolvers(new CurrentUserEmailArgumentResolver(tokenProvider))
@@ -141,6 +143,29 @@ class NotificationControllerTest extends ControllerTest {
                 )
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("모든 알림 읽음으로 바꾸는데 성공하면 상태코드 200 반환")
+    void 모든_알림_읽음으로_바꾸는데_성공하면_상태코드_200_반환() throws Exception {
+        // given
+        // 모든 알림을 읽음 처리하는 메서드 호출에 대한 설정
+        willDoNothing().given(notificationService).markAllNotificationsAsRead(member.getEmail());
+
+        // when & then
+        mockMvc.perform(
+                        patch("/api/notifications")
+                                .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("notification/markAsAllRead",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰"))
+                ))
+                .andExpect(status().isOk());
+    }
+
 
     /*@Test
     @DisplayName("알림 상세 조회에 성공하면 상태코드 200 반환")

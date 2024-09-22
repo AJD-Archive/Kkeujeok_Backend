@@ -44,14 +44,22 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public NotificationListResDto findAllNotificationsFromMember(String email) {
         Member member = findMemberByEmail(email);
-        List<Notification> notifications = notificationRepository.findAllByReceiver(member);
-
-        List<NotificationInfoResDto> notificationList = notifications.stream()
+        List<NotificationInfoResDto> notifications = notificationRepository.findAllByReceiver(member)
+                .stream()
                 .map(NotificationInfoResDto::from)
                 .toList();
 
-        return NotificationListResDto.of(notificationList);
+        return NotificationListResDto.of(notifications);
     }
+
+    @Transactional
+    public void markAllNotificationsAsRead(String email) {
+        Member member = findMemberByEmail(email);
+        List<Notification> notifications = notificationRepository.findAllByReceiver(member);
+
+        notifications.forEach(Notification::markAsRead);
+    }
+
 
     /*@Transactional
     public NotificationInfoResDto findByNotificationId(Long notificationId) {

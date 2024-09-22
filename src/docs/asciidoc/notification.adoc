@@ -22,3 +22,14 @@ include::{snippets}/notification/findAll/request-headers.adoc[]
 
 include::{snippets}/notification/findAll/http-response.adoc[]
 include::{snippets}/notification/findAll/response-fields.adoc[]
+
+=== 모든 알림 읽음으로 표시
+
+=== 요청
+
+include::{snippets}/notification/markAsAllRead/http-request.adoc[]
+include::{snippets}/notification/markAsAllRead/request-headers.adoc[]
+
+=== 응답
+
+include::{snippets}/notification/markAsAllRead/http-response.adoc[]
