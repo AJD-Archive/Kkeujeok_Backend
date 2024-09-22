@@ -13,16 +13,17 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.challenge.converter.CycleDetailsConverter;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 
 @Entity
 @Getter
@@ -140,18 +141,26 @@ public class Challenge extends BaseEntity {
         this.status = (this.status == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE;
     }
 
-    public List<Member> getParticipants() {
-        return this.participants.stream()
-                .map(ChallengeMemberMapping::getMember)
-                .collect(Collectors.toList());
-    }
-
     public int getParticipantsCount() {
         return participants.size();
     }
 
     public void addParticipant(Member member) {
-        ChallengeMemberMapping mapping = new ChallengeMemberMapping(this, member);
+        ChallengeMemberMapping mapping = ChallengeMemberMapping.of(this, member);
         this.participants.add(mapping);
+    }
+
+    public void updateCompletedMember(Member member, Progress progress) {
+        ChallengeMemberMapping mapping = findParticipantByMember(member);
+
+        mapping.updateIsCompleted(progress == Progress.COMPLETED);
+
+    }
+
+    private ChallengeMemberMapping findParticipantByMember(Member member) {
+        return this.participants.stream()
+                .filter(p -> p.getMember().equals(member))
+                .findFirst()
+                .orElseThrow(MemberNotFoundException::new);
     }
 }

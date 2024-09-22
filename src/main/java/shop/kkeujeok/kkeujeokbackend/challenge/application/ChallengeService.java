@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.challenge.application;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,10 +18,12 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUtil;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
@@ -34,6 +37,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
+
 
 @Service
 @RequiredArgsConstructor
@@ -103,12 +107,24 @@ public class ChallengeService {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
 
-        boolean isParticipant = challenge.getParticipants().stream()
-                .anyMatch(mapping -> mapping.equals(member));
-
+        boolean isParticipant = checkIfParticipant(challenge, member);
         boolean isAuthor = member.equals(challenge.getMember());
 
-        return ChallengeInfoResDto.of(challenge, isParticipant, isAuthor);
+        Set<ChallengeCompletedMemberInfoResDto> completedMembers = getCompletedMembers(challenge);
+
+        return ChallengeInfoResDto.of(challenge, isParticipant, isAuthor, completedMembers);
+    }
+
+    private boolean checkIfParticipant(Challenge challenge, Member member) {
+        return challenge.getParticipants().stream()
+                .anyMatch(mapping -> mapping.getMember().equals(member));
+    }
+
+    private Set<ChallengeCompletedMemberInfoResDto> getCompletedMembers(Challenge challenge) {
+        return challenge.getParticipants().stream()
+                .filter(ChallengeMemberMapping::isCompleted)
+                .map(mapping -> ChallengeCompletedMemberInfoResDto.from(mapping.getMember()))
+                .collect(Collectors.toSet());
     }
 
 
