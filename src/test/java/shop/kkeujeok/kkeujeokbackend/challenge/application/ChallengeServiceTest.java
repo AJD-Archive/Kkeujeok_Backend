@@ -24,7 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
+import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
@@ -43,6 +43,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.exception.InvalidCycleException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
@@ -78,6 +79,12 @@ class ChallengeServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private MultipartFile multipartFile;
+
+    @Mock
+    private S3Service s3Service;
+
     @InjectMocks
     private ChallengeService challengeService;
 
@@ -104,9 +111,8 @@ class ChallengeServiceTest {
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
-                LocalDate.now(),
                 LocalDate.now().plusDays(30),
-                "대표 이미지"
+                "1일 1커밋"
         );
 
         challenge = Challenge.builder()
@@ -114,9 +120,9 @@ class ChallengeServiceTest {
                 .contents(challengeSaveReqDto.contents())
                 .cycle(challengeSaveReqDto.cycle())
                 .cycleDetails(challengeSaveReqDto.cycleDetails())
-                .startDate(challengeSaveReqDto.startDate())
+                .startDate(LocalDate.now())
                 .endDate(challengeSaveReqDto.endDate())
-                .representImage(challengeSaveReqDto.representImage())
+                .representImage("대표 이미지")
                 .member(member)
                 .build();
 
@@ -126,9 +132,8 @@ class ChallengeServiceTest {
                 Category.CREATIVITY_AND_ARTS,
                 Cycle.WEEKLY,
                 List.of(CycleDetail.MON),
-                LocalDate.now(),
                 LocalDate.now().plusDays(30),
-                "업데이트 이미지"
+                "1일 1커밋"
         );
 
         block = Block.builder()
@@ -158,14 +163,15 @@ class ChallengeServiceTest {
     }
 
     @Test
-    @DisplayName("인증된 회원은 챌린지를 생성할 수 있다")
-    void 인증된_회원은_챌린지를_생성할_수_있다() {
-
+    @DisplayName("챌린지를 생성할 때 이미지를 업로드할 수 있다")
+    void 챌린지를_생성할_때_이미지를_업로드할_수_있다() {
         // given
-        when(challengeRepository.save(any(Challenge.class)))
-                .thenReturn(challenge);
+        String imageUrl = "https://example.com/image.jpg";
+        when(s3Service.uploadChallengeImage(any(MultipartFile.class)))
+                .thenReturn(imageUrl);
+
         // when
-        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto);
+        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto, multipartFile);
 
         // then
         assertAll(() -> {
@@ -174,7 +180,30 @@ class ChallengeServiceTest {
             assertThat(result.cycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
             assertThat(result.startDate()).isEqualTo(LocalDate.now());
             assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
-            assertThat(result.representImage()).isEqualTo("대표 이미지");
+            assertThat(result.authorName()).isEqualTo("동동");
+            assertThat(result.authorProfileImage()).isEqualTo("기본 프로필");
+            assertThat(result.representImage()).isEqualTo(imageUrl);
+        });
+    }
+
+    @Test
+    @DisplayName("이미지 업로드 없이 챌린지를 생성할 수 있다")
+    void 이미지_업로드_없이_챌린지를_생성할_수_있다() {
+
+        // given
+        when(challengeRepository.save(any(Challenge.class)))
+                .thenReturn(challenge);
+        // when
+        ChallengeInfoResDto result = challengeService.save(member.getEmail(), challengeSaveReqDto, multipartFile);
+
+        // then
+        assertAll(() -> {
+            assertThat(result.title()).isEqualTo("1일 1커밋");
+            assertThat(result.contents()).isEqualTo("1일 1커밋하기");
+            assertThat(result.cycleDetails()).isEqualTo(List.of(CycleDetail.MON, CycleDetail.TUE));
+            assertThat(result.startDate()).isEqualTo(LocalDate.now());
+            assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
+            assertThat(result.representImage()).isEqualTo(null);
             assertThat(result.authorName()).isEqualTo("동동");
             assertThat(result.authorProfileImage()).isEqualTo("기본 프로필");
         });
@@ -191,12 +220,12 @@ class ChallengeServiceTest {
                 Cycle.MONTHLY,
                 List.of(CycleDetail.MON, CycleDetail.TUE),
                 LocalDate.now(),
-                LocalDate.now().plusDays(30),
-                "대표 이미지"
+                "1일 1커밋"
         );
 
         // when & then
-        assertThatThrownBy(() -> challengeService.save(member.getEmail(), wrongChallengeSaveReqDto))
+        assertThatThrownBy(
+                () -> challengeService.save(member.getEmail(), wrongChallengeSaveReqDto, any(MultipartFile.class)))
                 .isInstanceOf(InvalidCycleException.class);
     }
 
@@ -210,7 +239,7 @@ class ChallengeServiceTest {
                 .thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> challengeService.save(errorEmail, challengeSaveReqDto))
+        assertThatThrownBy(() -> challengeService.save(errorEmail, challengeSaveReqDto, multipartFile))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -223,16 +252,14 @@ class ChallengeServiceTest {
                 .thenReturn(Optional.of(challenge));
 
         // when
-        ChallengeInfoResDto result = challengeService.update(member.getEmail(), challengeId, updateDto);
+        ChallengeInfoResDto result = challengeService.update(member.getEmail(), challengeId, updateDto, multipartFile);
 
         // then
         assertAll(() -> {
             assertThat(result.title()).isEqualTo("업데이트 제목");
             assertThat(result.contents()).isEqualTo("업데이트 내용");
             assertThat(result.cycleDetails()).containsExactly(CycleDetail.MON);
-            assertThat(result.startDate()).isEqualTo(LocalDate.now());
             assertThat(result.endDate()).isEqualTo(LocalDate.now().plusDays(30));
-            assertThat(result.representImage()).isEqualTo("업데이트 이미지");
         });
     }
 
@@ -258,7 +285,8 @@ class ChallengeServiceTest {
                 .thenReturn(Optional.of(otherMember));
 
         // when & then
-        assertThatThrownBy(() -> challengeService.update("other@example.com", challengeId, updateDto))
+        assertThatThrownBy(
+                () -> challengeService.update("other@example.com", challengeId, updateDto, any(MultipartFile.class)))
                 .isInstanceOf(ChallengeAccessDeniedException.class);
     }
 
@@ -283,37 +311,19 @@ class ChallengeServiceTest {
     }
 
     @Test
-    @DisplayName("챌린지 목록을 검색할 수 있다")
-    void 챌린지_목록을_검색할_수_있다() {
-        // given
-        Pageable pageable = PageRequest.of(0, 10);
-        ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from("1일");
-        Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
-        when(challengeRepository.findChallengesByKeyWord(any(ChallengeSearchReqDto.class), any(PageRequest.class)))
-                .thenReturn(page);
-
-        // when
-        ChallengeListResDto result = challengeService.findChallengesByKeyWord(searchReqDto, pageable);
-
-        // then
-        assertAll(() -> {
-            assertThat(result.challengeInfoResDto().size()).isEqualTo(1);
-            assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
-            assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
-        });
-    }
-
-    @Test
     @DisplayName("챌린지를 카테고리 별로 검색할 수 있다")
     void 챌린지를_카테고리_별로_검색할_수_있다() {
         //given
         Pageable pageable = PageRequest.of(0, 10);
         Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
-        when(challengeRepository.findChallengesByCategory(anyString(), any(PageRequest.class)))
+        ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from("1일", "CREATIVITY_AND_ARTS");
+
+        when(challengeRepository.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
+                any(PageRequest.class)))
                 .thenReturn(page);
 
         // when
-        ChallengeListResDto result = challengeService.findByCategory("CREATIVITY_AND_ARTS", pageable);
+        ChallengeListResDto result = challengeService.findChallengesByCategoryAndKeyword(searchReqDto, pageable);
 
         // then
         assertAll(() -> {
@@ -331,7 +341,7 @@ class ChallengeServiceTest {
         when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
 
         // when
-        ChallengeInfoResDto result = challengeService.findById(challengeId);
+        ChallengeInfoResDto result = challengeService.findById(anyString(), challengeId);
 
         // then
         assertAll(() -> {
@@ -381,19 +391,18 @@ class ChallengeServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
         when(challengeRepository.findById(anyLong())).thenReturn(Optional.of(challenge));
         when(personalDashboardRepository.findById(anyLong())).thenReturn(Optional.of(personalDashboard));
-        when(blockRepository.save(any(Block.class))).thenReturn(block);
 
         // when
-        BlockInfoResDto result = challengeService.addChallengeToPersonalDashboard(member.getEmail(),
-                personalDashboardId, challengeId);
+        challengeService.addChallengeToPersonalDashboard(member.getEmail(), personalDashboardId, challengeId);
 
         // then
         assertAll(() -> {
-            assertThat(result.title()).isEqualTo("1일 1커밋");
-            assertThat(result.contents()).isEqualTo("1일 1커밋하기");
-            assertThat(result.progress()).isEqualTo(Progress.NOT_STARTED);
-            assertThat(result.deadLine()).isEqualTo(
+            assertThat(block.getTitle()).isEqualTo("1일 1커밋");
+            assertThat(block.getContents()).isEqualTo("1일 1커밋하기");
+            assertThat(block.getProgress()).isEqualTo(Progress.NOT_STARTED);
+            assertThat(block.getDeadLine()).isEqualTo(
                     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")));
         });
     }
+
 }

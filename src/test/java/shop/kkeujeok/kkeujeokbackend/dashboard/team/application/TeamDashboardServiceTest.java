@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.team.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
@@ -29,6 +30,8 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboa
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.repository.TeamDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.exception.AlreadyJoinedTeamException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.exception.NotMemberOfTeamException;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
@@ -240,6 +243,20 @@ class TeamDashboardServiceTest {
         });
     }
 
+    @DisplayName("이미 팀에 참여한 멤버가 다시 참여할 경우 예외가 발생합니다")
+    @Test
+    void 팀_대시보드_중복_참여_예외() {
+        // given
+        Long dashboardId = 1L;
+        when(teamDashboardRepository.findById(dashboardId)).thenReturn(Optional.of(teamDashboard));
+
+        teamDashboardService.joinTeam(member.getEmail(), dashboardId);
+
+        // when & then
+        assertThatThrownBy(() -> teamDashboardService.joinTeam(member.getEmail(), dashboardId))
+                .isInstanceOf(AlreadyJoinedTeamException.class);
+    }
+
     @DisplayName("팀 대시보드를 탈퇴합니다.")
     @Test
     void 팀_대시보드_탈퇴() {
@@ -259,6 +276,18 @@ class TeamDashboardServiceTest {
             assertThat(result.blockProgress()).isEqualTo(0.0);
             assertThat(result.joinMembers().size()).isEqualTo(1);
         });
+    }
+
+    @DisplayName("참여하지 않은 팀에서 탈퇴를 시도할 때 예외가 발생합니다.")
+    @Test
+    void 참여하지_않은_팀에서_탈퇴_시도() {
+        // given
+        Long dashboardId = 1L;
+        when(teamDashboardRepository.findById(dashboardId)).thenReturn(Optional.of(teamDashboard));
+
+        // when & then
+        assertThatThrownBy(() -> teamDashboardService.leaveTeam(member.getEmail(), dashboardId))
+                .isInstanceOf(NotMemberOfTeamException.class);
     }
 
     @DisplayName("팀원 초대 리스트를 조회합니다.")

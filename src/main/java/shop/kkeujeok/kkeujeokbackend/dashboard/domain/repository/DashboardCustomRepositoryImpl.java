@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository;
 import static shop.kkeujeok.kkeujeokbackend.block.domain.QBlock.block;
 import static shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.QPersonalDashboard.personalDashboard;
 import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboard.teamDashboard;
+import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboardMemberMapping.teamDashboardMemberMapping;
 import static shop.kkeujeok.kkeujeokbackend.member.domain.QMember.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,6 +19,7 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboardMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
@@ -38,6 +40,25 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
                 .where(personalDashboard._super.member.eq(member)
                         .and(personalDashboard._super.status.eq(Status.ACTIVE)))
                 .fetch();
+    }
+
+    @Override
+    public Page<PersonalDashboard> findForPersonalDashboard(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE)))
+                .fetchCount();
+
+        List<PersonalDashboard> dashboards = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(dashboards, pageable, total);
     }
 
     @Override
@@ -73,9 +94,14 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     @Override
     public List<TeamDashboard> findForTeamDashboard(Member member) {
         return queryFactory
-                .selectFrom(teamDashboard)
-                .where(teamDashboard._super.member.eq(member)
-                        .and(teamDashboard._super.status.eq(Status.ACTIVE)))
+                .select(teamDashboard)
+                .from(teamDashboard)
+                .leftJoin(teamDashboard.teamDashboardMemberMappings, teamDashboardMemberMapping)
+                .where(
+                        teamDashboardMemberMapping.member.eq(member)
+                                .or(teamDashboard._super.member.eq(member))
+                                .and(teamDashboard._super.status.eq(Status.ACTIVE))
+                )
                 .fetch();
     }
 
@@ -117,5 +143,26 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
         }
 
         return (double) completedBlocks / totalBlocks * 100;
+    }
+
+    @Override
+    public Page<PersonalDashboard> findPublicPersonalDashboard(Member member, Pageable pageable) {
+        long total = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE))
+                        .and(personalDashboard.isPublic.eq(true))) // isPublic이 true인 경우
+                .fetchCount();
+
+        List<PersonalDashboard> dashboards = queryFactory
+                .selectFrom(personalDashboard)
+                .where(personalDashboard._super.member.eq(member)
+                        .and(personalDashboard._super.status.eq(Status.ACTIVE))
+                        .and(personalDashboard.isPublic.eq(true)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(dashboards, pageable, total);
     }
 }

@@ -17,6 +17,8 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboa
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.repository.TeamDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.exception.AlreadyJoinedTeamException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.exception.NotMemberOfTeamException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
@@ -28,9 +30,8 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @Transactional(readOnly = true)
 public class TeamDashboardService {
 
-    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.";
+    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.%d";
     private static final String TEAM_JOIN_ACCEPT_MESSAGE = "%s님이 초대를 수락하였습니다.";
-
 
     private final TeamDashboardRepository teamDashboardRepository;
     private final MemberRepository memberRepository;
@@ -132,10 +133,18 @@ public class TeamDashboardService {
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        validateMemberNotAlreadyJoined(dashboard, member);
+
         dashboard.addMember(member);
 
         String message = String.format(TEAM_JOIN_ACCEPT_MESSAGE, member.getEmail());
         notificationService.sendNotification(dashboard.getMember(), message);
+    }
+
+    private void validateMemberNotAlreadyJoined(TeamDashboard dashboard, Member member) {
+        if (dashboard.hasMember(member)) {
+            throw new AlreadyJoinedTeamException();
+        }
     }
 
     @Transactional
@@ -144,7 +153,15 @@ public class TeamDashboardService {
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        validateMemberInTeam(dashboard, member);
+
         dashboard.removeMember(member);
+    }
+
+    private void validateMemberInTeam(TeamDashboard dashboard, Member member) {
+        if (!dashboard.hasMember(member)) {
+            throw new NotMemberOfTeamException();
+        }
     }
 
     public SearchMemberListResDto searchMembers(String query) {
@@ -162,13 +179,12 @@ public class TeamDashboardService {
                         .orElseThrow(MemberNotFoundException::new);
 
                 String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
-                        teamDashboard.getTitle());
+                        teamDashboard.getTitle(), teamDashboard.getId());
                 notificationService.sendNotification(inviteReceivedMember, message);
             } catch (MemberNotFoundException ignored) {
             }
         }
     }
-
 
     private void verifyIsSameEmail(String email, String otherEmail) {
         if (email.equals(otherEmail)) {

@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDashboardService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -23,18 +24,19 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboar
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MyPageServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private PersonalDashboardService personalDashboardService;
 
     @Mock
     private TeamDashboardService teamDashboardService;
@@ -123,7 +125,7 @@ public class MyPageServiceTest {
         when(challengeService.findChallengeForMemberId(email, pageable)).thenReturn(challengeListResDto);
 
         // When
-        TeamDashboardsAndChallengesResDto result = myPageService.findTeamDashboardsAndChallenges(email, pageable);
+        TeamDashboardsAndChallengesResDto result = myPageService.findTeamDashboardsAndChallenges(email,"test@example.com", pageable);
 
         // Then
         assertEquals(teamDashboardListResDto, result.teamDashboardList());

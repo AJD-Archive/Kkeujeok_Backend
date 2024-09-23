@@ -2,12 +2,9 @@ package shop.kkeujeok.kkeujeokbackend.notification.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -45,16 +42,24 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public NotificationListResDto findAllNotificationsFromMember(String email, Pageable pageable) {
+    public NotificationListResDto findAllNotificationsFromMember(String email) {
         Member member = findMemberByEmail(email);
-        Page<Notification> notifications = notificationRepository.findAllNotifications(member, pageable);
-
-        List<NotificationInfoResDto> notificationList = notifications.stream()
+        List<NotificationInfoResDto> notifications = notificationRepository.findAllByReceiver(member)
+                .stream()
                 .map(NotificationInfoResDto::from)
                 .toList();
 
-        return NotificationListResDto.of(notificationList, PageInfoResDto.from(notifications));
+        return NotificationListResDto.of(notifications);
     }
+
+    @Transactional
+    public void markAllNotificationsAsRead(String email) {
+        Member member = findMemberByEmail(email);
+        List<Notification> notifications = notificationRepository.findAllByReceiver(member);
+
+        notifications.forEach(Notification::markAsRead);
+    }
+
 
     /*@Transactional
     public NotificationInfoResDto findByNotificationId(Long notificationId) {
