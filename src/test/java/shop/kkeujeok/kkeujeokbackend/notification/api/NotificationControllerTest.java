@@ -2,14 +2,12 @@ package shop.kkeujeok.kkeujeokbackend.notification.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -25,15 +23,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
+import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -79,8 +80,6 @@ class NotificationControllerTest extends ControllerTest {
                 .isRead(false)
                 .build();
 
-        ReflectionTestUtils.setField(notification, "id", 1L);
-
         mockMvc = MockMvcBuilders.standaloneSetup(notificationController)
                 .apply(documentationConfiguration(restDocumentation))
                 .setCustomArgumentResolvers(new CurrentUserEmailArgumentResolver(tokenProvider))
@@ -116,9 +115,11 @@ class NotificationControllerTest extends ControllerTest {
     void 알림_전체_조회에_성공하면_상태코드_200_반환() throws Exception {
         // given
         NotificationInfoResDto notificationInfoResDto = NotificationInfoResDto.from(notification);
-        NotificationListResDto response = NotificationListResDto.of(List.of(notificationInfoResDto));
+        Page<Notification> notificationPage = new PageImpl<>(List.of(notification), PageRequest.of(0, 10), 1);
+        NotificationListResDto response = NotificationListResDto.of(List.of(notificationInfoResDto),
+                PageInfoResDto.from(notificationPage));
 
-        given(notificationService.findAllNotificationsFromMember(member.getEmail()))
+        given(notificationService.findAllNotificationsFromMember(member.getEmail(), PageRequest.of(0, 10)))
                 .willReturn(response);
 
         // when & then
@@ -138,34 +139,14 @@ class NotificationControllerTest extends ControllerTest {
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.notificationInfoResDto[].id").description("알림 아이디"),
                                 fieldWithPath("data.notificationInfoResDto[].message").description("알림 메시지"),
-                                fieldWithPath("data.notificationInfoResDto[].isRead").description("알림 읽은 여부")
+                                fieldWithPath("data.notificationInfoResDto[].isRead").description("알림 읽은 여부"),
+                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
+                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
+                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 개수")
                         ))
                 )
                 .andExpect(status().isOk());
     }
-
-    @Test
-    @DisplayName("모든 알림 읽음으로 바꾸는데 성공하면 상태코드 200 반환")
-    void 모든_알림_읽음으로_바꾸는데_성공하면_상태코드_200_반환() throws Exception {
-        // given
-        // 모든 알림을 읽음 처리하는 메서드 호출에 대한 설정
-        willDoNothing().given(notificationService).markAllNotificationsAsRead(member.getEmail());
-
-        // when & then
-        mockMvc.perform(
-                        patch("/api/notifications")
-                                .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andDo(document("notification/markAsAllRead",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(headerWithName(AUTHORIZATION_HEADER_NAME).description("JWT 토큰"))
-                ))
-                .andExpect(status().isOk());
-    }
-
 
     /*@Test
     @DisplayName("알림 상세 조회에 성공하면 상태코드 200 반환")

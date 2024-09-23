@@ -1,10 +1,11 @@
 package shop.kkeujeok.kkeujeokbackend.notification.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
@@ -25,15 +26,11 @@ public class NotificationController {
     }
 
     @GetMapping
-    public RspTemplate<NotificationListResDto> findAllNotifications(@CurrentUserEmail String email) {
+    public RspTemplate<NotificationListResDto> findAllNotifications(@CurrentUserEmail String email,
+                                                                    @RequestParam(defaultValue = "0", name = "page") int page,
+                                                                    @RequestParam(defaultValue = "10", name = "size") int size) {
         return new RspTemplate<>(HttpStatus.OK, "알림 조회 성공",
-                notificationService.findAllNotificationsFromMember(email));
-    }
-
-    @PatchMapping
-    public RspTemplate<Void> markAllNotificationsAsRead(@CurrentUserEmail String email) {
-        notificationService.markAllNotificationsAsRead(email);
-        return new RspTemplate<>(HttpStatus.OK, "모든 알림이 읽음으로 표시되었습니다.");
+                notificationService.findAllNotificationsFromMember(email, PageRequest.of(page, size)));
     }
 
     /*@GetMapping("/{notificationId}")
