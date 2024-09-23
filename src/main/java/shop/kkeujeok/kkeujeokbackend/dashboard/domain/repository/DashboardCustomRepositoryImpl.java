@@ -129,7 +129,8 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     public double calculateCompletionPercentage(Long dashboardId) {
         List<Block> blocks = queryFactory
                 .selectFrom(block)
-                .where(block.dashboard.id.eq(dashboardId))
+                .where(block.dashboard.id.eq(dashboardId)
+                        .and(block.status.ne(Status.DELETED)))
                 .fetch();
 
         long totalBlocks = blocks.size();
