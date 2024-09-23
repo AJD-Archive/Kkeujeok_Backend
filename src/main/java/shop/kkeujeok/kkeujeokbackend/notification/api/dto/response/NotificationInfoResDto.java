@@ -10,6 +10,8 @@ public record NotificationInfoResDto(
         Boolean isRead
 ) {
     public static NotificationInfoResDto from(Notification notification) {
+        notification.markAsRead();
+
         return NotificationInfoResDto.builder()
                 .id(notification.getId())
                 .message(notification.getMessage())
