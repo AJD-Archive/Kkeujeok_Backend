@@ -23,13 +23,13 @@ include::{snippets}/notification/findAll/request-headers.adoc[]
 include::{snippets}/notification/findAll/http-response.adoc[]
 include::{snippets}/notification/findAll/response-fields.adoc[]
 
-=== 알림 상세 조회
+=== 모든 알림 읽음으로 표시
 
-==== 요청
+=== 요청
 
-include::{snippets}/notification/findById/http-request.adoc[]
+include::{snippets}/notification/markAsAllRead/http-request.adoc[]
+include::{snippets}/notification/markAsAllRead/request-headers.adoc[]
 
-==== 응답
+=== 응답
 
-include::{snippets}/notification/findById/http-response.adoc[]
-include::{snippets}/notification/findById/response-fields.adoc[]
+include::{snippets}/notification/markAsAllRead/http-response.adoc[]

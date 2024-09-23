@@ -1,10 +1,14 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -17,6 +21,9 @@ public class PersonalDashboard extends Dashboard {
     public boolean isPublic;
 
     private String category;
+
+    @OneToMany(mappedBy = "personalDashboard")
+    private List<ChallengeMemberMapping> challengeMemberMappings = new ArrayList<>();
 
     @Builder
     private PersonalDashboard(String title, String description, String dType, Member member, boolean isPublic,
@@ -35,5 +42,4 @@ public class PersonalDashboard extends Dashboard {
     public void statusUpdate() {
         super.statusUpdate((super.getStatus() == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE);
     }
-
 }

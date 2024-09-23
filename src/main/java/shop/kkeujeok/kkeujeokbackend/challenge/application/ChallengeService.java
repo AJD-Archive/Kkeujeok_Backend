@@ -3,31 +3,34 @@ package shop.kkeujeok.kkeujeokbackend.challenge.application;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
+import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUtil;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
+import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -38,36 +41,49 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 public class ChallengeService {
 
     private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
-
+    private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
 
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
     private final PersonalDashboardRepository personalDashboardRepository;
     private final BlockRepository blockRepository;
     private final NotificationService notificationService;
+    private final S3Service s3Service;
 
     @Transactional
-    public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto) {
+    public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto,
+                                    MultipartFile representImage) {
         Member member = findMemberByEmail(email);
-        Challenge challenge = challengeSaveReqDto.toEntity(member);
 
+        String imageUrl = null;
+        if (representImage != null && !representImage.isEmpty()) {
+            imageUrl = s3Service.uploadChallengeImage(representImage);
+        }
+
+        Challenge challenge = challengeSaveReqDto.toEntity(member, imageUrl);
         challengeRepository.save(challenge);
 
         return ChallengeInfoResDto.from(challenge);
     }
 
     @Transactional
-    public ChallengeInfoResDto update(String email, Long challengeId, ChallengeSaveReqDto challengeSaveReqDto) {
+    public ChallengeInfoResDto update(String email, Long challengeId, ChallengeSaveReqDto challengeSaveReqDto,
+                                      MultipartFile representImage) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
         verifyMemberIsAuthor(challenge, member);
 
+        String imageUrl = challenge.getRepresentImage();
+        if (representImage != null && !representImage.isEmpty()) {
+            imageUrl = s3Service.uploadChallengeImage(representImage);
+        }
+
         challenge.update(challengeSaveReqDto.title(),
                 challengeSaveReqDto.contents(),
                 challengeSaveReqDto.cycleDetails(),
-                challengeSaveReqDto.startDate(),
                 challengeSaveReqDto.endDate(),
-                challengeSaveReqDto.representImage());
+                challengeSaveReqDto.blockName(),
+                imageUrl);
 
         return ChallengeInfoResDto.from(challenge);
     }
@@ -84,33 +100,28 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeListResDto findChallengesByKeyWord(ChallengeSearchReqDto challengeSearchReqDto,
-                                                       Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findChallengesByKeyWord(challengeSearchReqDto, pageable);
-
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .toList();
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
-    }
-
-    @Transactional(readOnly = true)
-    public ChallengeListResDto findByCategory(String category, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findChallengesByCategory(category, pageable);
-
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .toList();
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
-    }
-
-    @Transactional(readOnly = true)
-    public ChallengeInfoResDto findById(Long challengeId) {
+    public ChallengeInfoResDto findById(String email, Long challengeId) {
+        Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
 
-        return ChallengeInfoResDto.from(challenge);
+        boolean isParticipant = checkIfParticipant(challenge, member);
+        boolean isAuthor = member.equals(challenge.getMember());
+
+        Set<ChallengeCompletedMemberInfoResDto> completedMembers = getCompletedMembers(challenge);
+
+        return ChallengeInfoResDto.of(challenge, isParticipant, isAuthor, completedMembers);
+    }
+
+    private boolean checkIfParticipant(Challenge challenge, Member member) {
+        return challenge.getParticipants().stream()
+                .anyMatch(mapping -> mapping.getMember().equals(member));
+    }
+
+    private Set<ChallengeCompletedMemberInfoResDto> getCompletedMembers(Challenge challenge) {
+        return challenge.getParticipants().stream()
+                .filter(ChallengeMemberMapping::isCompleted)
+                .map(mapping -> ChallengeCompletedMemberInfoResDto.from(mapping.getMember()))
+                .collect(Collectors.toSet());
     }
 
     @Transactional
@@ -123,21 +134,40 @@ public class ChallengeService {
     }
 
     @Transactional
-    public BlockInfoResDto addChallengeToPersonalDashboard(String email, Long personalDashboardId, Long challengeId) {
+    public void addChallengeToPersonalDashboard(String email, Long challengeId, Long personalDashboardId) {
         Member member = findMemberByEmail(email);
         Challenge challenge = findChallengeById(challengeId);
-        Dashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
+        PersonalDashboard personalDashboard = personalDashboardRepository.findById(personalDashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
-        Block block = createBlock(challenge, member, personalDashboard);
-        updateBlockStatusIfNotActive(block, challenge);
+        challenge.addParticipant(member, personalDashboard);
+        createBlockIfActiveToday(challenge, member, personalDashboard);
 
-        blockRepository.save(block);
+        challengeRepository.save(challenge);
 
         String message = String.format(CHALLENGE_JOIN_MESSAGE, member.getName());
         notificationService.sendNotification(challenge.getMember(), message);
+    }
 
-        return BlockInfoResDto.from(block);
+    private void createBlockIfActiveToday(Challenge challenge, Member member, Dashboard personalDashboard) {
+        if (challenge.isActiveToday()) {
+            Block block = createBlock(challenge, member, personalDashboard);
+            blockRepository.save(block);
+        }
+    }
+
+    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
+        return Block.builder()
+                .title(challenge.getTitle())
+                .contents(challenge.getContents())
+                .progress(Progress.NOT_STARTED)
+                .type(Type.CHALLENGE)
+                .deadLine(LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT)))
+                .member(member)
+                .dashboard(personalDashboard)
+                .challenge(challenge)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -153,25 +183,33 @@ public class ChallengeService {
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
-    private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
-        return Block.builder()
-                .title(challenge.getTitle())
-                .contents(challenge.getContents())
-                .progress(Progress.NOT_STARTED)
-                .type(Type.CHALLENGE)
-                .deadLine(LocalDate.now()
-                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")))
-                .member(member)
-                .dashboard(personalDashboard)
-                .challenge(challenge)
-                .build();
+    @Transactional(readOnly = true)
+    public ChallengeListResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                                  Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
+                pageable);
+
+        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
+                .map(ChallengeInfoResDto::from)
+                .toList();
+
+        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
 
-    private void updateBlockStatusIfNotActive(Block block, Challenge challenge) {
-        if (!ChallengeBlockStatusUtil.isChallengeBlockActiveToday(challenge.getCycle(), challenge.getCycleDetails())) {
-            block.updateChallengeStatus(Status.UN_ACTIVE);
-        }
+    @Transactional
+    public void withdrawFromChallenge(String email, Long challengeId) {
+        Member member = findMemberByEmail(email);
+        Challenge challenge = findChallengeById(challengeId);
+
+        ChallengeMemberMapping mapping = challenge.getParticipants().stream()
+                .filter(participant -> participant.getMember().equals(member))
+                .findFirst()
+                .orElseThrow(() -> new ChallengeAccessDeniedException("이 챌린지에 참여하지 않았습니다."));
+
+        challenge.removeParticipant(mapping);
+        challengeRepository.save(challenge);
     }
+
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
@@ -182,7 +220,6 @@ public class ChallengeService {
         return challengeRepository.findById(challengeId)
                 .orElseThrow(ChallengeNotFoundException::new);
     }
-
 
     private void verifyMemberIsAuthor(Challenge challenge, Member member) {
         if (!challenge.getMember().equals(member)) {

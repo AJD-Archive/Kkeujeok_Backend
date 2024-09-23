@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.member.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
@@ -11,8 +10,6 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateR
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
-
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,9 +32,10 @@ public class MemberController {
 
     @GetMapping("/mypage/dashboard-challenges")
     public RspTemplate<TeamDashboardsAndChallengesResDto> getTeamDashboardsAndChallenges(@CurrentUserEmail String email,
+                                                                                         @RequestParam(name = "requestEmail") String requestEmail,
                                                                                          @RequestParam(name = "page", defaultValue = "0") int page,
                                                                                          @RequestParam(name = "size", defaultValue = "10") int size) {
-        TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, PageRequest.of(page, size));
-        return new RspTemplate<>(HttpStatus.OK, "팀 대시보드와 챌린지 정보 조회", response);
+        TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, requestEmail, PageRequest.of(page, size));
+        return new RspTemplate<>(HttpStatus.OK, "대시보드와 챌린지 정보 조회", response);
     }
 }
