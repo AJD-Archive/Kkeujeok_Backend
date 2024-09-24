@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class PersonalDashboard extends Dashboard {
 
     private String category;
 
-    @OneToMany(mappedBy = "personalDashboard", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "personalDashboard", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChallengeMemberMapping> challengeMemberMappings = new ArrayList<>();
 
     @Builder

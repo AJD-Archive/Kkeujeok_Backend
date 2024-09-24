@@ -114,7 +114,7 @@ public class PersonalDashboardService {
         verifyMemberIsAuthor(dashboard, member);
 
         List<ChallengeMemberMapping> challengeMemberMappings = dashboard.getChallengeMemberMappings();
-        challengeMemberMappingRepository.deleteAll(challengeMemberMappings);
+        dashboard.getChallengeMemberMappings().removeAll(challengeMemberMappings);
 
         dashboard.statusUpdate();
     }
