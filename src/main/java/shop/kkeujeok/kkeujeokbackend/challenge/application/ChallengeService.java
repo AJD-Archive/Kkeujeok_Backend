@@ -43,7 +43,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @RequiredArgsConstructor
 public class ChallengeService {
 
-    private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
+    private static final String CHALLENGE_JOIN_MESSAGE = "챌린지 참여: %s님이 챌린지에 참여했습니다";
     private static final String START_DATE_FORMAT = "yyyy.MM.dd HH:mm";
     private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
 
