@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.challenge.application;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -188,7 +187,6 @@ public class ChallengeService {
                         .collect(Collectors.joining(", "));
     }
 
-
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
@@ -212,11 +210,8 @@ public class ChallengeService {
                 .map(ChallengeInfoResDto::from)
                 .collect(Collectors.toList());
 
-        Collections.reverse(challengeInfoResDtoList); // 리스트를 역순으로 변경
-
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
-
 
     @Transactional
     public void withdrawFromChallenge(String email, Long challengeId) {
@@ -231,7 +226,6 @@ public class ChallengeService {
         challenge.removeParticipant(mapping);
         challengeRepository.save(challenge);
     }
-
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
