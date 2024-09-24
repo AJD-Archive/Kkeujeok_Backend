@@ -137,6 +137,7 @@ public class ChallengeService {
 
         Set<ChallengeMemberMapping> challengeMemberMappings = challenge.getParticipants();
         challenge.getParticipants().removeAll(challengeMemberMappings);
+
         challenge.updateStatus();
     }
 
