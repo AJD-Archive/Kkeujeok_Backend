@@ -2,12 +2,13 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.application;
 
 import java.util.List;
 import java.util.Set;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.challengeMemberMapping.ChallengeMemberMappingRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.UnauthorizedAccessException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
@@ -31,6 +32,7 @@ public class PersonalDashboardService {
 
     private final PersonalDashboardRepository personalDashboardRepository;
     private final MemberRepository memberRepository;
+    private final ChallengeMemberMappingRepository challengeMemberMappingRepository;
 
     // 개인 대시보드 저장
     @Transactional
@@ -111,8 +113,12 @@ public class PersonalDashboardService {
 
         verifyMemberIsAuthor(dashboard, member);
 
+        List<ChallengeMemberMapping> challengeMemberMappings = dashboard.getChallengeMemberMappings();
+        dashboard.getChallengeMemberMappings().removeAll(challengeMemberMappings);
+
         dashboard.statusUpdate();
     }
+
 
     private void verifyMemberIsAuthor(PersonalDashboard dashboard, Member member) {
         if (!member.equals(dashboard.getMember())) {
@@ -124,7 +130,8 @@ public class PersonalDashboardService {
     public PersonalDashboardPageListResDto findPublicPersonalDashboards(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
-        Page<PersonalDashboard> publicDashboards = personalDashboardRepository.findPublicPersonalDashboard(member, pageable);
+        Page<PersonalDashboard> publicDashboards = personalDashboardRepository.findPublicPersonalDashboard(member,
+                pageable);
 
         List<PersonalDashboardInfoResDto> publicDashboardInfoResDtoList = publicDashboards.stream()
                 .map(dashboard -> PersonalDashboardInfoResDto.of(member, dashboard))
@@ -138,7 +145,8 @@ public class PersonalDashboardService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
         // Repository를 통해 페이징된 개인 대시보드 조회
-        Page<PersonalDashboard> personalDashboards = personalDashboardRepository.findForPersonalDashboard(member, pageable);
+        Page<PersonalDashboard> personalDashboards = personalDashboardRepository.findForPersonalDashboard(member,
+                pageable);
 
         // DTO 변환
         List<PersonalDashboardInfoResDto> personalDashboardInfoResDtoList = personalDashboards.stream()
@@ -146,6 +154,7 @@ public class PersonalDashboardService {
                 .toList();
 
         // 페이징 정보를 포함한 응답 반환
-        return PersonalDashboardPageListResDto.of(personalDashboardInfoResDtoList, PageInfoResDto.from(personalDashboards));
+        return PersonalDashboardPageListResDto.of(personalDashboardInfoResDtoList,
+                PageInfoResDto.from(personalDashboards));
     }
 }
