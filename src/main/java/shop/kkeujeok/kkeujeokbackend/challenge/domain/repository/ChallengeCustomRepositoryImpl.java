@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.domain.repository;
 
 import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallenge.challenge;
+import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallengeMemberMapping.challengeMemberMapping;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -46,23 +47,25 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     }
 
     @Override
-    public Page<Challenge> findChallengesByEmail(Member member, Pageable pageable) {
+    public Page<Challenge> findChallengesByMemberInMapping(Member member, Pageable pageable) {
         long total = queryFactory
-                .selectFrom(challenge)
-                .where(challenge.member.eq(member))
+                .selectFrom(challengeMemberMapping)
+                .where(challengeMemberMapping.member.eq(member))
                 .stream()
                 .count();
 
         List<Challenge> challenges = queryFactory
-                .selectFrom(challenge)
-                .where(challenge.member.eq(member)
-                        .and(challenge.status.eq(Status.ACTIVE)))
+                .select(challengeMemberMapping.challenge)
+                .from(challengeMemberMapping)
+                .where(challengeMemberMapping.member.eq(member)
+                        .and(challengeMemberMapping.challenge.status.eq(Status.ACTIVE)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         return new PageImpl<>(challenges, pageable, total);
     }
+
 
     @Override
     public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
