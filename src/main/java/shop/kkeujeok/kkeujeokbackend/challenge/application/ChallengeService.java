@@ -177,7 +177,7 @@ public class ChallengeService {
     public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
-        Page<Challenge> challenges = challengeRepository.findChallengesByEmail(member, pageable);
+        Page<Challenge> challenges = challengeRepository.findChallengesByMemberInMapping(member, pageable);
 
         List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
                 .map(ChallengeInfoResDto::from)
