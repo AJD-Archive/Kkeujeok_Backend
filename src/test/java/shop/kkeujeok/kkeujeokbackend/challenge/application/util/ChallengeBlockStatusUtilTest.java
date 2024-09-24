@@ -10,6 +10,8 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 
 class ChallengeBlockStatusUtilTest {
 
+    ChallengeBlockStatusUtil challengeBlockStatusUtil = ChallengeBlockStatusUtil.getInstance();
+
     @Test
     @DisplayName("DAILY 주기는 항상 true를 반환한다")
     void DAILY_주기는_항상_true를_반환한다() {
@@ -17,7 +19,7 @@ class ChallengeBlockStatusUtilTest {
         List<CycleDetail> cycleDetails = List.of(CycleDetail.DAILY);
 
         // when
-        Boolean result = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.DAILY, cycleDetails);
+        Boolean result = challengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.DAILY, cycleDetails);
 
         // then
         assertThat(result).isTrue();
@@ -31,7 +33,7 @@ class ChallengeBlockStatusUtilTest {
                 CycleDetail.FRI, CycleDetail.SAT, CycleDetail.SUN);
 
         // when
-        Boolean result = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.WEEKLY, activeDays);
+        Boolean result = challengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.WEEKLY, activeDays);
 
         // then
         assertThat(result).isTrue();
@@ -44,7 +46,7 @@ class ChallengeBlockStatusUtilTest {
         List<CycleDetail> activeDays = List.of();
 
         // when
-        Boolean result = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.WEEKLY, activeDays);
+        Boolean result = challengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.WEEKLY, activeDays);
 
         // then
         assertThat(result).isFalse();
@@ -68,7 +70,7 @@ class ChallengeBlockStatusUtilTest {
                 CycleDetail.THIRTY_FIRST);
 
         // when
-        Boolean result = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.MONTHLY, activeDays);
+        Boolean result = challengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.MONTHLY, activeDays);
 
         // then
         assertThat(result).isTrue();
@@ -81,7 +83,7 @@ class ChallengeBlockStatusUtilTest {
         List<CycleDetail> activeDays = List.of();
 
         // when
-        Boolean result = ChallengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.MONTHLY, activeDays);
+        Boolean result = challengeBlockStatusUtil.isChallengeBlockActiveToday(Cycle.MONTHLY, activeDays);
 
         // then
         assertThat(result).isFalse();

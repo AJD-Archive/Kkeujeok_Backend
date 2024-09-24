@@ -13,9 +13,11 @@ import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
+import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.block.exception.BlockNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository.DashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
@@ -74,7 +76,16 @@ public class BlockService {
 
         block.progressUpdate(progress);
 
+        updateChallengeCompletedMemberByProgress(block, member, progress);
+
         return BlockInfoResDto.from(block);
+    }
+
+    private void updateChallengeCompletedMemberByProgress(Block block, Member member, Progress progress) {
+        if (block.getType() == Type.CHALLENGE) {
+            Challenge challenge = block.getChallenge();
+            challenge.updateCompletedMember(member, progress);
+        }
     }
 
     // 블록 리스트
@@ -158,5 +169,4 @@ public class BlockService {
             throw new InvalidProgressException();
         }
     }
-
 }
