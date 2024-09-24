@@ -1,7 +1,8 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.application;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,7 +23,9 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoRes
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.challengeMemberMapping.ChallengeMemberMappingRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
@@ -40,7 +43,8 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @RequiredArgsConstructor
 public class ChallengeService {
 
-    private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
+    private static final String CHALLENGE_JOIN_MESSAGE = "챌린지 참여: %s님이 챌린지에 참여했습니다";
+    private static final String START_DATE_FORMAT = "yyyy.MM.dd HH:mm";
     private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
 
     private final ChallengeRepository challengeRepository;
@@ -49,6 +53,7 @@ public class ChallengeService {
     private final BlockRepository blockRepository;
     private final NotificationService notificationService;
     private final S3Service s3Service;
+    private final ChallengeMemberMappingRepository challengeMemberMappingRepository;
 
     @Transactional
     public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto,
@@ -130,6 +135,9 @@ public class ChallengeService {
         Challenge challenge = findChallengeById(challengeId);
         verifyMemberIsAuthor(challenge, member);
 
+        Set<ChallengeMemberMapping> challengeMemberMappings = challenge.getParticipants();
+        challenge.getParticipants().removeAll(challengeMemberMappings);
+
         challenge.updateStatus();
     }
 
@@ -159,10 +167,13 @@ public class ChallengeService {
     private Block createBlock(Challenge challenge, Member member, Dashboard personalDashboard) {
         return Block.builder()
                 .title(challenge.getTitle())
-                .contents(challenge.getContents())
+                .contents(generateCycleDescription(challenge))
                 .progress(Progress.NOT_STARTED)
                 .type(Type.CHALLENGE)
-                .deadLine(LocalDate.now()
+                .startDate(LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern(START_DATE_FORMAT)))
+                .deadLine(LocalDateTime.now()
+                        .withHour(23).withMinute(59)
                         .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT)))
                 .member(member)
                 .dashboard(personalDashboard)
@@ -170,11 +181,19 @@ public class ChallengeService {
                 .build();
     }
 
+    private String generateCycleDescription(Challenge challenge) {
+        return challenge.getCycle().getDescription() + " " +
+                challenge.getCycleDetails().stream()
+                        .map(CycleDetail::getDescription)
+                        .collect(Collectors.joining(", "));
+    }
+
+
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
-        Page<Challenge> challenges = challengeRepository.findChallengesByEmail(member, pageable);
+        Page<Challenge> challenges = challengeRepository.findChallengesByMemberInMapping(member, pageable);
 
         List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
                 .map(ChallengeInfoResDto::from)
@@ -191,10 +210,13 @@ public class ChallengeService {
 
         List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
                 .map(ChallengeInfoResDto::from)
-                .toList();
+                .collect(Collectors.toList());
+
+        Collections.reverse(challengeInfoResDtoList); // 리스트를 역순으로 변경
 
         return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
     }
+
 
     @Transactional
     public void withdrawFromChallenge(String email, Long challengeId) {
