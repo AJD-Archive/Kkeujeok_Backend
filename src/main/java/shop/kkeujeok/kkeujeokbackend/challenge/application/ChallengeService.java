@@ -41,6 +41,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 public class ChallengeService {
 
     private static final String CHALLENGE_JOIN_MESSAGE = "%s님이 챌린지에 참여했습니다";
+    private static final String START_DATE_FORMAT = "yyyy.MM.dd";
     private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
 
     private final ChallengeRepository challengeRepository;
@@ -162,6 +163,8 @@ public class ChallengeService {
                 .contents(challenge.getContents())
                 .progress(Progress.NOT_STARTED)
                 .type(Type.CHALLENGE)
+                .startDate(LocalDate.now()
+                        .format(DateTimeFormatter.ofPattern(START_DATE_FORMAT)))
                 .deadLine(LocalDate.now()
                         .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT)))
                 .member(member)
