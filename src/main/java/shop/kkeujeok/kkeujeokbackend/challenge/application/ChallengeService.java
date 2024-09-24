@@ -136,8 +136,7 @@ public class ChallengeService {
         verifyMemberIsAuthor(challenge, member);
 
         Set<ChallengeMemberMapping> challengeMemberMappings = challenge.getParticipants();
-        challengeMemberMappingRepository.deleteAll(challengeMemberMappings);
-
+        challenge.getParticipants().removeAll(challengeMemberMappings);
         challenge.updateStatus();
     }
 
