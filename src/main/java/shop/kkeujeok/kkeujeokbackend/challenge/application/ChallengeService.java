@@ -25,6 +25,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.challengeMemberMapping.ChallengeMemberMappingRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
@@ -52,6 +53,7 @@ public class ChallengeService {
     private final BlockRepository blockRepository;
     private final NotificationService notificationService;
     private final S3Service s3Service;
+    private final ChallengeMemberMappingRepository challengeMemberMappingRepository;
 
     @Transactional
     public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto,
@@ -133,6 +135,9 @@ public class ChallengeService {
         Challenge challenge = findChallengeById(challengeId);
         verifyMemberIsAuthor(challenge, member);
 
+        Set<ChallengeMemberMapping> challengeMemberMappings = challenge.getParticipants();
+        challengeMemberMappingRepository.deleteAll(challengeMemberMappings);
+
         challenge.updateStatus();
     }
 
@@ -200,7 +205,8 @@ public class ChallengeService {
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
                                                                   Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findChallengesByCategoryAndKeyword(challengeSearchReqDto, pageable);
+        Page<Challenge> challenges = challengeRepository.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
+                pageable);
 
         List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
                 .map(ChallengeInfoResDto::from)
