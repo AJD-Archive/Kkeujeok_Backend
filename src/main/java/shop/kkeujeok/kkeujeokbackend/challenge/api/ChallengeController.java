@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
@@ -55,43 +54,48 @@ public class ChallengeController {
                 challengeService.findAllChallenges(PageRequest.of(page, size)));
     }
 
-    @GetMapping("/search")
-    public RspTemplate<ChallengeListResDto> findChallengesByKeyWord(@RequestParam(name = "keyword") String keyWord,
-                                                                    @RequestParam(defaultValue = "0", name = "page") int page,
-                                                                    @RequestParam(defaultValue = "10", name = "size") int size) {
-        ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from(keyWord);
-        return new RspTemplate<>(HttpStatus.OK,
-                "챌린지 검색 성공",
-                challengeService.findChallengesByKeyWord(searchReqDto, PageRequest.of(page, size)));
-    }
-
-    @GetMapping("/find")
-    public RspTemplate<ChallengeListResDto> findByCategory(@RequestParam(name = "category") String category,
-                                                           @RequestParam(defaultValue = "0", name = "page") int page,
-                                                           @RequestParam(defaultValue = "10", name = "size") int size) {
-        return new RspTemplate<>(HttpStatus.OK,
-                "챌린지 카테고리 검색 성공",
-                challengeService.findByCategory(category, PageRequest.of(page, size)));
-    }
-
     @GetMapping("/{challengeId}")
-    public RspTemplate<ChallengeInfoResDto> findById(@PathVariable(name = "challengeId") Long challengeId) {
-        return new RspTemplate<>(HttpStatus.OK, "챌린지 상세보기", challengeService.findById(challengeId));
+    public RspTemplate<ChallengeInfoResDto> findById(@CurrentUserEmail String email,
+                                                     @PathVariable(name = "challengeId") Long challengeId) {
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 상세보기", challengeService.findById(email, challengeId));
     }
 
     @DeleteMapping("/{challengeId}")
     public RspTemplate<Void> delete(@CurrentUserEmail String email,
                                     @PathVariable(name = "challengeId") Long challengeId) {
         challengeService.delete(email, challengeId);
+
         return new RspTemplate<>(HttpStatus.OK, "챌린지 삭제 성공");
     }
 
     @PostMapping("/{challengeId}/{dashboardId}")
-    public RspTemplate<BlockInfoResDto> addChallengeToPersonalDashboard(@CurrentUserEmail String email,
-                                                                        @PathVariable(name = "challengeId") Long challengeId,
-                                                                        @PathVariable(name = "dashboardId") Long personalDashboardId) {
-        return new RspTemplate<>(HttpStatus.OK,
-                "챌린지 참여 성공",
-                challengeService.addChallengeToPersonalDashboard(email, challengeId, personalDashboardId));
+    public RspTemplate<Void> addChallengeToPersonalDashboard(@CurrentUserEmail String email,
+                                                             @PathVariable(name = "challengeId") Long challengeId,
+                                                             @PathVariable(name = "dashboardId") Long personalDashboardId) {
+        challengeService.addChallengeToPersonalDashboard(email, challengeId, personalDashboardId);
+
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 참여 성공");
     }
+
+    @GetMapping("/search")
+    public RspTemplate<ChallengeListResDto> findChallengesByCategoryAndKeyword(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0", name = "page") int page,
+            @RequestParam(defaultValue = "10", name = "size") int size) {
+
+        ChallengeSearchReqDto challengeSearchReqDto = ChallengeSearchReqDto.from(keyword, category);
+
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 검색 성공",
+                challengeService.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
+                        PageRequest.of(page, size)));
+    }
+
+    @DeleteMapping("/{challengeId}/withdraw")
+    public RspTemplate<Void> withdrawFromChallenge(@CurrentUserEmail String email,
+                                                   @PathVariable(name = "challengeId") Long challengeId) {
+        challengeService.withdrawFromChallenge(email, challengeId);
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 탈퇴 성공");
+    }
+
 }

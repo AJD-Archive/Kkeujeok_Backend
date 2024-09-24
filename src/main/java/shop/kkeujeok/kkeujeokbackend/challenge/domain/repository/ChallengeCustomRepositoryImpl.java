@@ -1,7 +1,9 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.domain.repository;
 
 import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallenge.challenge;
+import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallengeMemberMapping.challengeMemberMapping;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,7 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
         List<Challenge> challenges = queryFactory
                 .selectFrom(challenge)
                 .where(challenge.status.eq(Status.ACTIVE))
+                .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -45,39 +48,18 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     }
 
     @Override
-    public Page<Challenge> findChallengesByKeyWord(ChallengeSearchReqDto challengeSearchReqDto, Pageable pageable) {
-        long total = Optional.ofNullable(
-                queryFactory
-                        .select(challenge.count())
-                        .from(challenge)
-                        .where(challenge.status.eq(Status.ACTIVE),
-                                challenge.title.containsIgnoreCase(challengeSearchReqDto.keyWord()))
-                        .fetchOne()
-        ).orElse(0L);
-
-        List<Challenge> challenges = queryFactory
-                .selectFrom(challenge)
-                .where(challenge.status.eq(Status.ACTIVE),
-                        challenge.title.containsIgnoreCase(challengeSearchReqDto.keyWord()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        return new PageImpl<>(challenges, pageable, total);
-    }
-
-    @Override
-    public Page<Challenge> findChallengesByEmail(Member member, Pageable pageable) {
+    public Page<Challenge> findChallengesByMemberInMapping(Member member, Pageable pageable) {
         long total = queryFactory
-                .selectFrom(challenge)
-                .where(challenge.member.eq(member))
+                .selectFrom(challengeMemberMapping)
+                .where(challengeMemberMapping.member.eq(member))
                 .stream()
                 .count();
 
         List<Challenge> challenges = queryFactory
-                .selectFrom(challenge)
-                .where(challenge.member.eq(member)
-                        .and(challenge.status.eq(Status.ACTIVE)))
+                .select(challengeMemberMapping.challenge)
+                .from(challengeMemberMapping)
+                .where(challengeMemberMapping.member.eq(member)
+                        .and(challengeMemberMapping.challenge.status.eq(Status.ACTIVE)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -85,23 +67,38 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
         return new PageImpl<>(challenges, pageable, total);
     }
 
-    public Page<Challenge> findChallengesByCategory(String category, Pageable pageable) {
+    @Override
+    public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                              Pageable pageable) {
+        String keyword = challengeSearchReqDto.keyWord();
+        String category = challengeSearchReqDto.category();
+
+        BooleanExpression predicate = challenge.status.eq(Status.ACTIVE);
+
+        if (keyword != null && !keyword.isEmpty()) {
+            predicate = predicate.and(challenge.title.containsIgnoreCase(keyword));
+        }
+
+        if (category != null && !category.isEmpty()) {
+            predicate = predicate.and(challenge.category.eq(Category.valueOf(category)));
+        }
+
         long total = Optional.ofNullable(
                 queryFactory
                         .select(challenge.count())
                         .from(challenge)
-                        .where(challenge.status.eq(Status.ACTIVE),
-                                challenge.category.eq(Category.valueOf(category)))
+                        .where(predicate)
                         .fetchOne()
         ).orElse(0L);
 
         List<Challenge> challenges = queryFactory
                 .selectFrom(challenge)
-                .where(challenge.status.eq(Status.ACTIVE),
-                        challenge.category.eq(Category.valueOf(category)))
+                .where(predicate)
+                .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
         return new PageImpl<>(challenges, pageable, total);
     }
 }

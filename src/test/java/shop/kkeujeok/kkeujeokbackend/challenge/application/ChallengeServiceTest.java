@@ -25,7 +25,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
@@ -312,37 +311,19 @@ class ChallengeServiceTest {
     }
 
     @Test
-    @DisplayName("챌린지 목록을 검색할 수 있다")
-    void 챌린지_목록을_검색할_수_있다() {
-        // given
-        Pageable pageable = PageRequest.of(0, 10);
-        ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from("1일");
-        Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
-        when(challengeRepository.findChallengesByKeyWord(any(ChallengeSearchReqDto.class), any(PageRequest.class)))
-                .thenReturn(page);
-
-        // when
-        ChallengeListResDto result = challengeService.findChallengesByKeyWord(searchReqDto, pageable);
-
-        // then
-        assertAll(() -> {
-            assertThat(result.challengeInfoResDto().size()).isEqualTo(1);
-            assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
-            assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
-        });
-    }
-
-    @Test
     @DisplayName("챌린지를 카테고리 별로 검색할 수 있다")
     void 챌린지를_카테고리_별로_검색할_수_있다() {
         //given
         Pageable pageable = PageRequest.of(0, 10);
         Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
-        when(challengeRepository.findChallengesByCategory(anyString(), any(PageRequest.class)))
+        ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from("1일", "CREATIVITY_AND_ARTS");
+
+        when(challengeRepository.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
+                any(PageRequest.class)))
                 .thenReturn(page);
 
         // when
-        ChallengeListResDto result = challengeService.findByCategory("CREATIVITY_AND_ARTS", pageable);
+        ChallengeListResDto result = challengeService.findChallengesByCategoryAndKeyword(searchReqDto, pageable);
 
         // then
         assertAll(() -> {
@@ -360,7 +341,7 @@ class ChallengeServiceTest {
         when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
 
         // when
-        ChallengeInfoResDto result = challengeService.findById(challengeId);
+        ChallengeInfoResDto result = challengeService.findById(anyString(), challengeId);
 
         // then
         assertAll(() -> {
@@ -410,19 +391,18 @@ class ChallengeServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
         when(challengeRepository.findById(anyLong())).thenReturn(Optional.of(challenge));
         when(personalDashboardRepository.findById(anyLong())).thenReturn(Optional.of(personalDashboard));
-        when(blockRepository.save(any(Block.class))).thenReturn(block);
 
         // when
-        BlockInfoResDto result = challengeService.addChallengeToPersonalDashboard(member.getEmail(),
-                personalDashboardId, challengeId);
+        challengeService.addChallengeToPersonalDashboard(member.getEmail(), personalDashboardId, challengeId);
 
         // then
         assertAll(() -> {
-            assertThat(result.title()).isEqualTo("1일 1커밋");
-            assertThat(result.contents()).isEqualTo("1일 1커밋하기");
-            assertThat(result.progress()).isEqualTo(Progress.NOT_STARTED);
-            assertThat(result.deadLine()).isEqualTo(
+            assertThat(block.getTitle()).isEqualTo("1일 1커밋");
+            assertThat(block.getContents()).isEqualTo("1일 1커밋하기");
+            assertThat(block.getProgress()).isEqualTo(Progress.NOT_STARTED);
+            assertThat(block.getDeadLine()).isEqualTo(
                     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")));
         });
     }
+
 }

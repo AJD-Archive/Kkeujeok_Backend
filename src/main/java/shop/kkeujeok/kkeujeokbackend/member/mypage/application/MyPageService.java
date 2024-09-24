@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.auth.exception.EmailNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardPageListResDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.application.PersonalDashboardService;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -22,6 +24,7 @@ import shop.kkeujeok.kkeujeokbackend.member.mypage.exception.ExistsNicknameExcep
 public class MyPageService {
 
     private final MemberRepository memberRepository;
+    private final PersonalDashboardService personalDashboardService;
     private final TeamDashboardService teamDashboardService;
     private final ChallengeService challengeService;
 
@@ -46,13 +49,24 @@ public class MyPageService {
         return MyPageInfoResDto.From(member);
     }
 
-    // 팀 대시보드 & 챌린지 정보 조회
+    // 대시보드 & 챌린지 정보 조회
     @Transactional(readOnly = true)
-    public TeamDashboardsAndChallengesResDto findTeamDashboardsAndChallenges(String email, Pageable pageable) {
-        TeamDashboardListResDto teamDashboardListResDto = teamDashboardService.findForTeamDashboard(email, pageable);
-        ChallengeListResDto challengeListResDto = challengeService.findChallengeForMemberId(email, pageable);
+    public TeamDashboardsAndChallengesResDto findTeamDashboardsAndChallenges(String email,
+                                                                             String requestEmail,
+                                                                             Pageable pageable) {
+        TeamDashboardListResDto teamDashboardListResDto = teamDashboardService.findForTeamDashboard(requestEmail, pageable);
+        ChallengeListResDto challengeListResDto = challengeService.findChallengeForMemberId(requestEmail, pageable);
 
-        return TeamDashboardsAndChallengesResDto.of(teamDashboardListResDto, challengeListResDto);
+        PersonalDashboardPageListResDto personalDashboardPageListResDto;
+
+        if (email.equals(requestEmail)) {
+            // 본인이면 isPublic과 상관없이 모든 대시보드 및 챌린지 조회
+            personalDashboardPageListResDto = personalDashboardService.findForPersonalDashboard(requestEmail, pageable);
+        } else {
+            // 타인이면 isPublic이 true인 대시보드 및 챌린지 조회
+            personalDashboardPageListResDto = personalDashboardService.findPublicPersonalDashboards(requestEmail, pageable);
+        }
+        return TeamDashboardsAndChallengesResDto.of(personalDashboardPageListResDto,teamDashboardListResDto, challengeListResDto);
     }
 
     private boolean isNicknameChanged(Member member, String newNickname) {
