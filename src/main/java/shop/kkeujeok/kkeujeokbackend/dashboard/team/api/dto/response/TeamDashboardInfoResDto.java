@@ -46,6 +46,7 @@ public record TeamDashboardInfoResDto(
 
     @Builder
     private record JoinMemberInfoResDto(
+            Long id,
             String picture,
             String email,
             String name,
@@ -55,6 +56,7 @@ public record TeamDashboardInfoResDto(
     ) {
         private static JoinMemberInfoResDto from(Member member) {
             return JoinMemberInfoResDto.builder()
+                    .id(member.getId())
                     .picture(member.getPicture())
                     .email(member.getEmail())
                     .name(member.getName())
