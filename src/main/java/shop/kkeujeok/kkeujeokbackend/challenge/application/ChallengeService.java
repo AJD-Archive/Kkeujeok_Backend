@@ -1,6 +1,6 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.application;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
@@ -164,17 +164,15 @@ public class ChallengeService {
                 .contents(generateCycleDescription(challenge))
                 .progress(Progress.NOT_STARTED)
                 .type(Type.CHALLENGE)
-                .startDate(LocalDateTime.now()
+                .startDate(LocalDate.now()
                         .format(DateTimeFormatter.ofPattern(START_DATE_FORMAT)))
-                .deadLine(LocalDateTime.now()
-                        .withHour(23).withMinute(59)
+                .deadLine(LocalDate.now()
                         .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT)))
                 .member(member)
                 .dashboard(personalDashboard)
                 .challenge(challenge)
                 .build();
     }
-
 
     private String generateCycleDescription(Challenge challenge) {
         return challenge.getCycle().getDescription() + " " +
