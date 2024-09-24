@@ -39,6 +39,7 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
         List<Challenge> challenges = queryFactory
                 .selectFrom(challenge)
                 .where(challenge.status.eq(Status.ACTIVE))
+                .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -65,7 +66,6 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
 
         return new PageImpl<>(challenges, pageable, total);
     }
-
 
     @Override
     public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
@@ -94,6 +94,7 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
         List<Challenge> challenges = queryFactory
                 .selectFrom(challenge)
                 .where(predicate)
+                .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

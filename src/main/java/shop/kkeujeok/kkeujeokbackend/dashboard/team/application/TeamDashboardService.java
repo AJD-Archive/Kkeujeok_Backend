@@ -30,8 +30,8 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @Transactional(readOnly = true)
 public class TeamDashboardService {
 
-    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "%s님이 %s 대시보드에 초대하였습니다.%d";
-    private static final String TEAM_JOIN_ACCEPT_MESSAGE = "%s님이 초대를 수락하였습니다.";
+    private static final String TEAM_DASHBOARD_JOIN_MESSAGE = "팀 대시보드 초대: %s님이 %s 대시보드에 초대하였습니다.%d";
+    private static final String TEAM_JOIN_ACCEPT_MESSAGE = "팀 초대 수락: %s님이 초대를 수락하였습니다.";
 
     private final TeamDashboardRepository teamDashboardRepository;
     private final MemberRepository memberRepository;
