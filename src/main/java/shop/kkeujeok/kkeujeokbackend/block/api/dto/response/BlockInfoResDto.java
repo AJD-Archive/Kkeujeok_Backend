@@ -35,16 +35,15 @@ public record BlockInfoResDto(
                 .deadLine(block.getDeadLine())
                 .nickname(block.getMember().getNickname())
                 .picture(block.getMember().getPicture())
-                .dDay(calculateDDay(block.getStartDate(), block.getDeadLine()))
+                .dDay(calculateDDay(block.getDeadLine()))
                 .build();
     }
 
-    private static String calculateDDay(String startDateStr, String deadlineStr) {
-        LocalDate startDate = LocalDateTime.parse(startDateStr, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")).toLocalDate();
+    private static String calculateDDay(String deadlineStr) {
         LocalDate deadlineDate =  LocalDateTime.parse(deadlineStr, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")).toLocalDate();
         LocalDate today = LocalDate.now();
 
-        long daysBetween = ChronoUnit.DAYS.between(startDate, deadlineDate);
+        long daysBetween = ChronoUnit.DAYS.between(today, deadlineDate);
 
         if (today.isBefore(deadlineDate)) {
             return "D-" + daysBetween;
