@@ -6,9 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardDeletedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.InvalidMemberInviteException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.UnauthorizedAccessException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.request.TeamDashboardUpdateReqDto;
@@ -20,6 +22,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.repository.TeamDashbo
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.exception.AlreadyJoinedTeamException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.exception.NotMemberOfTeamException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -99,11 +102,18 @@ public class TeamDashboardService {
         TeamDashboard dashboard = teamDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        checkIfDashboardIsDeleted(dashboard);
         validateDashboardAccess(dashboard, member);
 
         double blockProgress = teamDashboardRepository.calculateCompletionPercentage(dashboard.getId());
 
         return TeamDashboardInfoResDto.detailOf(member, dashboard, blockProgress);
+    }
+
+    private void checkIfDashboardIsDeleted(TeamDashboard dashboard) {
+        if (dashboard.isDeleted()) {
+            throw new DashboardDeletedException();
+        }
     }
 
     private void validateDashboardAccess(TeamDashboard dashboard, Member member) {

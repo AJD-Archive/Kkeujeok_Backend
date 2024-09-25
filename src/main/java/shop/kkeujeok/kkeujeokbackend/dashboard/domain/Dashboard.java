@@ -63,4 +63,8 @@ public class Dashboard extends BaseEntity {
         this.status = status;
     }
 
+    public boolean isDeleted() {
+        return status == Status.DELETED;
+    }
+
 }
