@@ -63,7 +63,7 @@ public class AuthMemberService {
                         .role(Role.ROLE_USER)
                         .firstLogin(true)
                         .nickname(nickname)
-                        .introduction("자기 소개를 입력해 주세요.")
+                        .introduction("")
                         .tag(tag)
                         .build()
         );
