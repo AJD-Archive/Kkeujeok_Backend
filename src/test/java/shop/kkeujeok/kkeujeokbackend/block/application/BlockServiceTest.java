@@ -86,6 +86,7 @@ class BlockServiceTest {
                 "2024.07.28 16:40");
 
         blockSequenceUpdateReqDto = new BlockSequenceUpdateReqDto(
+                dashboard.getId(),
                 List.of(1L, 2L),
                 List.of(3L, 4L),
                 List.of(5L, 6L)
