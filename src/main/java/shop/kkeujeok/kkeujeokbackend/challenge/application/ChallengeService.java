@@ -42,6 +42,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @RequiredArgsConstructor
 public class ChallengeService {
 
+    private static final String CHALLENGE_CREATED_MESSAGE_TEMPLATE = "%s 챌린지 블록이 생성되었습니다.";
     private static final String CHALLENGE_JOIN_MESSAGE = "챌린지 참여: %s님이 챌린지에 참여했습니다";
     private static final String START_DATE_FORMAT = "yyyy.MM.dd HH:mm";
     private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
@@ -152,8 +153,11 @@ public class ChallengeService {
 
         challengeRepository.save(challenge);
 
-        String message = String.format(CHALLENGE_JOIN_MESSAGE, member.getName());
-        notificationService.sendNotification(challenge.getMember(), message);
+        String challengeJoinMessage = String.format(CHALLENGE_JOIN_MESSAGE, member.getName());
+        notificationService.sendNotification(challenge.getMember(), challengeJoinMessage);
+
+        String challengeCreateMessage = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, challenge.getBlockName());
+        notificationService.sendNotification(challenge.getMember(), challengeCreateMessage);
     }
 
     private void createBlockIfActiveToday(Challenge challenge, Member member, Dashboard personalDashboard) {

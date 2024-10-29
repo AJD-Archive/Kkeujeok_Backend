@@ -473,7 +473,7 @@ class ChallengeControllerTest extends ControllerTest {
                 "2024.09.31 23:59",
                 "동동",
                 "picture",
-                0);
+                "0");
 
         willDoNothing().given(challengeService).addChallengeToPersonalDashboard(anyString(), anyLong(), anyLong());
 

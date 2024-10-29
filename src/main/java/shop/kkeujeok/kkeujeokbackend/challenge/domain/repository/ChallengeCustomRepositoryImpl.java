@@ -67,6 +67,7 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
         return new PageImpl<>(challenges, pageable, total);
     }
 
+
     @Override
     public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
                                                               Pageable pageable) {

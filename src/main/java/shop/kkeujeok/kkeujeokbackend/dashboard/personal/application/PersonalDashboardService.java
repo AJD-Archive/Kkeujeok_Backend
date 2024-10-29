@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardDeletedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.challengeMemberMapping.ChallengeMemberMappingRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
@@ -21,6 +22,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.repository.PersonalDashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.exception.DashboardAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
@@ -82,11 +84,18 @@ public class PersonalDashboardService {
         PersonalDashboard dashboard = personalDashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
 
+        checkIfDashboardIsDeleted(dashboard);
         validateDashboardAccess(dashboard, member);
 
         double blockProgress = personalDashboardRepository.calculateCompletionPercentage(dashboard.getId());
 
         return PersonalDashboardInfoResDto.detailOf(member, dashboard, blockProgress);
+    }
+
+    private void checkIfDashboardIsDeleted(PersonalDashboard dashboard) {
+        if (dashboard.isDeleted()) {
+            throw new DashboardDeletedException();
+        }
     }
 
     private void validateDashboardAccess(PersonalDashboard dashboard, Member member) {
