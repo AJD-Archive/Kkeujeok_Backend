@@ -121,23 +121,27 @@ public class BlockService {
     @Transactional
     public void changeBlocksSequence(String email, BlockSequenceUpdateReqDto blockSequenceUpdateReqDto) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Long dashboardId = blockSequenceUpdateReqDto.dashboardId();
 
-        updateBlockSequence(blockSequenceUpdateReqDto.notStartedList());
-        updateBlockSequence(blockSequenceUpdateReqDto.inProgressList());
-        updateBlockSequence(blockSequenceUpdateReqDto.completedList());
+        updateBlockSequence(member, blockSequenceUpdateReqDto.notStartedList(), dashboardId, Progress.NOT_STARTED);
+        updateBlockSequence(member, blockSequenceUpdateReqDto.inProgressList(), dashboardId, Progress.IN_PROGRESS);
+        updateBlockSequence(member, blockSequenceUpdateReqDto.completedList(), dashboardId, Progress.COMPLETED);
     }
 
-    private void updateBlockSequence(List<Long> blockIds) {
-        int sequence = blockIds.size();
+    private void updateBlockSequence(Member member, List<Long> blockIds, Long dashboardId, Progress progress) {
+        int lastSequence = blockRepository.findLastSequenceByProgress(
+                member,
+                dashboardId,
+                progress);
 
         for (Long blockId : blockIds) {
             Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
-            if (block.getSequence() != sequence) {
-                block.sequenceUpdate(sequence);
+            if (block.getSequence() != lastSequence) {
+                block.sequenceUpdate(lastSequence);
             }
 
-            sequence--;
+            lastSequence--;
         }
     }
 

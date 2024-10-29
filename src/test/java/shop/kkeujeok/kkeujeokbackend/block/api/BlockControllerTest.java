@@ -97,6 +97,7 @@ class BlockControllerTest extends ControllerTest {
         ReflectionTestUtils.setField(block, "id", 1L);
 
         blockSequenceUpdateReqDto = new BlockSequenceUpdateReqDto(
+                dashboard.getId(),
                 List.of(2L, 3L),
                 List.of(3L, 1L),
                 List.of(1L, 2L)
@@ -414,6 +415,7 @@ class BlockControllerTest extends ControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
+                                fieldWithPath("dashboardId").description("대시보드 ID"),
                                 fieldWithPath("notStartedList").description("시작 전 블록 아이디 리스트"),
                                 fieldWithPath("inProgressList").description("진행 중 블록 아이디 리스트"),
                                 fieldWithPath("completedList").description("완료 블록 아이디 리스트")
@@ -494,5 +496,5 @@ class BlockControllerTest extends ControllerTest {
                 ))
                 .andExpect(status().isOk());
     }
-  
+
 }
