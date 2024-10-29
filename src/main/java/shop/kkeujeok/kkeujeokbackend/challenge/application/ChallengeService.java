@@ -157,7 +157,7 @@ public class ChallengeService {
         notificationService.sendNotification(challenge.getMember(), challengeJoinMessage);
 
         String challengeCreateMessage = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, challenge.getBlockName());
-        notificationService.sendNotification(challenge.getMember(), challengeCreateMessage);
+        notificationService.sendNotification(member, challengeCreateMessage);
     }
 
     private void createBlockIfActiveToday(Challenge challenge, Member member, Dashboard personalDashboard) {
