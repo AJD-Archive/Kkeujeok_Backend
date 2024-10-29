@@ -55,10 +55,10 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<ChallengeMemberMapping> challengeMemberMappings;
 
-    @OneToMany(mappedBy = "from_member", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fromMember", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Follow> followings;
 
-    @OneToMany(mappedBy = "to_member", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "toMember", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Follow> followers;
 
     @Builder
