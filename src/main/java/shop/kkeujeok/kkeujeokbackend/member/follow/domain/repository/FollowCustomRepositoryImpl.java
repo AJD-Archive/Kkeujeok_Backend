@@ -3,10 +3,13 @@ package shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository;
 import static shop.kkeujeok.kkeujeokbackend.member.follow.domain.QFollow.follow;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
 
 @Repository
 @RequiredArgsConstructor
@@ -14,6 +17,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
     @Override
     public boolean existsByFromMemberAndToMember(Member fromMember, Member toMember) {
@@ -27,5 +31,16 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                 .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    @Override
+    @Transactional
+    public boolean acceptFollowingRequest(Long followId) {
+        long updatedRows = new JPAUpdateClause(entityManager, follow)
+                .where(follow.id.eq(followId))
+                .set(follow.followStatus, FollowStatus.ACTIVE)
+                .execute();
+
+        return updatedRows > 0;
     }
 }

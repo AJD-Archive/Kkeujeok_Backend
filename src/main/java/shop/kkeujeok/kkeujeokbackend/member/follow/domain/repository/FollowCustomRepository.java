@@ -5,4 +5,6 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 public interface FollowCustomRepository {
 
     boolean existsByFromMemberAndToMember(Member fromMember, Member toMember);
+
+    boolean acceptFollowingRequest(Long followId);
 }

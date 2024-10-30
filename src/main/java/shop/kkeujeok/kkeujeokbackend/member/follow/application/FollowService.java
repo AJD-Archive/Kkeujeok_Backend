@@ -6,12 +6,15 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowAcceptReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowAcceptResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository.FollowRepository;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyExistsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowNotFoundException;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value.Str;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +45,15 @@ public class FollowService {
         }
     }
 
-    // 친구 요청 수락 로직 - 수락한 상태에서 또 요청하면 이미 친구라고 처리하는 로직
+    @Transactional
+    public FollowAcceptResDto accept(FollowAcceptReqDto followAcceptReqDto) {
+        Follow follow = followRepository.findById(followAcceptReqDto.followId())
+                .orElseThrow(FollowNotFoundException::new);
+
+        followRepository.acceptFollowingRequest(followAcceptReqDto.followId());
+
+        return FollowAcceptResDto.from(follow);
+    }
     // 친구 리스트 보는 로직
     // 추천 친구 리스트 보는 로직
     // 친구 검색 기능 (email, 혹은 닉네임#고유번호로)
