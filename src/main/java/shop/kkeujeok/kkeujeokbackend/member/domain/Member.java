@@ -58,9 +58,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "fromMember", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Follow> followings;
 
-    @OneToMany(mappedBy = "toMember", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    private List<Follow> followers;
-
     @Builder
     private Member(Status status, Role role,
                    String email, String name,

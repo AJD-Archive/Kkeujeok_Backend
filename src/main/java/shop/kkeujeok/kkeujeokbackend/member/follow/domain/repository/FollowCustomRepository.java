@@ -6,5 +6,5 @@ public interface FollowCustomRepository {
 
     boolean existsByFromMemberAndToMember(Member fromMember, Member toMember);
 
-    boolean acceptFollowingRequest(Long followId);
+    void acceptFollowingRequest(Long followId);
 }

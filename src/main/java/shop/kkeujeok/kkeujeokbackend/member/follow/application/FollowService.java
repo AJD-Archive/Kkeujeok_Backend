@@ -46,16 +46,13 @@ public class FollowService {
     }
 
     @Transactional
-    public FollowAcceptResDto accept(FollowAcceptReqDto followAcceptReqDto) {
-        Follow follow = followRepository.findById(followAcceptReqDto.followId())
-                .orElseThrow(FollowNotFoundException::new);
-
-        followRepository.acceptFollowingRequest(followAcceptReqDto.followId());
-
-        return FollowAcceptResDto.from(follow);
+    public void accept(Long followId) {
+        followRepository.acceptFollowingRequest(followId);
     }
-    // 친구 리스트 보는 로직
-    // 추천 친구 리스트 보는 로직
-    // 친구 검색 기능 (email, 혹은 닉네임#고유번호로)
-    // 친구 삭제 로직
+
+//    todo
+//     친구 리스트 보는 로직
+//     추천 친구 리스트 보는 로직
+//     친구 검색 기능 (email, 혹은 닉네임#고유번호로)
+//     친구 삭제 로직
 }

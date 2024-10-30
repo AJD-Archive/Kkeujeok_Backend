@@ -35,12 +35,10 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
     @Override
     @Transactional
-    public boolean acceptFollowingRequest(Long followId) {
-        long updatedRows = new JPAUpdateClause(entityManager, follow)
+    public void acceptFollowingRequest(Long followId) {
+        new JPAUpdateClause(entityManager, follow)
                 .where(follow.id.eq(followId))
-                .set(follow.followStatus, FollowStatus.ACTIVE)
+                .set(follow.followStatus, FollowStatus.ACCEPT)
                 .execute();
-
-        return updatedRows > 0;
     }
 }

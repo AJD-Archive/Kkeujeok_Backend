@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.member.follow.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class FollowController {
 
     private final FollowService followService;
 
-    @PostMapping("")
+    @PostMapping
     public RspTemplate<FollowResDto> save(@CurrentUserEmail String email,
                                           @RequestBody FollowReqDto followReqDto) {
         return new RspTemplate<>(HttpStatus.OK,
@@ -29,10 +30,11 @@ public class FollowController {
                 followService.save(email, followReqDto));
     }
 
-    @PostMapping("/accept")
-    public RspTemplate<FollowAcceptResDto> accept(@RequestBody FollowAcceptReqDto followAcceptReqDto) {
+    @PostMapping("/accept/{followId}")
+    public RspTemplate<Void> accept(@PathVariable Long followId) {
+        followService.accept(followId);
+
         return new RspTemplate<>(HttpStatus.OK,
-                "친구 추가 수락",
-                followService.accept(followAcceptReqDto));
+                "친구 추가 수락", null);
     }
 }

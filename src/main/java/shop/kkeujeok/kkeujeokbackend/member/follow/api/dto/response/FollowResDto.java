@@ -6,7 +6,8 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 
 @Builder
 public record FollowResDto(
-        Long toMemberId) {
+        Long toMemberId
+) {
     public static FollowResDto from(Member member) {
         return FollowResDto.builder()
                 .toMemberId(member.getId())
