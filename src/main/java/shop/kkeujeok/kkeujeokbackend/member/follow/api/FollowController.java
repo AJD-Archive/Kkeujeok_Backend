@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.member.follow.api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,7 @@ public class FollowController {
         followService.accept(followId);
 
         return new RspTemplate<>(HttpStatus.OK,
-                "친구 추가 수락", null);
+                "친구 추가 수락");
     }
 
     @GetMapping
@@ -59,5 +60,13 @@ public class FollowController {
         return new RspTemplate<>(HttpStatus.OK,
                 "추천 친구 목록 조회",
                 followService.findRecommendedFollowList(email, PageRequest.of(page, size)));
+    }
+
+    @DeleteMapping("/{memberId}")
+    public RspTemplate<Void> delete(@CurrentUserEmail String email, @PathVariable Long memberId) {
+        followService.delete(email, memberId);
+
+        return new RspTemplate<>(HttpStatus.OK,
+                "친구 삭제");
     }
 }

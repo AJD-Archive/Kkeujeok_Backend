@@ -75,6 +75,17 @@ public class FollowService {
                 PageInfoResDto.from(recommendedFollowInfoResDtos)
         );
     }
+
+    @Transactional
+    public void delete(String email, Long memberId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Member toMemberEntity = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+
+        Follow follow = followRepository.findByFromMemberAndToMember(member, toMemberEntity)
+                .orElseThrow(FollowNotFoundException::new);
+
+        followRepository.delete(follow);
+    }
 //    todo
 //     친구 검색 기능 (email, 혹은 닉네임#고유번호로)
 //     친구 삭제 로직

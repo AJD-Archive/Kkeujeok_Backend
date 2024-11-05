@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
 
 @Repository
@@ -125,5 +126,19 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
     }
+
+    @Override
+    public Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember) {
+        Follow followRecord = queryFactory
+                .selectFrom(follow)
+                .where(
+                        (follow.fromMember.eq(fromMember).and(follow.toMember.eq(toMember)))
+                                .or(follow.fromMember.eq(toMember).and(follow.toMember.eq(fromMember))) // 양방향 조회
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(followRecord);
+    }
+
 
 }

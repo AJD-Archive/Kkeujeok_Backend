@@ -1,10 +1,12 @@
 package shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository;
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 
 public interface FollowCustomRepository {
 
@@ -15,4 +17,6 @@ public interface FollowCustomRepository {
     Page<FollowInfoResDto> findFollowList(Long memberId, Pageable pageable);
 
     Page<RecommendedFollowInfoResDto> findRecommendedFollowList(Long memberId, Pageable pageable);
+
+    Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember);
 }
