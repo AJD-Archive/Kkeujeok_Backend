@@ -62,6 +62,8 @@ dependencies {
     // s3
     implementation 'software.amazon.awssdk:s3:2.20.140'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 ext {
     snippetsDir = file('build/generated-snippets')
