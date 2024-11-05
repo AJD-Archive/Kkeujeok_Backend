@@ -11,7 +11,7 @@ public record FollowInfoResDto(
         String name,
         String profileImage
 ) {
-    public static FollowInfoResDto from(Follow follow, Long myMemberId) {
+    public static FollowInfoResDto of(Follow follow, Long myMemberId) {
         Member friend = follow.getToMember().getId().equals(myMemberId)
                 ? follow.getFromMember()
                 : follow.getToMember();

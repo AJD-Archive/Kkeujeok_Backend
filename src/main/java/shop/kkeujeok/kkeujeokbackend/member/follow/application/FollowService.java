@@ -9,17 +9,16 @@ import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
-import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowAcceptReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
-import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowAcceptResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository.FollowRepository;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyExistsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowNotFoundException;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value.Str;
 
 @Service
 @RequiredArgsConstructor
@@ -59,14 +58,24 @@ public class FollowService {
 
         Page<FollowInfoResDto> followInfoResDtos = followRepository.findFollowList(memberId, pageable);
 
-        return FollowInfoListDto.from(
+        return FollowInfoListDto.of(
                 followInfoResDtos.getContent(),
                 PageInfoResDto.from(followInfoResDtos)
         );
     }
 
+    public RecommendedFollowInfoListDto findRecommendedFollowList(String email, Pageable pageable) {
+        Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
+
+        Page<RecommendedFollowInfoResDto> recommendedFollowInfoResDtos =
+                followRepository.findRecommendedFollowList(memberId, pageable);
+
+        return RecommendedFollowInfoListDto.of(
+                recommendedFollowInfoResDtos.getContent(),
+                PageInfoResDto.from(recommendedFollowInfoResDtos)
+        );
+    }
 //    todo
-//     추천 친구 리스트 보는 로직
 //     친구 검색 기능 (email, 혹은 닉네임#고유번호로)
 //     친구 삭제 로직
 }

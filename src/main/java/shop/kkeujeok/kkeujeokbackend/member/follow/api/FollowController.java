@@ -17,6 +17,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowAcceptResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.application.FollowService;
 
 @RestController
@@ -49,5 +50,14 @@ public class FollowController {
         return new RspTemplate<>(HttpStatus.OK,
                 "내 친구 목록 조회",
                 followService.findFollowList(email, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/recommended")
+    public RspTemplate<RecommendedFollowInfoListDto> findRecommendedFollowList(@CurrentUserEmail String email,
+                                                                               @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                               @RequestParam(name = "size", defaultValue = "10") int size) {
+        return new RspTemplate<>(HttpStatus.OK,
+                "추천 친구 목록 조회",
+                followService.findRecommendedFollowList(email, PageRequest.of(page, size)));
     }
 }

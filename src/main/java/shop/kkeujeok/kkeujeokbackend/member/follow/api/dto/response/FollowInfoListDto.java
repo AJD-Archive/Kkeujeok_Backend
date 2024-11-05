@@ -9,7 +9,7 @@ public record FollowInfoListDto(
         List<FollowInfoResDto> followInfoResDto,
         PageInfoResDto pageInfoResDto
 ) {
-    public static FollowInfoListDto from(List<FollowInfoResDto> follows, PageInfoResDto pageInfoResDto) {
+    public static FollowInfoListDto of(List<FollowInfoResDto> follows, PageInfoResDto pageInfoResDto) {
         return FollowInfoListDto.builder()
                 .followInfoResDto(follows)
                 .pageInfoResDto(pageInfoResDto)

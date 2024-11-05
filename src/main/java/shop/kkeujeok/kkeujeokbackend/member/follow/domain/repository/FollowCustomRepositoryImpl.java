@@ -1,5 +1,8 @@
 package shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository;
 
+import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboard.teamDashboard;
+import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboardMemberMapping.teamDashboardMemberMapping;
+import static shop.kkeujeok.kkeujeokbackend.member.domain.QMember.member;
 import static shop.kkeujeok.kkeujeokbackend.member.follow.domain.QFollow.follow;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
 
 @Repository
@@ -59,7 +63,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                 .limit(pageable.getPageSize())
                 .fetch()
                 .stream()
-                .map(follow -> FollowInfoResDto.from(follow, memberId))
+                .map(follow -> FollowInfoResDto.of(follow, memberId))
                 .collect(Collectors.toList());
 
         long total = Optional.ofNullable(queryFactory
@@ -71,4 +75,55 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(fetch, pageable, total);
     }
+
+    @Override
+    public Page<RecommendedFollowInfoResDto> findRecommendedFollowList(Long memberId, Pageable pageable) {
+        List<Member> potentialFriends = queryFactory
+                .select(member)
+                .from(teamDashboardMemberMapping)
+                .join(teamDashboardMemberMapping.member, member)
+                .join(teamDashboardMemberMapping.teamDashboard, teamDashboard)
+                .where(
+                        teamDashboard.id.in(
+                                queryFactory
+                                        .select(teamDashboard.id)
+                                        .from(teamDashboard)
+                                        .where(
+                                                teamDashboard.member.id.eq(memberId)
+                                                        .or(teamDashboardMemberMapping.member.id.eq(memberId))
+                                        )
+                        )
+                )
+                .where(member.id.ne(memberId))
+                .fetch();
+
+        List<Member> dashboardOwners = queryFactory
+                .select(teamDashboard.member)
+                .from(teamDashboard)
+                .where(teamDashboard.id.in(
+                        queryFactory
+                                .select(teamDashboard.id)
+                                .from(teamDashboardMemberMapping)
+                                .where(teamDashboardMemberMapping.member.id.eq(memberId))
+                ))
+                .fetch();
+
+        potentialFriends.addAll(dashboardOwners);
+
+        potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
+
+        List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
+                .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
+                .filter(teamMember -> !existsByFromMemberAndToMember(
+                        entityManager.find(Member.class, memberId), teamMember)) // 친구 관계가 없는 멤버만 포함
+                .map(RecommendedFollowInfoResDto::from)
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), recommendedFollows.size());
+        List<RecommendedFollowInfoResDto> pagedRecommendedFollows = recommendedFollows.subList(start, end);
+
+        return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
+    }
+
 }
