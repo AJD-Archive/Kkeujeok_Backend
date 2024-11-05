@@ -140,5 +140,55 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         return Optional.ofNullable(followRecord);
     }
 
+    @Override
+    public Page<RecommendedFollowInfoResDto> searchRecommendedFollowUsingKeywords(Long memberId, String keyword,
+                                                                                  Pageable pageable) {
+        List<Member> potentialFriends = queryFactory
+                .select(member)
+                .from(teamDashboardMemberMapping)
+                .join(teamDashboardMemberMapping.member, member)
+                .join(teamDashboardMemberMapping.teamDashboard, teamDashboard)
+                .where(
+                        teamDashboard.id.in(
+                                queryFactory
+                                        .select(teamDashboard.id)
+                                        .from(teamDashboard)
+                                        .where(
+                                                teamDashboard.member.id.eq(memberId)
+                                                        .or(teamDashboardMemberMapping.member.id.eq(memberId))
+                                        )
+                        )
+                )
+                .where(member.id.ne(memberId))
+                .fetch();
 
+        List<Member> dashboardOwners = queryFactory
+                .select(teamDashboard.member)
+                .from(teamDashboard)
+                .where(teamDashboard.id.in(
+                        queryFactory
+                                .select(teamDashboard.id)
+                                .from(teamDashboardMemberMapping)
+                                .where(teamDashboardMemberMapping.member.id.eq(memberId))
+                ))
+                .fetch();
+
+        potentialFriends.addAll(dashboardOwners);
+
+        potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
+
+        List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
+                .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
+                .filter(teamMember -> !existsByFromMemberAndToMember(
+                        entityManager.find(Member.class, memberId), teamMember)) // 친구 관계가 없는 멤버만 포함
+                .filter(teamMember -> teamMember.getName().contains(keyword) || teamMember.getEmail().contains(keyword))
+                .map(RecommendedFollowInfoResDto::from)
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), recommendedFollows.size());
+        List<RecommendedFollowInfoResDto> pagedRecommendedFollows = recommendedFollows.subList(start, end);
+
+        return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
+    }
 }

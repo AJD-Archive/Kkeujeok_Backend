@@ -86,7 +86,18 @@ public class FollowService {
 
         followRepository.delete(follow);
     }
-//    todo
-//     친구 검색 기능 (email, 혹은 닉네임#고유번호로)
-//     친구 삭제 로직
+
+    public RecommendedFollowInfoListDto searchRecommendedFollowUsingKeywords(String email,
+                                                                             String keyword,
+                                                                             Pageable pageable) {
+        Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
+
+        Page<RecommendedFollowInfoResDto> recommendedFollowInfoResDtos =
+                followRepository.searchRecommendedFollowUsingKeywords(memberId, keyword, pageable);
+
+        return RecommendedFollowInfoListDto.of(
+                recommendedFollowInfoResDtos.getContent(),
+                PageInfoResDto.from(recommendedFollowInfoResDtos)
+        );
+    }
 }

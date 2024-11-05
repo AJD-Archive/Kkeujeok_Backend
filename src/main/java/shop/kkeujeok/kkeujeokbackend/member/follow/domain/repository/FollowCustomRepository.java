@@ -19,4 +19,6 @@ public interface FollowCustomRepository {
     Page<RecommendedFollowInfoResDto> findRecommendedFollowList(Long memberId, Pageable pageable);
 
     Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember);
+
+    Page<RecommendedFollowInfoResDto> searchRecommendedFollowUsingKeywords(Long memberId, String keyword, Pageable pageable);
 }
