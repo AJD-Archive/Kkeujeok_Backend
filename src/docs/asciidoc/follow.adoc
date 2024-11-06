@@ -6,15 +6,12 @@
 
 include::{snippets}/follow/save/http-request.adoc[]
 include::{snippets}/follow/save/request-fields.adoc[]
+include::{snippets}/follow/accept/request-headers.adoc[]
 
 === 응답
 
 include::{snippets}/follow/save/http-response.adoc[]
 include::{snippets}/follow/save/response-fields.adoc[]
-
-== 친구 요청 수락 API
-
-=== 요청
 
 == 친구 요청 수락 API
 
@@ -34,6 +31,7 @@ include::{snippets}/follow/accept/response-fields.adoc[]
 
 include::{snippets}/follow/findFollowList/http-request.adoc[]
 include::{snippets}/follow/findFollowList/query-parameters.adoc[]
+include::{snippets}/follow/accept/request-headers.adoc[]
 
 === 응답
 
@@ -46,6 +44,7 @@ include::{snippets}/follow/findFollowList/response-fields.adoc[]
 
 include::{snippets}/follow/findRecommendedFollowList/http-request.adoc[]
 include::{snippets}/follow/findRecommendedFollowList/query-parameters.adoc[]
+include::{snippets}/follow/accept/request-headers.adoc[]
 
 === 응답
 
@@ -58,6 +57,7 @@ include::{snippets}/follow/findRecommendedFollowList/response-fields.adoc[]
 
 include::{snippets}/follow/delete/http-request.adoc[]
 include::{snippets}/follow/delete/path-parameters.adoc[]
+include::{snippets}/follow/accept/request-headers.adoc[]
 
 === 응답
 
@@ -70,6 +70,7 @@ include::{snippets}/follow/delete/response-fields.adoc[]
 
 include::{snippets}/follow/searchRecommendedFollowUsingKeywords/http-request.adoc[]
 include::{snippets}/follow/searchRecommendedFollowUsingKeywords/query-parameters.adoc[]
+include::{snippets}/follow/accept/request-headers.adoc[]
 
 === 응답
 
