@@ -23,6 +23,7 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardSer
 import shop.kkeujeok.kkeujeokbackend.global.aws.S3Service;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 import shop.kkeujeok.kkeujeokbackend.member.api.MemberControllerTest;
+import shop.kkeujeok.kkeujeokbackend.member.follow.application.FollowService;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 import shop.kkeujeok.kkeujeokbackend.member.nickname.application.NicknameService;
 import shop.kkeujeok.kkeujeokbackend.notification.api.NotificationController;
@@ -88,4 +89,7 @@ public abstract class ControllerTest {
 
     @MockBean
     S3Service s3Service;
+
+    @MockBean
+    protected FollowService followService;
 }
