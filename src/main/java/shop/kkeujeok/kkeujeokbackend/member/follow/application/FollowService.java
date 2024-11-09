@@ -19,6 +19,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository.FollowRepository;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyExistsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class FollowService {
 
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public FollowResDto save(String email, FollowReqDto followReqDto) {
@@ -38,6 +40,7 @@ public class FollowService {
         Follow follow = followReqDto.toEntity(fromMember, toMember);
 
         followRepository.save(follow);
+        notificationService.sendNotification(toMember, fromMember.getEmail() + "님이 친구 신청을 보냈습니다.");
 
         return FollowResDto.from(toMember);
     }
@@ -51,6 +54,9 @@ public class FollowService {
     @Transactional
     public void accept(Long followId) {
         followRepository.acceptFollowingRequest(followId);
+        Member fromMember = followRepository.findById(followId).orElseThrow(FollowNotFoundException::new)
+                .getFromMember();
+        notificationService.sendNotification(fromMember, "친구 신청이 수락되었습니다.");
     }
 
     public FollowInfoListDto findFollowList(String email, Pageable pageable) {
