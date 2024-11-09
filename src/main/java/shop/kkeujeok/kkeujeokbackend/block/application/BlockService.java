@@ -1,9 +1,15 @@
 package shop.kkeujeok.kkeujeokbackend.block.application;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
@@ -34,6 +40,7 @@ public class BlockService {
     private final MemberRepository memberRepository;
     private final BlockRepository blockRepository;
     private final DashboardRepository dashboardRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     // 블록 생성
     @Transactional
@@ -48,9 +55,23 @@ public class BlockService {
                 blockSaveReqDto.progress());
 
         Block block = blockRepository.save(blockSaveReqDto.toEntity(member, dashboard, lastSequence));
+        saveDeadlineNotification(block);
 
         return BlockInfoResDto.from(block);
     }
+
+    private void saveDeadlineNotification(Block block) {
+        String deadlineKey = "block:deadline:" + block.getId();
+
+        String memberEmail = block.getMember().getEmail();
+        String deadlineValue = block.getDeadLine() + ":" + memberEmail + ":" + block.getTitle();
+        redisTemplate.opsForValue().set(deadlineKey, deadlineValue);
+
+        LocalDate deadline = LocalDate.parse(block.getDeadLine(), DateTimeFormatter.ISO_DATE);
+        long daysToDeadline = DAYS.between(LocalDate.now(), deadline.minusDays(1));
+        redisTemplate.expire(deadlineKey, Duration.ofDays(daysToDeadline));
+    }
+
 
     // 블록 수정 (자동 수정 예정)
     @Transactional
