@@ -4,6 +4,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -67,8 +68,10 @@ public class BlockService {
         String deadlineValue = block.getDeadLine() + ":" + memberEmail + ":" + block.getTitle();
         redisTemplate.opsForValue().set(deadlineKey, deadlineValue);
 
-        LocalDate deadline = LocalDate.parse(block.getDeadLine(), DateTimeFormatter.ISO_DATE);
-        long daysToDeadline = DAYS.between(LocalDate.now(), deadline.minusDays(1));
+        LocalDateTime deadline = LocalDateTime.parse(block.getDeadLine(),
+                DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+
+        long daysToDeadline = DAYS.between(LocalDate.now(), deadline.toLocalDate().minusDays(1));
         redisTemplate.expire(deadlineKey, Duration.ofDays(daysToDeadline));
     }
 
