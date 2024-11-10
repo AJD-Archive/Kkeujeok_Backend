@@ -57,7 +57,7 @@ public class FollowService {
         followRepository.acceptFollowingRequest(followId);
         Member fromMember = followRepository.findById(followId).orElseThrow(FollowNotFoundException::new)
                 .getFromMember();
-        notificationService.sendNotification(fromMember, "친구 신청이 수락되었습니다.");
+        notificationService.sendNotification(fromMember, "followId" + followId);
     }
 
     public FollowInfoListDto findFollowList(String email, Pageable pageable) {
