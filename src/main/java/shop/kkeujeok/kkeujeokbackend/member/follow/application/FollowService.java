@@ -40,7 +40,8 @@ public class FollowService {
         Follow follow = followReqDto.toEntity(fromMember, toMember);
         followRepository.save(follow);
 
-        notificationService.sendNotification(toMember, fromMember.getNickname() + "님이 친구 신청을 보냈습니다.");
+        notificationService.sendNotification(toMember,
+                fromMember.getNickname() + "님이 친구 신청을 보냈습니다.followerId" + follow.getId());
 
         return FollowResDto.from(toMember);
     }
