@@ -79,4 +79,7 @@ public class FollowController {
                 "키워드로 추천 친구 목록 조회",
                 followService.searchRecommendedFollowUsingKeywords(email, keyword, PageRequest.of(page, size)));
     }
+
+
+    // 처음에는 전체 친구 + 추천 친구 조회. 추천 친구는 키워드로 검색도 가능
 }
