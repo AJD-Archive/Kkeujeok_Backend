@@ -41,6 +41,8 @@ import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
@@ -264,6 +266,50 @@ class FollowControllerTest extends ControllerTest {
                                 fieldWithPath("data.recommendedFollowInfoResDtos[].name").description("추천 친구 이름"),
                                 fieldWithPath("data.recommendedFollowInfoResDtos[].profileImage").description(
                                         "추천 친구 프로필 이미지"),
+                                fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지 번호"),
+                                fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
+                                fieldWithPath("data.pageInfoResDto.totalItems").description("전체 항목 수")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("GET 키워드로 전체 친구 조회")
+    @Test
+    void 키워드로_전체_친구_조회() throws Exception {
+        // 테스트 응답 데이터 설정
+        MemberInfoForFollowListDto response = new MemberInfoForFollowListDto(
+                Collections.singletonList(new MemberInfoForFollowResDto(4L, "nickname4", "name4", "profileImage4", true)),
+                new PageInfoResDto(0, 10, 1)
+        );
+        given(followService.searchAllUsers(anyString(), anyString(), any())).willReturn(response);
+
+        // 테스트 수행 및 문서화
+        mockMvc.perform(get("/api/member/follow/search/all")
+                        .header("Authorization", "Bearer valid-token")
+                        .param("keyword", "test")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andDo(print())
+                .andDo(document("follow/searchFollowListUsingKeywords",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("keyword").description("검색 키워드"),
+                                parameterWithName("page").description("페이지 번호"),
+                                parameterWithName("size").description("페이지 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].memberId").description("멤버 ID"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].nickname").description("닉네임"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].name").description("이름"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].profileImage").description("프로필 이미지 URL"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].isFollow").description("팔로우 여부"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 항목 수")

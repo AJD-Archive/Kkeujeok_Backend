@@ -18,6 +18,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowAcceptResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.application.FollowService;
 
@@ -78,5 +79,15 @@ public class FollowController {
         return new RspTemplate<>(HttpStatus.OK,
                 "키워드로 추천 친구 목록 조회",
                 followService.searchRecommendedFollowUsingKeywords(email, keyword, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/search/all")
+    public RspTemplate<MemberInfoForFollowListDto> searchFollowListUsingKeywords(@CurrentUserEmail String email,
+                                                                                 @RequestParam(name = "keyword") String keyword,
+                                                                                 @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                                 @RequestParam(name = "size", defaultValue = "10") int size) {
+        return new RspTemplate<>(HttpStatus.OK,
+                "키워드로 전체 친구 조회",
+                followService.searchAllUsers(email, keyword, PageRequest.of(page, size)));
     }
 }

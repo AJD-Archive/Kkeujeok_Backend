@@ -13,6 +13,8 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
@@ -105,6 +107,20 @@ public class FollowService {
         return RecommendedFollowInfoListDto.of(
                 recommendedFollowInfoResDtos.getContent(),
                 PageInfoResDto.from(recommendedFollowInfoResDtos)
+        );
+    }
+
+    public MemberInfoForFollowListDto searchAllUsers(String email,
+                                                     String keyword,
+                                                     Pageable pageable) {
+        Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
+
+        Page<MemberInfoForFollowResDto> memberInfoForFollowResDtos =
+                followRepository.searchFollowListUsingKeywords(memberId, keyword, pageable);
+
+        return MemberInfoForFollowListDto.of(
+                memberInfoForFollowResDtos.getContent(),
+                PageInfoResDto.from(memberInfoForFollowResDtos)
         );
     }
 }

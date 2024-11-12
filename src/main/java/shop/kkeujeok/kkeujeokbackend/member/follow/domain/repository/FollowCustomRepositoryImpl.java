@@ -5,6 +5,8 @@ import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboard
 import static shop.kkeujeok.kkeujeokbackend.member.domain.QMember.member;
 import static shop.kkeujeok.kkeujeokbackend.member.follow.domain.QFollow.follow;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
@@ -190,5 +193,45 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         List<RecommendedFollowInfoResDto> pagedRecommendedFollows = recommendedFollows.subList(start, end);
 
         return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
+    }
+
+    @Override
+    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword, Pageable pageable) {
+        BooleanExpression keywordCondition = keyword != null && !keyword.isBlank()
+                ? member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword))
+                : null;
+
+        List<MemberInfoForFollowResDto> members = queryFactory
+                .select(Projections.constructor(MemberInfoForFollowResDto.class,
+                        member.id,
+                        member.nickname,
+                        member.name,
+                        member.picture,
+                        follow.id.isNotNull()
+                ))
+                .from(member)
+                .leftJoin(follow)
+                .on(
+                        (follow.fromMember.id.eq(memberId).and(follow.toMember.id.eq(member.id)))
+                                .or(follow.fromMember.id.eq(member.id).and(follow.toMember.id.eq(memberId)))
+                )
+                .where(
+                        member.id.ne(memberId)
+                                .and(keywordCondition)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = Optional.ofNullable(queryFactory
+                .select(member.count())
+                .from(member)
+                .where(
+                        member.id.ne(memberId)
+                                .and(keywordCondition)
+                )
+                .fetchOne()).orElse(0L);
+
+        return new PageImpl<>(members, pageable, total);
     }
 }
