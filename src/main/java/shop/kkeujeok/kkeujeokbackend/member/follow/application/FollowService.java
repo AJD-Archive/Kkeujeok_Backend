@@ -13,6 +13,8 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
@@ -108,13 +110,17 @@ public class FollowService {
         );
     }
 
-//    public RecommendedFollowInfoListDto SearchAllUsers(String email,
-//
-//                                                       ) {
-//
-//    }
-    // 처음에는 전체 친구 + 추천 친구 조회. 추천 친구는 키워드로 검색도 가능
-    // 1. 끄적끄적 내 모든 유저 조회 -> 검색하면(email로) 결과 보이면서 2번(추천친구)는 안 뜸!
-    // 다시 공백으로 조회하면 1,2로직 다 뜸
-    // 2. 추천친구! 나와 친구가 되지 않았지만 팀 대시보드를 함께 하고 있는 사람 최대 10명!
+    public MemberInfoForFollowListDto searchAllUsers(String email,
+                                                     String keyword,
+                                                     Pageable pageable) {
+        Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
+
+        Page<MemberInfoForFollowResDto> memberInfoForFollowResDtos =
+                followRepository.searchFollowListUsingKeywords(memberId, keyword, pageable);
+
+        return MemberInfoForFollowListDto.of(
+                memberInfoForFollowResDtos.getContent(),
+                PageInfoResDto.from(memberInfoForFollowResDtos)
+        );
+    }
 }
