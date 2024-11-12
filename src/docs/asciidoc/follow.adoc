@@ -64,15 +64,15 @@ include::{snippets}/follow/accept/request-headers.adoc[]
 include::{snippets}/follow/delete/http-response.adoc[]
 include::{snippets}/follow/delete/response-fields.adoc[]
 
-== 키워드로 추천 친구 목록 조회 API
+== 키워드로 전체 친구 조회 API
 
 === 요청
 
-include::{snippets}/follow/searchRecommendedFollowUsingKeywords/http-request.adoc[]
-include::{snippets}/follow/searchRecommendedFollowUsingKeywords/query-parameters.adoc[]
+include::{snippets}/follow/searchFollowListUsingKeywords/http-request.adoc[]
+include::{snippets}/follow/searchFollowListUsingKeywords/query-parameters.adoc[]
 include::{snippets}/follow/accept/request-headers.adoc[]
 
 === 응답
 
-include::{snippets}/follow/searchRecommendedFollowUsingKeywords/http-response.adoc[]
-include::{snippets}/follow/searchRecommendedFollowUsingKeywords/response-fields.adoc[]
+include::{snippets}/follow/searchFollowListUsingKeywords/http-response.adoc[]
+include::{snippets}/follow/searchFollowListUsingKeywords/response-fields.adoc[]
