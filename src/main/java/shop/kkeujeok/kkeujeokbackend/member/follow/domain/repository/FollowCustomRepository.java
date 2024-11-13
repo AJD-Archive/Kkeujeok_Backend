@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 
@@ -21,7 +22,7 @@ public interface FollowCustomRepository {
 
     Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember);
 
-    Page<RecommendedFollowInfoResDto> searchRecommendedFollowUsingKeywords(Long memberId, String keyword, Pageable pageable);
-
     Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword, Pageable pageable);
+
+    MyFollowsResDto findMyFollowsCount(Long memberId);
 }

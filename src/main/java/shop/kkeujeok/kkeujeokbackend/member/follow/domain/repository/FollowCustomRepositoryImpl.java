@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
@@ -118,11 +119,22 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
 
+        // 친구 관계 여부 확인을 위한 로직 추가
         List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
                 .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
-                .filter(teamMember -> !existsByFromMemberAndToMember(
-                        entityManager.find(Member.class, memberId), teamMember)) // 친구 관계가 없는 멤버만 포함
-                .map(RecommendedFollowInfoResDto::from)
+                .map(teamMember -> {
+                    // 현재 추천 대상 사용자가 팔로우 관계인지 확인
+                    boolean isFollow = queryFactory
+                            .selectOne()
+                            .from(follow)
+                            .where(
+                                    (follow.fromMember.id.eq(memberId).and(follow.toMember.id.eq(teamMember.getId())))
+                                            .or(follow.fromMember.id.eq(teamMember.getId()).and(follow.toMember.id.eq(memberId)))
+                            )
+                            .fetchFirst() != null;
+
+                    return RecommendedFollowInfoResDto.from(teamMember, isFollow);
+                })
                 .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
@@ -131,6 +143,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
     }
+
 
     @Override
     public Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember) {
@@ -143,58 +156,6 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                 .fetchOne();
 
         return Optional.ofNullable(followRecord);
-    }
-
-    @Override
-    public Page<RecommendedFollowInfoResDto> searchRecommendedFollowUsingKeywords(Long memberId, String keyword,
-                                                                                  Pageable pageable) {
-        List<Member> potentialFriends = queryFactory
-                .select(member)
-                .from(teamDashboardMemberMapping)
-                .join(teamDashboardMemberMapping.member, member)
-                .join(teamDashboardMemberMapping.teamDashboard, teamDashboard)
-                .where(
-                        teamDashboard.id.in(
-                                queryFactory
-                                        .select(teamDashboard.id)
-                                        .from(teamDashboard)
-                                        .where(
-                                                teamDashboard.member.id.eq(memberId)
-                                                        .or(teamDashboardMemberMapping.member.id.eq(memberId))
-                                        )
-                        )
-                )
-                .where(member.id.ne(memberId))
-                .fetch();
-
-        List<Member> dashboardOwners = queryFactory
-                .select(teamDashboard.member)
-                .from(teamDashboard)
-                .where(teamDashboard.id.in(
-                        queryFactory
-                                .select(teamDashboard.id)
-                                .from(teamDashboardMemberMapping)
-                                .where(teamDashboardMemberMapping.member.id.eq(memberId))
-                ))
-                .fetch();
-
-        potentialFriends.addAll(dashboardOwners);
-
-        potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
-
-        List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
-                .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
-                .filter(teamMember -> !existsByFromMemberAndToMember(
-                        entityManager.find(Member.class, memberId), teamMember)) // 친구 관계가 없는 멤버만 포함
-                .filter(teamMember -> teamMember.getName().contains(keyword) || teamMember.getEmail().contains(keyword))
-                .map(RecommendedFollowInfoResDto::from)
-                .collect(Collectors.toList());
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), recommendedFollows.size());
-        List<RecommendedFollowInfoResDto> pagedRecommendedFollows = recommendedFollows.subList(start, end);
-
-        return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
     }
 
     @Override
@@ -237,4 +198,20 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(members, pageable, total);
     }
+
+    @Override
+    public MyFollowsResDto findMyFollowsCount(Long memberId) {
+        int followCount = (int) queryFactory
+                .select(follow)
+                .from(follow)
+                .where(
+                        (follow.fromMember.id.eq(memberId)
+                                .or(follow.toMember.id.eq(memberId)))
+                                .and(follow.followStatus.eq(FollowStatus.ACCEPT))
+                )
+                .fetchCount();
+
+        return MyFollowsResDto.from(followCount);
+    }
+
 }
