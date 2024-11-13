@@ -76,3 +76,15 @@ include::{snippets}/follow/accept/request-headers.adoc[]
 
 include::{snippets}/follow/searchFollowListUsingKeywords/http-response.adoc[]
 include::{snippets}/follow/searchFollowListUsingKeywords/response-fields.adoc[]
+
+== 내 팔로우 정보 조회 API
+
+=== 요청
+
+include::{snippets}/follow/findMyFollowsCount/http-request.adoc[]
+include::{snippets}/follow/findMyFollowsCount/request-headers.adoc[]
+
+=== 응답
+
+include::{snippets}/follow/findMyFollowsCount/http-response.adoc[]
+include::{snippets}/follow/findMyFollowsCount/response-fields.adoc[]

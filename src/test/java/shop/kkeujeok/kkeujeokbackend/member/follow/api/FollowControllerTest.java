@@ -43,6 +43,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
@@ -313,6 +314,30 @@ class FollowControllerTest extends ControllerTest {
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 항목 수")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("GET 내 팔로우 정보 조회")
+    @Test
+    void 내_팔로우_정보_조회() throws Exception {
+        MyFollowsResDto response = new MyFollowsResDto(1);
+        given(followService.findMyFollowsCount(anyString())).willReturn(response);
+
+        mockMvc.perform(get("/api/member/follow/my-follows")
+                        .header("Authorization", "Bearer valid-token"))
+                .andDo(print())
+                .andDo(document("follow/findMyFollowsCount",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.myFollowsCount").description("내 팔로우 수")
                         )
                 ))
                 .andExpect(status().isOk());
