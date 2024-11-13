@@ -62,7 +62,8 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         List<FollowInfoResDto> fetch = queryFactory
                 .selectFrom(follow)
                 .where(follow.fromMember.id.eq(memberId)
-                        .or(follow.toMember.id.eq(memberId)))
+                        .or(follow.toMember.id.eq(memberId))
+                        .and(follow.followStatus.eq(FollowStatus.ACCEPT)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch()
@@ -74,7 +75,8 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                 .select(follow.count())
                 .from(follow)
                 .where(follow.fromMember.id.eq(memberId)
-                        .or(follow.toMember.id.eq(memberId)))
+                        .or(follow.toMember.id.eq(memberId))
+                        .and(follow.followStatus.eq(FollowStatus.ACCEPT)))
                 .fetchOne()).orElse(0L);
 
         return new PageImpl<>(fetch, pageable, total);
@@ -196,7 +198,8 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
     }
 
     @Override
-    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword, Pageable pageable) {
+    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword,
+                                                                         Pageable pageable) {
         BooleanExpression keywordCondition = keyword != null && !keyword.isBlank()
                 ? member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword))
                 : null;
