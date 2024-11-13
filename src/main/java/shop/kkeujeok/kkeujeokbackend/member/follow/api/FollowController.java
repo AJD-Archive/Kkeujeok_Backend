@@ -19,6 +19,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowAccept
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.application.FollowService;
 
@@ -89,5 +90,12 @@ public class FollowController {
         return new RspTemplate<>(HttpStatus.OK,
                 "키워드로 전체 친구 조회",
                 followService.searchAllUsers(email, keyword, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/my-follows")
+    public RspTemplate<MyFollowsResDto> findMyFollowsCount(@CurrentUserEmail String email) {
+        return new RspTemplate<>(HttpStatus.OK,
+                "내 팔로우 수 조회",
+                followService.findMyFollowsCount(email));
     }
 }

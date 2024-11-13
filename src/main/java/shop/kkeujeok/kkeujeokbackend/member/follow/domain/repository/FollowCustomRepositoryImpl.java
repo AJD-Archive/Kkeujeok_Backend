@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
@@ -237,4 +238,20 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(members, pageable, total);
     }
+
+    @Override
+    public MyFollowsResDto findMyFollowsCount(Long memberId) {
+        int followCount = (int) queryFactory
+                .select(follow)
+                .from(follow)
+                .where(
+                        (follow.fromMember.id.eq(memberId)
+                                .or(follow.toMember.id.eq(memberId)))
+                                .and(follow.followStatus.eq(FollowStatus.ACCEPT))
+                )
+                .fetchCount();
+
+        return MyFollowsResDto.from(followCount);
+    }
+
 }
