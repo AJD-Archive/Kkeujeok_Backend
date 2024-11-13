@@ -9,7 +9,8 @@ public record FollowInfoResDto(
         Long memberId,
         String nickname,
         String name,
-        String profileImage
+        String profileImage,
+        boolean isFollow
 ) {
     public static FollowInfoResDto of(Follow follow, Long myMemberId) {
         Member friend = follow.getToMember().getId().equals(myMemberId)
@@ -21,6 +22,7 @@ public record FollowInfoResDto(
                 .nickname(friend.getNickname())
                 .name(friend.getName())
                 .profileImage(friend.getPicture())
+                .isFollow(true)
                 .build();
     }
 }

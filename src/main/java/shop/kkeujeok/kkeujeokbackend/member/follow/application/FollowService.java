@@ -97,20 +97,6 @@ public class FollowService {
         followRepository.delete(follow);
     }
 
-    public RecommendedFollowInfoListDto searchRecommendedFollowUsingKeywords(String email,
-                                                                             String keyword,
-                                                                             Pageable pageable) {
-        Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
-
-        Page<RecommendedFollowInfoResDto> recommendedFollowInfoResDtos =
-                followRepository.searchRecommendedFollowUsingKeywords(memberId, keyword, pageable);
-
-        return RecommendedFollowInfoListDto.of(
-                recommendedFollowInfoResDtos.getContent(),
-                PageInfoResDto.from(recommendedFollowInfoResDtos)
-        );
-    }
-
     public MemberInfoForFollowListDto searchAllUsers(String email,
                                                      String keyword,
                                                      Pageable pageable) {

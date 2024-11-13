@@ -9,14 +9,17 @@ public record RecommendedFollowInfoResDto(
         Long memberId,
         String nickname,
         String name,
-        String profileImage
+        String profileImage,
+        boolean isFollow
+
 ) {
-    public static RecommendedFollowInfoResDto from(Member member) {
+    public static RecommendedFollowInfoResDto from(Member member, boolean isFollow) {
         return RecommendedFollowInfoResDto.builder()
                 .memberId(member.getId())
                 .nickname(member.getNickname())
                 .name(member.getName())
                 .profileImage(member.getPicture())
+                .isFollow(isFollow)
                 .build();
     }
 }

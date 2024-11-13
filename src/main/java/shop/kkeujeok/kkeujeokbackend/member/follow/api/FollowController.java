@@ -58,7 +58,7 @@ public class FollowController {
     @GetMapping("/recommended")
     public RspTemplate<RecommendedFollowInfoListDto> findRecommendedFollowList(@CurrentUserEmail String email,
                                                                                @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                               @RequestParam(name = "size", defaultValue = "10") int size) {
+                                                                               @RequestParam(name = "size", defaultValue = "8") int size) {
         return new RspTemplate<>(HttpStatus.OK,
                 "추천 친구 목록 조회",
                 followService.findRecommendedFollowList(email, PageRequest.of(page, size)));
@@ -70,16 +70,6 @@ public class FollowController {
 
         return new RspTemplate<>(HttpStatus.OK,
                 "친구 삭제");
-    }
-
-    @GetMapping("/search")
-    public RspTemplate<RecommendedFollowInfoListDto> searchRecommendedFollowUsingKeywords(@CurrentUserEmail String email,
-                                                                                          @RequestParam(name = "keyword") String keyword,
-                                                                                          @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                                          @RequestParam(name = "size", defaultValue = "10") int size) {
-        return new RspTemplate<>(HttpStatus.OK,
-                "키워드로 추천 친구 목록 조회",
-                followService.searchRecommendedFollowUsingKeywords(email, keyword, PageRequest.of(page, size)));
     }
 
     @GetMapping("/search/all")
