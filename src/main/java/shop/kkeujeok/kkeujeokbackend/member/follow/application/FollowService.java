@@ -13,6 +13,9 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
@@ -94,17 +97,23 @@ public class FollowService {
         followRepository.delete(follow);
     }
 
-    public RecommendedFollowInfoListDto searchRecommendedFollowUsingKeywords(String email,
-                                                                             String keyword,
-                                                                             Pageable pageable) {
+    public MemberInfoForFollowListDto searchAllUsers(String email,
+                                                     String keyword,
+                                                     Pageable pageable) {
         Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
 
-        Page<RecommendedFollowInfoResDto> recommendedFollowInfoResDtos =
-                followRepository.searchRecommendedFollowUsingKeywords(memberId, keyword, pageable);
+        Page<MemberInfoForFollowResDto> memberInfoForFollowResDtos =
+                followRepository.searchFollowListUsingKeywords(memberId, keyword, pageable);
 
-        return RecommendedFollowInfoListDto.of(
-                recommendedFollowInfoResDtos.getContent(),
-                PageInfoResDto.from(recommendedFollowInfoResDtos)
+        return MemberInfoForFollowListDto.of(
+                memberInfoForFollowResDtos.getContent(),
+                PageInfoResDto.from(memberInfoForFollowResDtos)
         );
+    }
+
+    public MyFollowsResDto findMyFollowsCount(String email) {
+        Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
+
+        return followRepository.findMyFollowsCount(memberId);
     }
 }
