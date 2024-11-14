@@ -73,7 +73,6 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         }
     }
 
-
     @Override
     public Page<FollowInfoResDto> findFollowList(Long memberId, Pageable pageable) {
         List<FollowInfoResDto> fetch = queryFactory
@@ -145,7 +144,8 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                             .from(follow)
                             .where(
                                     (follow.fromMember.id.eq(memberId).and(follow.toMember.id.eq(teamMember.getId())))
-                                            .or(follow.fromMember.id.eq(teamMember.getId()).and(follow.toMember.id.eq(memberId)))
+                                            .or(follow.fromMember.id.eq(teamMember.getId())
+                                                    .and(follow.toMember.id.eq(memberId)))
                             )
                             .fetchFirst() != null;
 
@@ -159,7 +159,6 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
     }
-
 
     @Override
     public Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember) {
@@ -175,7 +174,8 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
     }
 
     @Override
-    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword, Pageable pageable) {
+    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword,
+                                                                         Pageable pageable) {
         BooleanExpression keywordCondition = buildKeywordCondition(keyword);
 
         List<MemberInfoForFollowResDto> members = queryFactory
@@ -218,7 +218,6 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         }
         return member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword));
     }
-
 
     @Override
     public MyFollowsResDto findMyFollowsCount(Long memberId) {
