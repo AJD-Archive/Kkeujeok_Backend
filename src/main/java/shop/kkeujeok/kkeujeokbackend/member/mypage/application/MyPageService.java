@@ -80,4 +80,13 @@ public class MyPageService {
     private String normalizeNickname(String nickname) {
         return nickname.replaceAll("\\s+", "");
     }
+
+    // 친구 프로필 정보 조회
+    public MyPageInfoResDto findFriendProfile(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+
+        return MyPageInfoResDto.From(member);
+    }
+
+    // todo: 친구 프로필에 표시되는 정보를 추가해야 함
 }

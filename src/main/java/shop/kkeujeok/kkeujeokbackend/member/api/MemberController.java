@@ -38,4 +38,10 @@ public class MemberController {
         TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, requestEmail, PageRequest.of(page, size));
         return new RspTemplate<>(HttpStatus.OK, "대시보드와 챌린지 정보 조회", response);
     }
+
+    @GetMapping("/mypage/{memberId}")
+    public RspTemplate<MyPageInfoResDto> getFriendProfileInfo(@PathVariable Long memberId) {
+        MyPageInfoResDto friendProfile = myPageService.findFriendProfile(memberId);
+        return new RspTemplate<>(HttpStatus.OK, "친구 프로필 정보 조회", friendProfile);
+    }
 }
