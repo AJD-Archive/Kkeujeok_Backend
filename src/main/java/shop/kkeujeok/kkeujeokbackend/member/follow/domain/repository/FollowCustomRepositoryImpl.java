@@ -175,11 +175,8 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
     }
 
     @Override
-    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword,
-                                                                         Pageable pageable) {
-        BooleanExpression keywordCondition = keyword != null && !keyword.isBlank()
-                ? member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword))
-                : null;
+    public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword, Pageable pageable) {
+        BooleanExpression keywordCondition = buildKeywordCondition(keyword);
 
         List<MemberInfoForFollowResDto> members = queryFactory
                 .select(Projections.constructor(MemberInfoForFollowResDto.class,
@@ -215,6 +212,14 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         return new PageImpl<>(members, pageable, total);
     }
 
+    private BooleanExpression buildKeywordCondition(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return null;
+        }
+        return member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword));
+    }
+
+
     @Override
     public MyFollowsResDto findMyFollowsCount(Long memberId) {
         int followCount = (int) queryFactory
@@ -229,5 +234,4 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return MyFollowsResDto.from(followCount);
     }
-
 }
