@@ -211,4 +211,48 @@ public class MemberControllerTest extends ControllerTest {
 //                ))
 //                .andExpect(status().isOk());
 //    }
+
+    @DisplayName("친구의 프로필 정보를 가져옵니다.")
+    @Test
+    void 친구_프로필_정보를_가져옵니다() throws Exception {
+        // Given
+        Long friendId = 1L;
+        MyPageInfoResDto friendProfileDto = new MyPageInfoResDto(
+                "friendPicture",
+                "friend@example.com",
+                "친구이름",
+                "친구닉네임",
+                SocialType.GOOGLE,
+                "친구소개"
+        );
+
+        when(myPageService.findFriendProfile(friendId)).thenReturn(friendProfileDto);
+
+        // When & Then
+        mockMvc.perform(get("/api/members/mypage/{memberId}", friendId)
+                        .header("Authorization", "Bearer valid-token"))
+                .andDo(print())
+                .andDo(document("member/friend-profile",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.picture").description("친구 사진"),
+                                fieldWithPath("data.email").description("친구 이메일"),
+                                fieldWithPath("data.name").description("친구 이름"),
+                                fieldWithPath("data.nickName").description("친구 닉네임"),
+                                fieldWithPath("data.socialType").description("친구 소셜 타입"),
+                                fieldWithPath("data.introduction").description("친구 소개")
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", is("친구 프로필 정보 조회")))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.email", is("friend@example.com")))
+                .andExpect(jsonPath("$.data.name", is("친구이름")))
+                .andExpect(jsonPath("$.data.nickName", is("친구닉네임")))
+                .andExpect(jsonPath("$.data.socialType", is(SocialType.GOOGLE.name())))
+                .andExpect(jsonPath("$.data.introduction", is("친구소개")));
+    }
 }

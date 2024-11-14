@@ -38,3 +38,14 @@ include::{snippets}/member/mypage-update/request-fields.adoc[]
 
 include::{snippets}/member/mypage/http-response.adoc[]
 include::{snippets}/member/mypage/response-fields.adoc[]
+
+=== 친구 프로필 정보 조회 API
+
+==== 요청
+
+include::{snippets}/member/friend-profile/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/member/friend-profile/http-response.adoc[]
+include::{snippets}/member/friend-profile/response-fields.adoc[]
