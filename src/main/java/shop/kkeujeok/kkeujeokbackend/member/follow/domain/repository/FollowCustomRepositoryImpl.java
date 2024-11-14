@@ -7,6 +7,7 @@ import static shop.kkeujeok.kkeujeokbackend.member.follow.domain.QFollow.follow;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
@@ -26,6 +27,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsRes
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
+import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyAcceptException;
 
 @Repository
 @RequiredArgsConstructor
@@ -50,13 +52,27 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
     }
 
     @Override
-    @Transactional
     public void acceptFollowingRequest(Long followId) {
+        checkIfAlreadyAccepted(followId);
+
         new JPAUpdateClause(entityManager, follow)
                 .where(follow.id.eq(followId))
                 .set(follow.followStatus, FollowStatus.ACCEPT)
                 .execute();
     }
+
+    private void checkIfAlreadyAccepted(Long followId) {
+        FollowStatus currentStatus = new JPAQuery<>(entityManager)
+                .select(follow.followStatus)
+                .from(follow)
+                .where(follow.id.eq(followId))
+                .fetchOne();
+
+        if (currentStatus == FollowStatus.ACCEPT) {
+            throw new FollowAlreadyAcceptException();
+        }
+    }
+
 
     @Override
     public Page<FollowInfoResDto> findFollowList(Long memberId, Pageable pageable) {
