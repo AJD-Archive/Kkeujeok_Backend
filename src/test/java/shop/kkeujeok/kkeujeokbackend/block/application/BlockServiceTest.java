@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
@@ -35,6 +38,7 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
@@ -47,6 +51,12 @@ class BlockServiceTest {
 
     @Mock
     private DashboardRepository dashboardRepository;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private RedisTemplate<String, String> redisTemplate;
 
     @InjectMocks
     private BlockService blockService;
@@ -120,6 +130,7 @@ class BlockServiceTest {
         // given
         when(blockRepository.save(any(Block.class))).thenReturn(block);
         when(dashboardRepository.findById(anyLong())).thenReturn(Optional.of(dashboard));
+        when(redisTemplate.opsForValue()).thenReturn(mock(ValueOperations.class));
 
         // when
         BlockInfoResDto result = blockService.save("email", blockSaveReqDto);
