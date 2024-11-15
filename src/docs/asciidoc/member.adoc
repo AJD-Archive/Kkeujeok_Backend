@@ -49,3 +49,15 @@ include::{snippets}/member/friend-profile/http-request.adoc[]
 
 include::{snippets}/member/friend-profile/http-response.adoc[]
 include::{snippets}/member/friend-profile/response-fields.adoc[]
+
+=== 친구 public 개인 대시보드와 챌린지 정보 조회 API
+
+==== 요청
+
+include::{snippets}/member/friend-dashboard-challenges/http-request.adoc[]
+include::{snippets}/member/friend-dashboard-challenges/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/member/friend-dashboard-challenges/http-response.adoc[]
+include::{snippets}/member/friend-dashboard-challenges/response-fields.adoc[]
