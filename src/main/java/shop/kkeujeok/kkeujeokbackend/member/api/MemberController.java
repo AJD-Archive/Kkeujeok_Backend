@@ -8,6 +8,7 @@ import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.PersonalDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.application.MyPageService;
 
@@ -35,7 +36,8 @@ public class MemberController {
                                                                                          @RequestParam(name = "requestEmail") String requestEmail,
                                                                                          @RequestParam(name = "page", defaultValue = "0") int page,
                                                                                          @RequestParam(name = "size", defaultValue = "10") int size) {
-        TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, requestEmail, PageRequest.of(page, size));
+        TeamDashboardsAndChallengesResDto response = myPageService.findTeamDashboardsAndChallenges(email, requestEmail,
+                PageRequest.of(page, size));
         return new RspTemplate<>(HttpStatus.OK, "대시보드와 챌린지 정보 조회", response);
     }
 
@@ -43,5 +45,14 @@ public class MemberController {
     public RspTemplate<MyPageInfoResDto> getFriendProfileInfo(@PathVariable Long memberId) {
         MyPageInfoResDto friendProfile = myPageService.findFriendProfile(memberId);
         return new RspTemplate<>(HttpStatus.OK, "친구 프로필 정보 조회", friendProfile);
+    }
+
+    @GetMapping("/mypage/{memberId}/dashboard-challenges")
+    public RspTemplate<PersonalDashboardsAndChallengesResDto> getPersonalDashboardsAndChallenges(@PathVariable Long memberId,
+                                                                                                 @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                                                 @RequestParam(name = "size", defaultValue = "10") int size) {
+        PersonalDashboardsAndChallengesResDto response = myPageService.findFriendDashboardsAndChallenges(memberId,
+                PageRequest.of(page, size));
+        return new RspTemplate<>(HttpStatus.OK, "대시보드와 챌린지 정보 조회", response);
     }
 }

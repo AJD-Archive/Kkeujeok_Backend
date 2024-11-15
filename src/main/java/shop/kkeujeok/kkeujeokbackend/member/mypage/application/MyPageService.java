@@ -13,8 +13,10 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboa
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.application.TeamDashboardService;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
+import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.PersonalDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.exception.ExistsNicknameException;
 
@@ -30,7 +32,7 @@ public class MyPageService {
 
     // 프로필 정보 조회
     public MyPageInfoResDto findMyProfileByEmail(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow();
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
         return MyPageInfoResDto.From(member);
     }
@@ -83,10 +85,20 @@ public class MyPageService {
 
     // 친구 프로필 정보 조회
     public MyPageInfoResDto findFriendProfile(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
         return MyPageInfoResDto.From(member);
     }
 
-    // todo: 친구 프로필에 표시되는 정보를 추가해야 함
+    // 친구 프로필에 표시되는 정보 조회
+    public PersonalDashboardsAndChallengesResDto findFriendDashboardsAndChallenges(Long memberId, Pageable pageable) {
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+
+        ChallengeListResDto challengeListResDto = challengeService.findChallengeForMemberId(member.getEmail(), pageable);
+
+        PersonalDashboardPageListResDto personalDashboardPageListResDto =
+                personalDashboardService.findPublicPersonalDashboards(member.getEmail(), pageable);
+
+        return PersonalDashboardsAndChallengesResDto.of(personalDashboardPageListResDto, challengeListResDto);
+    }
 }
