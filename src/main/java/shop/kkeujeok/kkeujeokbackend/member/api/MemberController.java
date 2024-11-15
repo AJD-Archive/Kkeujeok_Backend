@@ -41,17 +41,17 @@ public class MemberController {
         return new RspTemplate<>(HttpStatus.OK, "대시보드와 챌린지 정보 조회", response);
     }
 
-    @GetMapping("/mypage/{memberId}")
-    public RspTemplate<MyPageInfoResDto> getFriendProfileInfo(@PathVariable Long memberId) {
-        MyPageInfoResDto friendProfile = myPageService.findFriendProfile(memberId);
+    @GetMapping("/mypage/{friendId}")
+    public RspTemplate<MyPageInfoResDto> getFriendProfileInfo(@PathVariable Long friendId) {
+        MyPageInfoResDto friendProfile = myPageService.findFriendProfile(friendId);
         return new RspTemplate<>(HttpStatus.OK, "친구 프로필 정보 조회", friendProfile);
     }
 
-    @GetMapping("/mypage/{memberId}/dashboard-challenges")
-    public RspTemplate<PersonalDashboardsAndChallengesResDto> getPersonalDashboardsAndChallenges(@PathVariable Long memberId,
+    @GetMapping("/mypage/{friendId}/dashboard-challenges")
+    public RspTemplate<PersonalDashboardsAndChallengesResDto> getPersonalDashboardsAndChallenges(@PathVariable Long friendId,
                                                                                                  @RequestParam(name = "page", defaultValue = "0") int page,
                                                                                                  @RequestParam(name = "size", defaultValue = "10") int size) {
-        PersonalDashboardsAndChallengesResDto response = myPageService.findFriendDashboardsAndChallenges(memberId,
+        PersonalDashboardsAndChallengesResDto response = myPageService.findFriendDashboardsAndChallenges(friendId,
                 PageRequest.of(page, size));
         return new RspTemplate<>(HttpStatus.OK, "대시보드와 챌린지 정보 조회", response);
     }
