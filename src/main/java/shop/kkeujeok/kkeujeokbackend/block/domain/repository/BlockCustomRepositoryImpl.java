@@ -3,6 +3,7 @@ package shop.kkeujeok.kkeujeokbackend.block.domain.repository;
 import static shop.kkeujeok.kkeujeokbackend.block.domain.QBlock.block;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -84,4 +85,23 @@ public class BlockCustomRepositoryImpl implements BlockCustomRepository {
 
         return new PageImpl<>(blocks, pageable, total);
     }
+
+    @Override
+    public List<Block> findByDeletedBlocks(Long dashboardId) {
+        return queryFactory
+                .selectFrom(block)
+                .where(block.dashboard.id.eq(dashboardId)
+                        .and(block.status.eq(Status.DELETED)))
+                .orderBy(block.sequence.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Block> findBlocksToDeletePermanently(LocalDateTime thirtyDaysAgo) {
+        return queryFactory.selectFrom(block)
+                .where(block.status.eq(Status.DELETED)
+                        .and(block.updatedAt.before(thirtyDaysAgo)))
+                .fetch();
+    }
+
 }

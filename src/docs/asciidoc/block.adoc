@@ -117,3 +117,14 @@ include::{snippets}/block/deletePermanentBlock/path-parameters.adoc[]
 ==== 응답
 
 include::{snippets}/block/deletePermanentBlock/http-response.adoc[]
+
+=== 삭제된 블록 영구 삭제 (휴지통 비움)
+
+==== 요청
+
+include::{snippets}/block/deleteAllPermanentBlock/http-request.adoc[]
+include::{snippets}/block/deleteAllPermanentBlock/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/block/deleteAllPermanentBlock/http-response.adoc[]
