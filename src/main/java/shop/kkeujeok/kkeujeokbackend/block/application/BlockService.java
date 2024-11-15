@@ -244,7 +244,9 @@ public class BlockService {
     private void validateDashboardAccess(Dashboard dashboard, Member member) {
         if (dashboard instanceof PersonalDashboard) {
             validatePersonalDashboardAccess((PersonalDashboard) dashboard, member);
-        } else {
+        }
+
+        if (dashboard instanceof TeamDashboard) {
             validateTeamDashboardAccess((TeamDashboard) dashboard, member);
         }
     }
