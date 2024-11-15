@@ -192,7 +192,6 @@ public class BlockService {
     }
 
     // 삭제된 블록 조회
-    @Transactional
     public BlockListResDto findDeletedBlocks(String email, Long dashboardId, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(dashboardId).orElseThrow(DashboardNotFoundException::new);
