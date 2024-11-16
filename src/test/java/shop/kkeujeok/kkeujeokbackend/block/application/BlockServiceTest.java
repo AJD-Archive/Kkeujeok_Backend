@@ -38,7 +38,6 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
-import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
@@ -51,9 +50,6 @@ class BlockServiceTest {
 
     @Mock
     private DashboardRepository dashboardRepository;
-
-    @Mock
-    private NotificationService notificationService;
 
     @Mock
     private RedisTemplate<String, String> redisTemplate;
@@ -151,6 +147,7 @@ class BlockServiceTest {
         // given
         Long blockId = 1L;
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         BlockInfoResDto result = blockService.update("email", blockId, blockUpdateReqDto);
@@ -171,6 +168,7 @@ class BlockServiceTest {
         BlockUpdateReqDto originBlockUpdateReqDto = new BlockUpdateReqDto("Title", "Contents", "2024.07.03 13:23",
                 "2024.07.25 13:23");
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         BlockInfoResDto result = blockService.update("email", blockId, originBlockUpdateReqDto);
@@ -189,6 +187,7 @@ class BlockServiceTest {
         // given
         Long blockId = 1L;
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         BlockInfoResDto result = blockService.progressUpdate("email", blockId, "IN_PROGRESS");
@@ -219,6 +218,7 @@ class BlockServiceTest {
         // given
         Long blockId = 1L;
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         blockService.delete("email", blockId);
@@ -235,6 +235,7 @@ class BlockServiceTest {
         // given
         Long blockId = 1L;
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(deleteBlock));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         blockService.delete("email", blockId);
@@ -270,6 +271,7 @@ class BlockServiceTest {
     void 블록_순번_변경() {
         // given
         when(blockRepository.findById(anyLong())).thenReturn(Optional.of(block));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         blockService.changeBlocksSequence("email", blockSequenceUpdateReqDto);
@@ -284,12 +286,29 @@ class BlockServiceTest {
         // given
         Long blockId = 1L;
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(deleteBlock));
+        when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
         blockService.deletePermanently("email", blockId);
 
         // then
         verify(blockRepository, times(1)).delete(deleteBlock);
+    }
+
+    @DisplayName("삭제된 블록을 전체 삭제합니다.")
+    @Test
+    void 삭제_블록_전체_삭제() {
+        // given
+        Long dashboardId = 1L;
+        List<Block> deletedBlocks = List.of(deleteBlock);
+        when(blockRepository.findByDeletedBlocks(dashboardId)).thenReturn(deletedBlocks);
+        when(dashboardRepository.findById(dashboardId)).thenReturn(Optional.of(dashboard));
+
+        // when
+        blockService.deleteAllPermanently("email", dashboardId);
+
+        // then
+        verify(blockRepository).deleteAll(deletedBlocks);
     }
 
 }
