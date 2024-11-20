@@ -28,6 +28,9 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.repository.DashboardRepository;
 import shop.kkeujeok.kkeujeokbackend.dashboard.exception.DashboardNotFoundException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.exception.UnauthorizedAccessException;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
+import shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.TeamDashboard;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
@@ -49,6 +52,8 @@ public class BlockService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(blockSaveReqDto.dashboardId())
                 .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         int lastSequence = blockRepository.findLastSequenceByProgress(
                 member,
@@ -81,6 +86,10 @@ public class BlockService {
     public BlockInfoResDto update(String email, Long blockId, BlockUpdateReqDto blockUpdateReqDto) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
+        Dashboard dashboard = dashboardRepository.findById(block.getDashboard().getId())
+                .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         block.update(blockUpdateReqDto.title(),
                 blockUpdateReqDto.contents(),
@@ -97,6 +106,11 @@ public class BlockService {
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
         Progress progress = parseProgress(progressString);
+
+        Dashboard dashboard = dashboardRepository.findById(block.getDashboard().getId())
+                .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         block.progressUpdate(progress);
 
@@ -137,6 +151,10 @@ public class BlockService {
     public void delete(String email, Long blockId) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
+        Dashboard dashboard = dashboardRepository.findById(block.getDashboard().getId())
+                .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         block.statusUpdate();
     }
@@ -146,6 +164,10 @@ public class BlockService {
     public void changeBlocksSequence(String email, BlockSequenceUpdateReqDto blockSequenceUpdateReqDto) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Long dashboardId = blockSequenceUpdateReqDto.dashboardId();
+        Dashboard dashboard = dashboardRepository.findById(blockSequenceUpdateReqDto.dashboardId())
+                .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         updateBlockSequence(member, blockSequenceUpdateReqDto.notStartedList(), dashboardId, Progress.NOT_STARTED);
         updateBlockSequence(member, blockSequenceUpdateReqDto.inProgressList(), dashboardId, Progress.IN_PROGRESS);
@@ -172,6 +194,10 @@ public class BlockService {
     // 삭제된 블록 조회
     public BlockListResDto findDeletedBlocks(String email, Long dashboardId, Pageable pageable) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Dashboard dashboard = dashboardRepository.findById(dashboardId).orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
+
         Page<Block> deletedBlocks = blockRepository.findByDeletedBlocks(dashboardId, pageable);
 
         List<BlockInfoResDto> blockInfoResDtoList = deletedBlocks.stream()
@@ -186,8 +212,25 @@ public class BlockService {
     public void deletePermanently(String email, Long blockId) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
+        Dashboard dashboard = dashboardRepository.findById(block.getDashboard().getId())
+                .orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
 
         blockRepository.delete(block);
+    }
+
+    // 삭제된 블록 전체 삭제
+    @Transactional
+    public void deleteAllPermanently(String email, Long dashboardId) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Dashboard dashboard = dashboardRepository.findById(dashboardId).orElseThrow(DashboardNotFoundException::new);
+
+        validateDashboardAccess(dashboard, member);
+
+        List<Block> deletedBlocks = blockRepository.findByDeletedBlocks(dashboardId);
+
+        blockRepository.deleteAll(deletedBlocks);
     }
 
     private Progress parseProgress(String progressString) {
@@ -197,4 +240,30 @@ public class BlockService {
             throw new InvalidProgressException();
         }
     }
+
+    private void validateDashboardAccess(Dashboard dashboard, Member member) {
+        if (dashboard instanceof PersonalDashboard) {
+            validatePersonalDashboardAccess((PersonalDashboard) dashboard, member);
+        }
+
+        if (dashboard instanceof TeamDashboard) {
+            validateTeamDashboardAccess((TeamDashboard) dashboard, member);
+        }
+    }
+
+    private void validatePersonalDashboardAccess(PersonalDashboard dashboard, Member member) {
+        if (!dashboard.getMember().getEmail().equals(member.getEmail())) {
+            throw new UnauthorizedAccessException();
+        }
+    }
+
+    private void validateTeamDashboardAccess(TeamDashboard dashboard, Member member) {
+        boolean isMemberInDashboard = dashboard.getTeamDashboardMemberMappings().stream()
+                .anyMatch(mapping -> mapping.getMember().equals(member));
+
+        if (!dashboard.getMember().equals(member) && !isMemberInDashboard) {
+            throw new UnauthorizedAccessException();
+        }
+    }
+
 }

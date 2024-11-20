@@ -98,4 +98,12 @@ public class BlockController {
                 "블록 영구 삭제");
     }
 
+    @DeleteMapping("/permanent")
+    public RspTemplate<Void> deleteAllPermanently(@CurrentUserEmail String email,
+                                                  @RequestParam(name = "dashboardId") Long dashboardId) {
+        blockService.deleteAllPermanently(email, dashboardId);
+        return new RspTemplate<>(HttpStatus.OK,
+                "삭제된 블록 영구 삭제(휴지통 비움)");
+    }
+
 }
