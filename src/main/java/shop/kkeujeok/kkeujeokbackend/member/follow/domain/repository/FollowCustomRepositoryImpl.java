@@ -184,7 +184,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                         member.nickname,
                         member.name,
                         member.picture,
-                        follow.id.isNotNull()
+                        follow.followStatus.eq(FollowStatus.ACCEPT)
                 ))
                 .from(member)
                 .leftJoin(follow)

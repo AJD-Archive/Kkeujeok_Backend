@@ -58,11 +58,11 @@ public class FollowService {
 
     @Transactional
     public void accept(Long followId) {
-        followRepository.acceptFollowingRequest(followId);
-
         if (followRepository.existsAlreadyFollow(followId)) {
             throw new AlreadyFriendsException();
         }
+
+        followRepository.acceptFollowingRequest(followId);
 
         Member fromMember = followRepository.findById(followId).orElseThrow(AlreadyFriendsException::new)
                 .getFromMember();
