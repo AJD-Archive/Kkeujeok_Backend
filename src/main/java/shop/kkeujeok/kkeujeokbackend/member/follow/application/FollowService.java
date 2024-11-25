@@ -58,9 +58,7 @@ public class FollowService {
 
     @Transactional
     public void accept(Long followId) {
-        if (followRepository.existsAlreadyFollow(followId)) {
-            throw new AlreadyFriendsException();
-        }
+        validateFollowStatusIsAccept(followId);
 
         followRepository.acceptFollowingRequest(followId);
 
@@ -68,6 +66,12 @@ public class FollowService {
                 .getFromMember();
 
         notificationService.sendNotification(fromMember, "followId" + followId);
+    }
+
+    private void validateFollowStatusIsAccept(Long followId) {
+        if (followRepository.existsAlreadyFollow(followId)) {
+            throw new AlreadyFriendsException();
+        }
     }
 
     public FollowInfoListDto findFollowList(String email, Pageable pageable) {
@@ -116,7 +120,7 @@ public class FollowService {
                 memberInfoForFollowResDtos.getContent(),
                 PageInfoResDto.from(memberInfoForFollowResDtos)
         );
-    } // 모두 isfollow로 나옴.
+    }
 
     public MyFollowsResDto findMyFollowsCount(String email) {
         Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
