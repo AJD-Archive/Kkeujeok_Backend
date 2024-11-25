@@ -233,4 +233,14 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return MyFollowsResDto.from(followCount);
     }
+
+    @Override
+    public boolean existsAlreadyFollow(Long followId) {
+        return queryFactory
+                .selectOne()
+                .from(follow)
+                .where(follow.id.eq(followId)
+                        .and(follow.followStatus.eq(FollowStatus.ACCEPT)))
+                .fetchFirst() != null;
+    }
 }

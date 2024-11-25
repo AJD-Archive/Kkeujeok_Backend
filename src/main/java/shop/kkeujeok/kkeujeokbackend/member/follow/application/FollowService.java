@@ -20,6 +20,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedF
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository.FollowRepository;
+import shop.kkeujeok.kkeujeokbackend.member.follow.exception.AlreadyFriendsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyExistsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
@@ -58,8 +59,14 @@ public class FollowService {
     @Transactional
     public void accept(Long followId) {
         followRepository.acceptFollowingRequest(followId);
-        Member fromMember = followRepository.findById(followId).orElseThrow(FollowNotFoundException::new)
+
+        if (followRepository.existsAlreadyFollow(followId)) {
+            throw new AlreadyFriendsException();
+        }
+
+        Member fromMember = followRepository.findById(followId).orElseThrow(AlreadyFriendsException::new)
                 .getFromMember();
+
         notificationService.sendNotification(fromMember, "followId" + followId);
     }
 
@@ -109,7 +116,7 @@ public class FollowService {
                 memberInfoForFollowResDtos.getContent(),
                 PageInfoResDto.from(memberInfoForFollowResDtos)
         );
-    }
+    } // 모두 isfollow로 나옴.
 
     public MyFollowsResDto findMyFollowsCount(String email) {
         Long memberId = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new).getId();
