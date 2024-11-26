@@ -184,7 +184,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                         member.nickname,
                         member.name,
                         member.picture,
-                        follow.id.isNotNull()
+                        follow.followStatus.eq(FollowStatus.ACCEPT)
                 ))
                 .from(member)
                 .leftJoin(follow)
@@ -232,5 +232,15 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                 .fetchCount();
 
         return MyFollowsResDto.from(followCount);
+    }
+
+    @Override
+    public boolean existsAlreadyFollow(Long followId) {
+        return queryFactory
+                .selectOne()
+                .from(follow)
+                .where(follow.id.eq(followId)
+                        .and(follow.followStatus.eq(FollowStatus.ACCEPT)))
+                .fetchFirst() != null;
     }
 }

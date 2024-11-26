@@ -20,6 +20,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedF
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.repository.FollowRepository;
+import shop.kkeujeok.kkeujeokbackend.member.follow.exception.AlreadyFriendsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyExistsException;
 import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
@@ -57,10 +58,20 @@ public class FollowService {
 
     @Transactional
     public void accept(Long followId) {
+        validateFollowStatusIsAccept(followId);
+
         followRepository.acceptFollowingRequest(followId);
-        Member fromMember = followRepository.findById(followId).orElseThrow(FollowNotFoundException::new)
+
+        Member fromMember = followRepository.findById(followId).orElseThrow(AlreadyFriendsException::new)
                 .getFromMember();
+
         notificationService.sendNotification(fromMember, "followId" + followId);
+    }
+
+    private void validateFollowStatusIsAccept(Long followId) {
+        if (followRepository.existsAlreadyFollow(followId)) {
+            throw new AlreadyFriendsException();
+        }
     }
 
     public FollowInfoListDto findFollowList(String email, Pageable pageable) {
