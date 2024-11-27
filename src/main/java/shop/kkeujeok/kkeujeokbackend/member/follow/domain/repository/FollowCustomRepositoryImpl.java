@@ -134,11 +134,9 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
 
-        // 친구 관계 여부 확인을 위한 로직 추가
         List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
                 .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
-                .map(teamMember -> {
-                    // 현재 추천 대상 사용자가 팔로우 관계인지 확인
+                .filter(teamMember -> {
                     boolean isFollow = queryFactory
                             .selectOne()
                             .from(follow)
@@ -148,9 +146,9 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                                                     .and(follow.toMember.id.eq(memberId)))
                             )
                             .fetchFirst() != null;
-
-                    return RecommendedFollowInfoResDto.from(teamMember, isFollow);
+                    return !isFollow;
                 })
+                .map(teamMember -> RecommendedFollowInfoResDto.from(teamMember, false))
                 .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
