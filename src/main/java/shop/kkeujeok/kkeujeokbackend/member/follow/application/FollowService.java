@@ -29,6 +29,8 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FollowService {
+    private static final String FOLLOW_REQUEST_MESSAGE_TEMPLATE = "친구 추가 요청: %s님이 친구 추가 요청을 보냈습니다.followerId%d";
+    private static final String FOLLOW_ACCEPT_MESSAGE_TEMPLATE = "친구 추가 수락: %s님이 %s님의 친구 추가를 수락하였습니다.";
 
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
@@ -44,8 +46,9 @@ public class FollowService {
         Follow follow = followReqDto.toEntity(fromMember, toMember);
         followRepository.save(follow);
 
-        notificationService.sendNotification(toMember,
-                fromMember.getNickname() + "님이 친구 신청을 보냈습니다.followerId" + follow.getId());
+        String followRequestMessage = String.format(FOLLOW_REQUEST_MESSAGE_TEMPLATE, fromMember.getNickname(),
+                follow.getId());
+        notificationService.sendNotification(toMember, followRequestMessage);
 
         return FollowResDto.from(toMember);
     }
@@ -57,15 +60,18 @@ public class FollowService {
     }
 
     @Transactional
-    public void accept(Long followId) {
+    public void accept(String email, Long followId) {
         validateFollowStatusIsAccept(followId);
 
         followRepository.acceptFollowingRequest(followId);
 
+        Member toMember = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Member fromMember = followRepository.findById(followId).orElseThrow(AlreadyFriendsException::new)
                 .getFromMember();
 
-        notificationService.sendNotification(fromMember, "followId" + followId);
+        String followAcceptMessage = String.format(FOLLOW_ACCEPT_MESSAGE_TEMPLATE, fromMember.getNickname(),
+                toMember.getNickname());
+        notificationService.sendNotification(fromMember, followAcceptMessage);
     }
 
     private void validateFollowStatusIsAccept(Long followId) {
