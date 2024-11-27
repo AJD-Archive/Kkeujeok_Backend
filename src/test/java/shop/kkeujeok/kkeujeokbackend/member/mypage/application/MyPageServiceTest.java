@@ -57,7 +57,8 @@ public class MyPageServiceTest {
     @BeforeEach
     void setUp() {
         myPageUpdateReqDto = new MyPageUpdateReqDto("nickname", "introduction");
-        myPageInfoResDto = new MyPageInfoResDto("picture", "email", "name", "nickname", SocialType.GOOGLE, "introduction");
+        myPageInfoResDto = new MyPageInfoResDto("picture", "email", "name", "nickname", SocialType.GOOGLE,
+                "introduction", 1l);
         member = Member.builder()
                 .email("email")
                 .name("name")
@@ -125,7 +126,8 @@ public class MyPageServiceTest {
         when(challengeService.findChallengeForMemberId(email, pageable)).thenReturn(challengeListResDto);
 
         // When
-        TeamDashboardsAndChallengesResDto result = myPageService.findTeamDashboardsAndChallenges(email,"test@example.com", pageable);
+        TeamDashboardsAndChallengesResDto result = myPageService.findTeamDashboardsAndChallenges(email,
+                "test@example.com", pageable);
 
         // Then
         assertEquals(teamDashboardListResDto, result.teamDashboardList());

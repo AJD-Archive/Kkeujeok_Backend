@@ -85,7 +85,8 @@ public class MemberControllerTest extends ControllerTest {
                 "name",
                 "nickname",
                 SocialType.GOOGLE,
-                "introduction");
+                "introduction",
+                1L);
 
         when(myPageService.findMyProfileByEmail(anyString())).thenReturn(myPageInfoResDto);
 
@@ -108,7 +109,8 @@ public class MemberControllerTest extends ControllerTest {
                                 fieldWithPath("data.name").description("회원 이름"),
                                 fieldWithPath("data.nickName").description("회원 닉네임"),
                                 fieldWithPath("data.socialType").description("회원 소셜 타입"),
-                                fieldWithPath("data.introduction").description("회원 소개")
+                                fieldWithPath("data.introduction").description("회원 소개"),
+                                fieldWithPath("data.memberId").description("회원 ID")
                         )
                 ))
                 .andExpect(status().isOk())
@@ -224,7 +226,8 @@ public class MemberControllerTest extends ControllerTest {
                 "친구이름",
                 "친구닉네임",
                 SocialType.GOOGLE,
-                "친구소개"
+                "친구소개",
+                2L
         );
 
         when(myPageService.findFriendProfile(friendId)).thenReturn(friendProfileDto);
@@ -244,7 +247,8 @@ public class MemberControllerTest extends ControllerTest {
                                 fieldWithPath("data.name").description("친구 이름"),
                                 fieldWithPath("data.nickName").description("친구 닉네임"),
                                 fieldWithPath("data.socialType").description("친구 소셜 타입"),
-                                fieldWithPath("data.introduction").description("친구 소개")
+                                fieldWithPath("data.introduction").description("친구 소개"),
+                                fieldWithPath("data.memberId").description("친구 ID")
                         )
                 ))
                 .andExpect(status().isOk())
