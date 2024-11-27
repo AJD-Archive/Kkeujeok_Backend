@@ -1,5 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.block.domain.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
@@ -12,4 +14,8 @@ public interface BlockCustomRepository {
     int findLastSequenceByProgress(Member member, Long dashboardId, Progress progress);
 
     Page<Block> findByDeletedBlocks(Long dashboardId, Pageable pageable);
+
+    List<Block> findByDeletedBlocks(Long dashboardId);
+
+    List<Block> findBlocksToDeletePermanently(LocalDateTime thirtyDaysAgo);
 }

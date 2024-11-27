@@ -497,4 +497,25 @@ class BlockControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("DELETED 논리 삭제된 블록을 전체 삭제합니다.")
+    @Test
+    void 삭제_블록_전체_삭제() throws Exception {
+        // given
+        doNothing().when(blockService).deleteAllPermanently(anyString(), any());
+
+        // when & then
+        mockMvc.perform(delete(String.format("/api/blocks/permanent?dashboardId=%d", 1L))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("block/deleteAllPermanentBlock",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("dashboardId").description("대시보드 ID")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
 }

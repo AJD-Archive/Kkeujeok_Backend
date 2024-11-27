@@ -41,6 +41,9 @@ import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
@@ -127,7 +130,7 @@ class FollowControllerTest extends ControllerTest {
     @Test
     void 친구_목록_조회() throws Exception {
         FollowInfoListDto response = new FollowInfoListDto(
-                Collections.singletonList(new FollowInfoResDto(1L, "nickname", "name", "profileImage")),
+                Collections.singletonList(new FollowInfoResDto(1L, "nickname", "name", "profileImage", true)),
                 new PageInfoResDto(0, 10, 1)
         );
         given(followService.findFollowList(anyString(), any())).willReturn(response);
@@ -154,6 +157,8 @@ class FollowControllerTest extends ControllerTest {
                                 fieldWithPath("data.followInfoResDto[].nickname").description("친구 닉네임"),
                                 fieldWithPath("data.followInfoResDto[].name").description("친구 이름"),
                                 fieldWithPath("data.followInfoResDto[].profileImage").description("친구 프로필 이미지"),
+                                fieldWithPath("data.followInfoResDto[].isFollow").description(
+                                        "추천 친구 팔로우 여부"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 항목 수")
@@ -166,7 +171,8 @@ class FollowControllerTest extends ControllerTest {
     @Test
     void 추천_친구_목록_조회() throws Exception {
         RecommendedFollowInfoListDto response = new RecommendedFollowInfoListDto(
-                Collections.singletonList(new RecommendedFollowInfoResDto(2L, "nickname2", "name2", "profileImage2")),
+                Collections.singletonList(
+                        new RecommendedFollowInfoResDto(2L, "nickname2", "name2", "profileImage2", false)),
                 new PageInfoResDto(0, 10, 1)
         );
         given(followService.findRecommendedFollowList(anyString(), any())).willReturn(response);
@@ -195,6 +201,8 @@ class FollowControllerTest extends ControllerTest {
                                 fieldWithPath("data.recommendedFollowInfoResDtos[].name").description("추천 친구 이름"),
                                 fieldWithPath("data.recommendedFollowInfoResDtos[].profileImage").description(
                                         "추천 친구 프로필 이미지"),
+                                fieldWithPath("data.recommendedFollowInfoResDtos[].isFollow").description(
+                                        "추천 친구 팔로우 여부"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 항목 수")
@@ -229,22 +237,25 @@ class FollowControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("GET 키워드로 추천 친구 목록 조회")
+    @DisplayName("GET 키워드로 전체 친구 조회")
     @Test
-    void 키워드로_추천_친구_목록_조회() throws Exception {
-        RecommendedFollowInfoListDto response = new RecommendedFollowInfoListDto(
-                Collections.singletonList(new RecommendedFollowInfoResDto(3L, "nickname3", "name3", "profileImage3")),
+    void 키워드로_전체_친구_조회() throws Exception {
+        // 테스트 응답 데이터 설정
+        MemberInfoForFollowListDto response = new MemberInfoForFollowListDto(
+                Collections.singletonList(
+                        new MemberInfoForFollowResDto(4L, "nickname4", "name4", "profileImage4", true)),
                 new PageInfoResDto(0, 10, 1)
         );
-        given(followService.searchRecommendedFollowUsingKeywords(anyString(), anyString(), any())).willReturn(response);
+        given(followService.searchAllUsers(anyString(), anyString(), any())).willReturn(response);
 
-        mockMvc.perform(get("/api/member/follow/search")
+        // 테스트 수행 및 문서화
+        mockMvc.perform(get("/api/member/follow/search/all")
                         .header("Authorization", "Bearer valid-token")
                         .param("keyword", "test")
                         .param("page", "0")
                         .param("size", "10"))
                 .andDo(print())
-                .andDo(document("follow/searchRecommendedFollowUsingKeywords",
+                .andDo(document("follow/searchFollowListUsingKeywords",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -258,15 +269,39 @@ class FollowControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.recommendedFollowInfoResDtos[].memberId").description(
-                                        "추천 친구 멤버 ID"),
-                                fieldWithPath("data.recommendedFollowInfoResDtos[].nickname").description("추천 친구 닉네임"),
-                                fieldWithPath("data.recommendedFollowInfoResDtos[].name").description("추천 친구 이름"),
-                                fieldWithPath("data.recommendedFollowInfoResDtos[].profileImage").description(
-                                        "추천 친구 프로필 이미지"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].memberId").description("멤버 ID"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].nickname").description("닉네임"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].name").description("이름"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].profileImage").description(
+                                        "프로필 이미지 URL"),
+                                fieldWithPath("data.memberInfoForFollowResDtos[].isFollow").description("팔로우 여부"),
                                 fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
                                 fieldWithPath("data.pageInfoResDto.totalItems").description("전체 항목 수")
+                        )
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("GET 내 팔로우 정보 조회")
+    @Test
+    void 내_팔로우_정보_조회() throws Exception {
+        MyFollowsResDto response = new MyFollowsResDto(1);
+        given(followService.findMyFollowsCount(anyString())).willReturn(response);
+
+        mockMvc.perform(get("/api/member/follow/my-follows")
+                        .header("Authorization", "Bearer valid-token"))
+                .andDo(print())
+                .andDo(document("follow/findMyFollowsCount",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.myFollowsCount").description("내 팔로우 수")
                         )
                 ))
                 .andExpect(status().isOk());
