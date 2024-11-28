@@ -1,3 +1,53 @@
 spring:
   profiles:
-    active: test
+    active: prod
+
+  data:
+    redis:
+      host: ${spring.data.redis.host}
+      port: ${spring.data.redis.port}
+
+  datasource:
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    driver-class-name: ${spring.datasource.driver-class-name}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.sql: debug
+    org.hibernate.type: trace
+
+  discord:
+    webhook-uri: ${logging.discord.webhook-uri}
+  config: ${logging.config}
+
+jwt:
+  secret: ${jwt.secret}
+token:
+  expire:
+    time:
+      access: ${token.expire.time.access}
+      refresh: ${token.expire.time.refresh}
+
+google:
+  client:
+    id: ${google.client.id}
+
+    secret: ${google.client.secret}
+  redirect:
+    uri: ${google.redirect.uri}
+
+oauth:
+  kakao:
+    rest-api-key: ${oauth.kakao.rest-api-key}
+    redirect-url: ${oauth.kakao.redirect-url}
