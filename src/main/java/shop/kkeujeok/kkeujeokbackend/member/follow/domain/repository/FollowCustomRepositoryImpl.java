@@ -134,9 +134,11 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
 
+        // 친구 관계 여부 확인을 위한 로직 추가
         List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
                 .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
-                .filter(teamMember -> {
+                .map(teamMember -> {
+                    // 현재 추천 대상 사용자가 팔로우 관계인지 확인
                     boolean isFollow = queryFactory
                             .selectOne()
                             .from(follow)
@@ -146,9 +148,9 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                                                     .and(follow.toMember.id.eq(memberId)))
                             )
                             .fetchFirst() != null;
-                    return !isFollow;
+
+                    return RecommendedFollowInfoResDto.from(teamMember, isFollow);
                 })
-                .map(teamMember -> RecommendedFollowInfoResDto.from(teamMember, false))
                 .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
@@ -182,7 +184,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                         member.nickname,
                         member.name,
                         member.picture,
-                        follow.followStatus.eq(FollowStatus.ACCEPT)
+                        follow.id.isNotNull()
                 ))
                 .from(member)
                 .leftJoin(follow)
@@ -230,15 +232,5 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                 .fetchCount();
 
         return MyFollowsResDto.from(followCount);
-    }
-
-    @Override
-    public boolean existsAlreadyFollow(Long followId) {
-        return queryFactory
-                .selectOne()
-                .from(follow)
-                .where(follow.id.eq(followId)
-                        .and(follow.followStatus.eq(FollowStatus.ACCEPT)))
-                .fetchFirst() != null;
     }
 }
