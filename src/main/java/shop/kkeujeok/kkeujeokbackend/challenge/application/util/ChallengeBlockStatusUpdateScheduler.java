@@ -21,8 +21,9 @@ import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationServic
 @Component
 @RequiredArgsConstructor
 public class ChallengeBlockStatusUpdateScheduler {
-
     private static final String DAILY_CRON_EXPRESSION = "0 0 0 * * ?";
+    private static final String CHALLENGE_WITHDRAW_MESSAGE_TEMPLATE = "%s 챌린지가 탈퇴되었습니다.";
+
     private static final String CHALLENGE_CREATED_MESSAGE_TEMPLATE = "%s 챌린지 블록이 생성되었습니다.";
     private static final String DEADLINE_DATE_FORMAT = "yyyy.MM.dd 23:59";
     private static final int DEADLINE_EXTENSION_DAYS = 1;
@@ -36,38 +37,73 @@ public class ChallengeBlockStatusUpdateScheduler {
     public void createNewChallengeBlocks() {
         List<ChallengeMemberMapping> activeMappings = challengeMemberMappingRepository.findActiveMappings();
 
-        for (ChallengeMemberMapping mapping : activeMappings) {
-            if (isNewBlockNeeded(mapping)) {
-                createNewBlock(mapping);
-            }
-        }
+        activeMappings.stream()
+                .filter(this::isNewBlockNeeded)
+                .forEach(this::processMappingForNewBlock);
     }
 
     private boolean isNewBlockNeeded(ChallengeMemberMapping mapping) {
         return mapping.getChallenge().isActiveToday();
     }
 
-    private void createNewBlock(ChallengeMemberMapping mapping) {
-        PersonalDashboard dashboard = mapping.getPersonalDashboard();
+    private void processMappingForNewBlock(ChallengeMemberMapping mapping) {
+        if (shouldRemoveParticipant(mapping)) {
+            removeParticipantFromChallenge(mapping);
+            return;
+        }
+        createAndSaveBlock(mapping);
+        notifyMemberForNewBlock(mapping);
+    }
 
+    private boolean shouldRemoveParticipant(ChallengeMemberMapping mapping) {
+        PersonalDashboard dashboard = mapping.getPersonalDashboard();
+        Challenge challenge = mapping.getChallenge();
+
+        long existingChallengeBlockCount = dashboard.getBlocks().stream()
+                .filter(block -> block.getProgress().equals(Progress.NOT_STARTED))
+                .filter(block -> block.getType().equals(Type.CHALLENGE))
+                .filter(block -> block.getChallenge().getId().equals(challenge.getId()))
+                .count();
+
+        return existingChallengeBlockCount >= 5;
+    }
+
+    private void removeParticipantFromChallenge(ChallengeMemberMapping mapping) {
+        Challenge challenge = mapping.getChallenge();
+        challenge.removeParticipant(mapping);
+        notifyMemberForWithdrawChallenge(mapping, challenge);
+    }
+
+    private void notifyMemberForWithdrawChallenge(ChallengeMemberMapping mapping, Challenge challenge) {
+        Member member = mapping.getMember();
+        String message = String.format(CHALLENGE_WITHDRAW_MESSAGE_TEMPLATE, challenge.getTitle());
+        notificationService.sendNotification(member, message);
+    }
+
+    private void createAndSaveBlock(ChallengeMemberMapping mapping) {
         Block newBlock = Block.builder()
                 .title(mapping.getChallenge().getTitle())
                 .contents(mapping.getChallenge().getContents())
                 .progress(Progress.NOT_STARTED)
                 .type(Type.CHALLENGE)
-                .deadLine(LocalDate.now().plusDays(DEADLINE_EXTENSION_DAYS)
-                        .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT)))
+                .deadLine(getFormattedDeadline())
                 .member(mapping.getMember())
-                .dashboard(dashboard)
+                .dashboard(mapping.getPersonalDashboard())
                 .challenge(mapping.getChallenge())
                 .build();
 
         blockRepository.save(newBlock);
-
-        sendChallengeCreatedNotification(mapping.getMember(), mapping.getChallenge());
     }
 
-    private void sendChallengeCreatedNotification(Member member, Challenge challenge) {
+    private String getFormattedDeadline() {
+        return LocalDate.now()
+                .plusDays(DEADLINE_EXTENSION_DAYS)
+                .format(DateTimeFormatter.ofPattern(DEADLINE_DATE_FORMAT));
+    }
+
+    private void notifyMemberForNewBlock(ChallengeMemberMapping mapping) {
+        Member member = mapping.getMember();
+        Challenge challenge = mapping.getChallenge();
         String message = String.format(CHALLENGE_CREATED_MESSAGE_TEMPLATE, challenge.getTitle());
         notificationService.sendNotification(member, message);
     }
