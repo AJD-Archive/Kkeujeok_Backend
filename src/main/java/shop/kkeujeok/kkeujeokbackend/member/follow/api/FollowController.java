@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowAcceptReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowAcceptResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
@@ -37,9 +39,8 @@ public class FollowController {
     }
 
     @PostMapping("/accept/{followId}")
-    public RspTemplate<Void> accept(@CurrentUserEmail String email,
-                                    @PathVariable Long followId) {
-        followService.accept(email, followId);
+    public RspTemplate<Void> accept(@PathVariable Long followId) {
+        followService.accept(followId);
 
         return new RspTemplate<>(HttpStatus.OK,
                 "친구 추가 수락");

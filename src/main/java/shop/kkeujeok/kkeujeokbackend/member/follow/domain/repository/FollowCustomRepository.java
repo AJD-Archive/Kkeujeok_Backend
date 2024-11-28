@@ -25,6 +25,4 @@ public interface FollowCustomRepository {
     Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword, Pageable pageable);
 
     MyFollowsResDto findMyFollowsCount(Long memberId);
-
-    boolean existsAlreadyFollow(Long followId);
 }

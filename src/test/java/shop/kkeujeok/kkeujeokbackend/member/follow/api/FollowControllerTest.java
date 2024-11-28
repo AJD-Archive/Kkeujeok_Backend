@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.requestFields;
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,14 +39,16 @@ import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailA
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.request.FollowReqDto;
-import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
-import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowResDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowListDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MemberInfoForFollowResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoListDto;
+import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.FollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
+
+import java.util.Collections;
 
 class FollowControllerTest extends ControllerTest {
 
@@ -102,7 +103,7 @@ class FollowControllerTest extends ControllerTest {
     @DisplayName("POST 친구 요청 수락")
     @Test
     void 친구_요청_수락() throws Exception {
-        doNothing().when(followService).accept(anyString(), anyLong());
+        doNothing().when(followService).accept(anyLong());
 
         mockMvc.perform(post("/api/member/follow/accept/{followId}", 1L)
                         .header("Authorization", "Bearer valid-token"))
