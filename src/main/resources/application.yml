@@ -36,8 +36,8 @@ jwt:
 token:
   expire:
     time:
-      access : ${token.expire.time.access}
-      refresh : ${token.expire.time.refresh}
+      access: ${token.expire.time.access}
+      refresh: ${token.expire.time.refresh}
 
 google:
   client:

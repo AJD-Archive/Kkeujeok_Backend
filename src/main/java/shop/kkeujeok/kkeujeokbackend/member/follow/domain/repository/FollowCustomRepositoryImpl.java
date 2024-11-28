@@ -7,6 +7,7 @@ import static shop.kkeujeok.kkeujeokbackend.member.follow.domain.QFollow.follow;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
@@ -26,6 +27,7 @@ import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.MyFollowsRes
 import shop.kkeujeok.kkeujeokbackend.member.follow.api.dto.response.RecommendedFollowInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.Follow;
 import shop.kkeujeok.kkeujeokbackend.member.follow.domain.FollowStatus;
+import shop.kkeujeok.kkeujeokbackend.member.follow.exception.FollowAlreadyAcceptException;
 
 @Repository
 @RequiredArgsConstructor
@@ -50,12 +52,25 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
     }
 
     @Override
-    @Transactional
     public void acceptFollowingRequest(Long followId) {
+        checkIfAlreadyAccepted(followId);
+
         new JPAUpdateClause(entityManager, follow)
                 .where(follow.id.eq(followId))
                 .set(follow.followStatus, FollowStatus.ACCEPT)
                 .execute();
+    }
+
+    private void checkIfAlreadyAccepted(Long followId) {
+        FollowStatus currentStatus = new JPAQuery<>(entityManager)
+                .select(follow.followStatus)
+                .from(follow)
+                .where(follow.id.eq(followId))
+                .fetchOne();
+
+        if (currentStatus == FollowStatus.ACCEPT) {
+            throw new FollowAlreadyAcceptException();
+        }
     }
 
     @Override
@@ -119,22 +134,21 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         potentialFriends = potentialFriends.stream().distinct().collect(Collectors.toList());
 
-        // 친구 관계 여부 확인을 위한 로직 추가
         List<RecommendedFollowInfoResDto> recommendedFollows = potentialFriends.stream()
                 .filter(teamMember -> !teamMember.getId().equals(memberId)) // 본인 제외
-                .map(teamMember -> {
-                    // 현재 추천 대상 사용자가 팔로우 관계인지 확인
+                .filter(teamMember -> {
                     boolean isFollow = queryFactory
                             .selectOne()
                             .from(follow)
                             .where(
                                     (follow.fromMember.id.eq(memberId).and(follow.toMember.id.eq(teamMember.getId())))
-                                            .or(follow.fromMember.id.eq(teamMember.getId()).and(follow.toMember.id.eq(memberId)))
+                                            .or(follow.fromMember.id.eq(teamMember.getId())
+                                                    .and(follow.toMember.id.eq(memberId)))
                             )
                             .fetchFirst() != null;
-
-                    return RecommendedFollowInfoResDto.from(teamMember, isFollow);
+                    return !isFollow;
                 })
+                .map(teamMember -> RecommendedFollowInfoResDto.from(teamMember, false))
                 .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
@@ -143,7 +157,6 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
 
         return new PageImpl<>(pagedRecommendedFollows, pageable, recommendedFollows.size());
     }
-
 
     @Override
     public Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember) {
@@ -161,9 +174,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
     @Override
     public Page<MemberInfoForFollowResDto> searchFollowListUsingKeywords(Long memberId, String keyword,
                                                                          Pageable pageable) {
-        BooleanExpression keywordCondition = keyword != null && !keyword.isBlank()
-                ? member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword))
-                : null;
+        BooleanExpression keywordCondition = buildKeywordCondition(keyword);
 
         List<MemberInfoForFollowResDto> members = queryFactory
                 .select(Projections.constructor(MemberInfoForFollowResDto.class,
@@ -171,7 +182,7 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
                         member.nickname,
                         member.name,
                         member.picture,
-                        follow.id.isNotNull()
+                        follow.followStatus.eq(FollowStatus.ACCEPT)
                 ))
                 .from(member)
                 .leftJoin(follow)
@@ -199,6 +210,13 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         return new PageImpl<>(members, pageable, total);
     }
 
+    private BooleanExpression buildKeywordCondition(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return null;
+        }
+        return member.name.containsIgnoreCase(keyword).or(member.email.containsIgnoreCase(keyword));
+    }
+
     @Override
     public MyFollowsResDto findMyFollowsCount(Long memberId) {
         int followCount = (int) queryFactory
@@ -214,4 +232,13 @@ public class FollowCustomRepositoryImpl implements FollowCustomRepository {
         return MyFollowsResDto.from(followCount);
     }
 
+    @Override
+    public boolean existsAlreadyFollow(Long followId) {
+        return queryFactory
+                .selectOne()
+                .from(follow)
+                .where(follow.id.eq(followId)
+                        .and(follow.followStatus.eq(FollowStatus.ACCEPT)))
+                .fetchFirst() != null;
+    }
 }

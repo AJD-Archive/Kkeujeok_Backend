@@ -13,6 +13,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 @Builder
 public record ChallengeInfoResDto(
         Long challengeId,
+        Long authorId,
         String title,
         String contents,
         Category category,
@@ -32,6 +33,7 @@ public record ChallengeInfoResDto(
     public static ChallengeInfoResDto from(Challenge challenge) {
         return ChallengeInfoResDto.builder()
                 .challengeId(challenge.getId())
+                .authorId(challenge.getMember().getId())
                 .title(challenge.getTitle())
                 .contents(challenge.getContents())
                 .category(challenge.getCategory())
@@ -54,6 +56,7 @@ public record ChallengeInfoResDto(
                                          Set<ChallengeCompletedMemberInfoResDto> completedMembers) {
         return ChallengeInfoResDto.builder()
                 .challengeId(challenge.getId())
+                .authorId(challenge.getMember().getId())
                 .title(challenge.getTitle())
                 .contents(challenge.getContents())
                 .category(challenge.getCategory())

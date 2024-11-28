@@ -20,6 +20,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.PersonalDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
 
 import java.util.ArrayList;
@@ -84,7 +85,8 @@ public class MemberControllerTest extends ControllerTest {
                 "name",
                 "nickname",
                 SocialType.GOOGLE,
-                "introduction");
+                "introduction",
+                1L);
 
         when(myPageService.findMyProfileByEmail(anyString())).thenReturn(myPageInfoResDto);
 
@@ -107,7 +109,8 @@ public class MemberControllerTest extends ControllerTest {
                                 fieldWithPath("data.name").description("회원 이름"),
                                 fieldWithPath("data.nickName").description("회원 닉네임"),
                                 fieldWithPath("data.socialType").description("회원 소셜 타입"),
-                                fieldWithPath("data.introduction").description("회원 소개")
+                                fieldWithPath("data.introduction").description("회원 소개"),
+                                fieldWithPath("data.memberId").description("회원 ID")
                         )
                 ))
                 .andExpect(status().isOk())
@@ -211,4 +214,115 @@ public class MemberControllerTest extends ControllerTest {
 //                ))
 //                .andExpect(status().isOk());
 //    }
+
+    @DisplayName("친구의 프로필 정보를 가져옵니다.")
+    @Test
+    void 친구_프로필_정보를_가져옵니다() throws Exception {
+        // Given
+        Long friendId = 1L;
+        MyPageInfoResDto friendProfileDto = new MyPageInfoResDto(
+                "friendPicture",
+                "friend@example.com",
+                "친구이름",
+                "친구닉네임",
+                SocialType.GOOGLE,
+                "친구소개",
+                2L
+        );
+
+        when(myPageService.findFriendProfile(friendId)).thenReturn(friendProfileDto);
+
+        // When & Then
+        mockMvc.perform(get("/api/members/mypage/{memberId}", friendId)
+                        .header("Authorization", "Bearer valid-token"))
+                .andDo(print())
+                .andDo(document("member/friend-profile",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.picture").description("친구 사진"),
+                                fieldWithPath("data.email").description("친구 이메일"),
+                                fieldWithPath("data.name").description("친구 이름"),
+                                fieldWithPath("data.nickName").description("친구 닉네임"),
+                                fieldWithPath("data.socialType").description("친구 소셜 타입"),
+                                fieldWithPath("data.introduction").description("친구 소개"),
+                                fieldWithPath("data.memberId").description("친구 ID")
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", is("친구 프로필 정보 조회")))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.email", is("friend@example.com")))
+                .andExpect(jsonPath("$.data.name", is("친구이름")))
+                .andExpect(jsonPath("$.data.nickName", is("친구닉네임")))
+                .andExpect(jsonPath("$.data.socialType", is(SocialType.GOOGLE.name())))
+                .andExpect(jsonPath("$.data.introduction", is("친구소개")));
+    }
+
+    @DisplayName("친구의 public 개인 대시보드와 챌린지 정보를 가져옵니다.")
+    @Test
+    void 친구_대시보드와_챌린지_정보를_가져옵니다() throws Exception {
+        // Given
+        PersonalDashboardPageListResDto personalDashboardList = new PersonalDashboardPageListResDto(
+                new ArrayList<>(),
+                new PageInfoResDto(0, 0, 0)
+        );
+
+        ChallengeListResDto challengeList = new ChallengeListResDto(
+                new ArrayList<>(),
+                new PageInfoResDto(0, 0, 0)
+        );
+
+        PersonalDashboardsAndChallengesResDto resDto = new PersonalDashboardsAndChallengesResDto(
+                personalDashboardList,
+                challengeList
+        );
+
+        Long friendId = 1L;
+
+        when(myPageService.findFriendDashboardsAndChallenges(friendId, PageRequest.of(0, 10))).thenReturn(resDto);
+
+        // When & Then
+        mockMvc.perform(get("/api/members/mypage/{memberId}/dashboard-challenges", friendId)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andDo(print())
+                .andDo(document("member/friend-dashboard-challenges",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호 (기본값: 0)"),
+                                parameterWithName("size").description("페이지 당 항목 수 (기본값: 10)")
+                        ),
+                        responseFields(
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("message").description("응답 메시지"),
+                                fieldWithPath("data.personalDashboardList.personalDashboardInfoResDto").description("개인 대시보드 정보 목록"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalPages").description("총 페이지 수"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalItems").description("총 항목 수"),
+                                fieldWithPath("data.challengeList.challengeInfoResDto").description("챌린지 정보 목록"),
+                                fieldWithPath("data.challengeList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
+                                fieldWithPath("data.challengeList.pageInfoResDto.totalPages").description("총 페이지 수"),
+                                fieldWithPath("data.challengeList.pageInfoResDto.totalItems").description("총 항목 수")
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode", is(200)))
+                .andExpect(jsonPath("$.message", is("대시보드와 챌린지 정보 조회")))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.personalDashboardList").exists())
+                .andExpect(jsonPath("$.data.personalDashboardList.personalDashboardInfoResDto").isArray())
+                .andExpect(jsonPath("$.data.personalDashboardList.pageInfoResDto.currentPage", is(0)))
+                .andExpect(jsonPath("$.data.personalDashboardList.pageInfoResDto.totalPages", is(0)))
+                .andExpect(jsonPath("$.data.personalDashboardList.pageInfoResDto.totalItems", is(0)))
+                .andExpect(jsonPath("$.data.challengeList").exists())
+                .andExpect(jsonPath("$.data.challengeList.challengeInfoResDto").isArray())
+                .andExpect(jsonPath("$.data.challengeList.pageInfoResDto.currentPage", is(0)))
+                .andExpect(jsonPath("$.data.challengeList.pageInfoResDto.totalPages", is(0)))
+                .andExpect(jsonPath("$.data.challengeList.pageInfoResDto.totalItems", is(0)));
+    }
+
 }

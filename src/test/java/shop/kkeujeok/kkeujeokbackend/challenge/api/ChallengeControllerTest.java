@@ -50,6 +50,7 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
@@ -179,6 +180,7 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("data.challengeId").description("챌린지 id"),
+                                        fieldWithPath("data.authorId").description("챌린지 작성자 id"),
                                         fieldWithPath("data.title").description("챌린지 제목"),
                                         fieldWithPath("data.contents").description("챌린지 내용"),
                                         fieldWithPath("data.category").description("챌린지 카테고리"),
@@ -242,6 +244,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.challengeId").description("챌린지 id"),
+                                fieldWithPath("data.authorId").description("챌린지 작성자 id"),
                                 fieldWithPath("data.title").description("챌린지 제목"),
                                 fieldWithPath("data.contents").description("챌린지 내용"),
                                 fieldWithPath("data.category").description("챌린지 카테고리"),
@@ -295,6 +298,7 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
+                                        fieldWithPath("data.challengeInfoResDto[].authorId").description("챌린지 작성자"),
                                         fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
                                         fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
                                         fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
@@ -360,6 +364,7 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
+                                        fieldWithPath("data.challengeInfoResDto[].authorId").description("챌린지 작성자"),
                                         fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
                                         fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
                                         fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
@@ -394,6 +399,8 @@ class ChallengeControllerTest extends ControllerTest {
     @DisplayName("챌린지 상세 정보 조회에 성공하면 상태코드 200 반환")
     void 챌린지_상세_조회에_성공하면_상태코드_200_반환() throws Exception {
         // given
+        ChallengeCompletedMemberInfoResDto challengeCompletedMemberInfoResDto = ChallengeCompletedMemberInfoResDto.from(
+                member);
         ChallengeInfoResDto response = ChallengeInfoResDto.from(challenge);
         given(challengeService.findById(anyString(), anyLong()))
                 .willReturn(response);
@@ -414,6 +421,7 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("data.challengeId").description("챌린지 id"),
+                                fieldWithPath("data.authorId").description("챌린지 작성자 id"),
                                 fieldWithPath("data.title").description("챌린지 제목"),
                                 fieldWithPath("data.contents").description("챌린지 내용"),
                                 fieldWithPath("data.category").description("챌린지 카테고리"),
@@ -429,7 +437,6 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.isParticipant").description("참여 여부"),
                                 fieldWithPath("data.isAuthor").description("작성자 여부"),
                                 fieldWithPath("data.completedMembers[]").description("완료한 회원 목록")
-
                         ))
                 )
                 .andExpect(status().isOk());
