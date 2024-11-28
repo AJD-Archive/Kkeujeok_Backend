@@ -6,6 +6,7 @@ import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboard
 import static shop.kkeujeok.kkeujeokbackend.dashboard.team.domain.QTeamDashboardMemberMapping.teamDashboardMemberMapping;
 import static shop.kkeujeok.kkeujeokbackend.member.domain.QMember.member;
 
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Set;
@@ -76,7 +77,16 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
     public Page<TeamDashboard> findForTeamDashboard(Member member, Pageable pageable) {
         long total = queryFactory
                 .selectFrom(teamDashboard)
-                .where(teamDashboard._super.member.eq(member))
+                .where(
+                        teamDashboard._super.member.eq(member)
+                                .or(
+                                        teamDashboard.id.in(
+                                                JPAExpressions.select(teamDashboardMemberMapping.teamDashboard.id)
+                                                        .from(teamDashboardMemberMapping)
+                                                        .where(teamDashboardMemberMapping.member.id.eq(member.getId()))
+                                        )
+                                )
+                )
                 .stream()
                 .count();
 
