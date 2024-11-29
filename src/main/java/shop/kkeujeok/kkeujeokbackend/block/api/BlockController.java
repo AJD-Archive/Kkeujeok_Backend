@@ -56,7 +56,7 @@ public class BlockController {
                                                                @RequestParam(name = "size", defaultValue = "10") int size) {
         return new RspTemplate<>(HttpStatus.OK,
                 "블록 상태별 전체 조회",
-                blockService.findForBlockByProgress(email, dashboardId, progress, PageRequest.of(page, size)));
+                blockService.findForBlockByProgress("email", dashboardId, progress, PageRequest.of(page, size)));
     }
 
     @DeleteMapping("/{blockId}")

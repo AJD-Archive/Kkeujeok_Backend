@@ -128,14 +128,16 @@ public class BlockService {
 
     // 블록 리스트
     public BlockListResDto findForBlockByProgress(String email, Long dashboardId, String progress, Pageable pageable) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboardId, parseProgress(progress), pageable);
+//        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+//        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboardId, parseProgress(progress), pageable);
+        Page<BlockInfoResDto> blocks = blockRepository.findForBlockByProgress(dashboardId, parseProgress(progress),
+                pageable);
 
-        List<BlockInfoResDto> blockInfoResDtoList = blocks.stream()
-                .map(BlockInfoResDto::from)
-                .toList();
+//        List<BlockInfoResDto> blockInfoResDtoList = blocks.stream()
+//                .map(BlockInfoResDto::from)
+//                .toList();
 
-        return BlockListResDto.from(blockInfoResDtoList, PageInfoResDto.from(blocks));
+        return BlockListResDto.from(blocks.stream().toList(), PageInfoResDto.from(blocks));
     }
 
     // 블록 상세보기
