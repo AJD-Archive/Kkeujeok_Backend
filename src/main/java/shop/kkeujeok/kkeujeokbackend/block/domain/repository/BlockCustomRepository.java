@@ -11,7 +11,6 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 public interface BlockCustomRepository {
     Page<BlockInfoResDto> findForBlockByProgress(Long dashboardId, Progress progress, Pageable pageable);
-//    Page<Block> findByBlockWithProgress(Long dashboardId, Progress progress, Pageable pageable);
 
     int findLastSequenceByProgress(Member member, Long dashboardId, Progress progress);
 

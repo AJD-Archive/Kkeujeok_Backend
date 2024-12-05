@@ -18,6 +18,7 @@ import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateRe
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
+import shop.kkeujeok.kkeujeokbackend.block.application.util.DDayCalculator;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
@@ -63,7 +64,7 @@ public class BlockService {
         Block block = blockRepository.save(blockSaveReqDto.toEntity(member, dashboard, lastSequence));
         saveDeadlineNotification(block);
 
-        return BlockInfoResDto.from(block);
+        return BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
     }
 
     private void saveDeadlineNotification(Block block) {
@@ -96,7 +97,7 @@ public class BlockService {
                 blockUpdateReqDto.startDate(),
                 blockUpdateReqDto.deadLine());
 
-        return BlockInfoResDto.from(block);
+        return BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
     }
 
     // 블록 상태 업데이트 (Progress)
@@ -116,7 +117,7 @@ public class BlockService {
 
         updateChallengeCompletedMemberByProgress(block, member, progress);
 
-        return BlockInfoResDto.from(block);
+        return BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
     }
 
     private void updateChallengeCompletedMemberByProgress(Block block, Member member, Progress progress) {
@@ -126,16 +127,11 @@ public class BlockService {
         }
     }
 
-    // 블록 리스트
-    public BlockListResDto findForBlockByProgress(String email, Long dashboardId, String progress, Pageable pageable) {
-//        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-//        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboardId, parseProgress(progress), pageable);
-        Page<BlockInfoResDto> blocks = blockRepository.findForBlockByProgress(dashboardId, parseProgress(progress),
+    public BlockListResDto findForBlockByProgress(Long dashboardId, String progress, Pageable pageable) {
+        Page<BlockInfoResDto> blocks = blockRepository.findForBlockByProgress(
+                dashboardId,
+                parseProgress(progress),
                 pageable);
-
-//        List<BlockInfoResDto> blockInfoResDtoList = blocks.stream()
-//                .map(BlockInfoResDto::from)
-//                .toList();
 
         return BlockListResDto.from(blocks.stream().toList(), PageInfoResDto.from(blocks));
     }
@@ -145,7 +141,7 @@ public class BlockService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
-        return BlockInfoResDto.from(block);
+        return BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
     }
 
     // 블록 삭제 유무 업데이트 (논리 삭제)
@@ -203,7 +199,7 @@ public class BlockService {
         Page<Block> deletedBlocks = blockRepository.findByDeletedBlocks(dashboardId, pageable);
 
         List<BlockInfoResDto> blockInfoResDtoList = deletedBlocks.stream()
-                .map(BlockInfoResDto::from)
+                .map(block -> BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine())))
                 .toList();
 
         return BlockListResDto.from(blockInfoResDtoList, PageInfoResDto.from(deletedBlocks));
