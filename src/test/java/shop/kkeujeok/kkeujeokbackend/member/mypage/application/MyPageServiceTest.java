@@ -1,5 +1,13 @@
 package shop.kkeujeok.kkeujeokbackend.member.mypage.application;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,14 +28,6 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.repository.MemberRepository;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.request.MyPageUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
-
-import java.util.Collections;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MyPageServiceTest {
@@ -58,7 +58,7 @@ public class MyPageServiceTest {
     void setUp() {
         myPageUpdateReqDto = new MyPageUpdateReqDto("nickname", "introduction");
         myPageInfoResDto = new MyPageInfoResDto("picture", "email", "name", "nickname", SocialType.GOOGLE,
-                "introduction", 1l);
+                "introduction", 1l, "#1234");
         member = Member.builder()
                 .email("email")
                 .name("name")
