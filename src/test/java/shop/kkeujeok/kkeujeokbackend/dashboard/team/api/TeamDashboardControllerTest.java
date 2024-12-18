@@ -86,8 +86,10 @@ class TeamDashboardControllerTest extends ControllerTest {
                 .build();
 
         List<String> emails = List.of("joinEmail");
-        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", emails);
-        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription", emails);
+        List<String> nicknamesAndTags = List.of("joinNickname#1234");
+        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", emails, nicknamesAndTags);
+        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription", emails,
+                nicknamesAndTags);
         teamDashboard = teamDashboardSaveReqDto.toEntity(member);
 
         ReflectionTestUtils.setField(teamDashboard, "id", 1L);
@@ -128,7 +130,8 @@ class TeamDashboardControllerTest extends ControllerTest {
                         requestFields(
                                 fieldWithPath("title").description("팀 대시보드 제목"),
                                 fieldWithPath("description").description("팀 대시보드 설명"),
-                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일")
+                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일"),
+                                fieldWithPath("invitedNicknamesAndTags").description("초대할 멤버 닉네임과 태그")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -173,7 +176,8 @@ class TeamDashboardControllerTest extends ControllerTest {
                         requestFields(
                                 fieldWithPath("title").description("개인 대시보드 제목"),
                                 fieldWithPath("description").description("개인 대시보드 설명"),
-                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일")
+                                fieldWithPath("invitedEmails").description("초대할 멤버 이메일"),
+                                fieldWithPath("invitedNicknamesAndTags").description("초대할 멤버 닉네임과 태그")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),

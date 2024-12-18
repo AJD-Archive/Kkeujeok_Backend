@@ -45,6 +45,7 @@ import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockSequenceUpdateRe
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.request.BlockUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockListResDto;
+import shop.kkeujeok.kkeujeokbackend.block.application.util.DDayCalculator;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.block.exception.InvalidProgressException;
@@ -118,7 +119,7 @@ class BlockControllerTest extends ControllerTest {
     @Test
     void 블록_저장() throws Exception {
         // given
-        BlockInfoResDto response = BlockInfoResDto.from(block);
+        BlockInfoResDto response = BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
         given(blockService.save(anyString(), any(BlockSaveReqDto.class))).willReturn(response);
 
         // when & then
@@ -168,7 +169,7 @@ class BlockControllerTest extends ControllerTest {
         // given
         block.update(blockUpdateReqDto.title(), blockUpdateReqDto.contents(), blockUpdateReqDto.startDate(),
                 blockUpdateReqDto.deadLine());
-        BlockInfoResDto response = BlockInfoResDto.from(block);
+        BlockInfoResDto response = BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
         given(blockService.update(anyString(), anyLong(), any(BlockUpdateReqDto.class))).willReturn(response);
 
         // when & then
@@ -216,7 +217,7 @@ class BlockControllerTest extends ControllerTest {
         // given
         Long blockId = 1L;
         String progressString = "IN_PROGRESS";
-        BlockInfoResDto response = BlockInfoResDto.from(block);
+        BlockInfoResDto response = BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
 
         given(blockService.progressUpdate(anyString(), anyLong(), anyString())).willReturn(response);
 
@@ -313,10 +314,10 @@ class BlockControllerTest extends ControllerTest {
         String progressString = "NOT_STARTED";
         Page<Block> blockPage = new PageImpl<>(List.of(block), PageRequest.of(0, 10), 1);
         BlockListResDto response = BlockListResDto.from(
-                Collections.singletonList(BlockInfoResDto.from(block)),
+                Collections.singletonList(BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()))),
                 PageInfoResDto.from(blockPage));
 
-        given(blockService.findForBlockByProgress(anyString(), anyLong(), anyString(), any())).willReturn(response);
+        given(blockService.findForBlockByProgress(anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(
@@ -364,7 +365,7 @@ class BlockControllerTest extends ControllerTest {
     @Test
     void 블록_상세보기() throws Exception {
         // given
-        BlockInfoResDto response = BlockInfoResDto.from(block);
+        BlockInfoResDto response = BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
 
         given(blockService.findById(anyString(), anyLong())).willReturn(response);
 
@@ -431,7 +432,7 @@ class BlockControllerTest extends ControllerTest {
         block.statusUpdate();
         Page<Block> blockPage = new PageImpl<>(List.of(block), PageRequest.of(0, 10), 1);
         BlockListResDto response = BlockListResDto.from(
-                Collections.singletonList(BlockInfoResDto.from(block)),
+                Collections.singletonList(BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()))),
                 PageInfoResDto.from(blockPage));
 
         given(blockService.findDeletedBlocks(anyString(), anyLong(), any())).willReturn(response);
