@@ -13,7 +13,9 @@ public record TeamDashboardSaveReqDto(
         @NotBlank(message = "필수 입력값 입니다.")
         @Size(max = 300)
         String description,
-        List<String> invitedEmails
+
+        List<String> invitedEmails,
+        List<String> invitedNicknamesAndTags
 ) {
     public TeamDashboard toEntity(Member member) {
         return TeamDashboard.builder()

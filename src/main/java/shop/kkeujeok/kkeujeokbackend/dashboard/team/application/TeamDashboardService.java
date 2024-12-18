@@ -46,7 +46,9 @@ public class TeamDashboardService {
 
         teamDashboardRepository.save(teamDashboard);
 
-        inviteMember(member, teamDashboard, teamDashboardSaveReqDto.invitedEmails());
+        inviteMember(member, teamDashboard,
+                teamDashboardSaveReqDto.invitedEmails(),
+                teamDashboardSaveReqDto.invitedNicknamesAndTags());
         return TeamDashboardInfoResDto.of(member, teamDashboard);
     }
 
@@ -64,7 +66,9 @@ public class TeamDashboardService {
         dashboard.update(teamDashboardUpdateReqDto.title(),
                 teamDashboardUpdateReqDto.description());
 
-        inviteMember(member, dashboard, teamDashboardUpdateReqDto.invitedEmails());
+        inviteMember(member, dashboard,
+                teamDashboardUpdateReqDto.invitedEmails(),
+                teamDashboardUpdateReqDto.invitedNicknamesAndTags());
 
         return TeamDashboardInfoResDto.of(member, dashboard);
     }
@@ -178,12 +182,30 @@ public class TeamDashboardService {
         return SearchMemberListResDto.from(searchMembers);
     }
 
-    private void inviteMember(Member member, TeamDashboard teamDashboard, List<String> invitedEmails) {
+    private void inviteMember(Member member, TeamDashboard teamDashboard,
+                              List<String> invitedEmails,
+                              List<String> invitedNicknamesAndTags) {
         for (String email : invitedEmails) {
             try {
                 verifyIsSameEmail(member.getEmail(), email);
 
                 Member inviteReceivedMember = memberRepository.findByEmail(email)
+                        .orElseThrow(MemberNotFoundException::new);
+
+                String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
+                        teamDashboard.getTitle(), teamDashboard.getId());
+                notificationService.sendNotification(inviteReceivedMember, message);
+            } catch (MemberNotFoundException ignored) {
+            }
+        }
+
+        for (String nicknameAndTag : invitedNicknamesAndTags) {
+            try {
+                String[] split = nicknameAndTag.split("#");
+                String nickname = split[0];
+                String tag = "#" + split[1];
+
+                Member inviteReceivedMember = memberRepository.findByNicknameAndTag(nickname, tag)
                         .orElseThrow(MemberNotFoundException::new);
 
                 String message = String.format(TEAM_DASHBOARD_JOIN_MESSAGE, member.getName(),
