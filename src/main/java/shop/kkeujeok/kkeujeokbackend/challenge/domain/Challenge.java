@@ -44,7 +44,6 @@ public class Challenge extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Category category;
 
-    @Enumerated(value = EnumType.STRING)
     private Cycle cycle;
 
     @Column(name = "cycle_details")
