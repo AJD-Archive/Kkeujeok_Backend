@@ -57,7 +57,7 @@ class ChallengeTest {
         String updateBlockName = "수정된 블록 이름";
 
         // when
-        challenge.update(updateTitle, updateContents, updateCycleDetails, updateEndDate, updateBlockName,
+        challenge.update(updateTitle, updateContents, updateCycle, updateCycleDetails, updateEndDate, updateBlockName,
                 updateRepresentImage);
 
         // then
@@ -80,7 +80,7 @@ class ChallengeTest {
         String updateTitle = "수정된 제목";
 
         // when
-        challenge.update(updateTitle, challenge.getContents(), challenge.getCycleDetails(),
+        challenge.update(updateTitle, challenge.getContents(), challenge.getCycle(), challenge.getCycleDetails(),
                 challenge.getEndDate(), challenge.getBlockName(), imageUrl);
 
         // then
@@ -101,7 +101,7 @@ class ChallengeTest {
         String updateContents = "수정된 내용";
 
         // when
-        challenge.update(challenge.getTitle(), updateContents, challenge.getCycleDetails(),
+        challenge.update(challenge.getTitle(), updateContents, challenge.getCycle(), challenge.getCycleDetails(),
                 challenge.getEndDate(), challenge.getBlockName(), imageUrl);
 
         // then
@@ -121,7 +121,8 @@ class ChallengeTest {
         LocalDate updateEndDate = LocalDate.now().plusDays(40);
 
         // when
-        challenge.update(challenge.getTitle(), challenge.getContents(), challenge.getCycleDetails(),
+        challenge.update(challenge.getTitle(), challenge.getContents(), challenge.getCycle(),
+                challenge.getCycleDetails(),
                 updateEndDate, challenge.getBlockName(), imageUrl);
 
         // then
