@@ -95,14 +95,16 @@ public class Challenge extends BaseEntity {
         this.blockName = blockName;
     }
 
-    public void update(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
+    public void update(String updateTitle, String updateContents, Cycle updateCycle,
+                       List<CycleDetail> updateCycleDetails,
                        LocalDate updateEndDate, String updateBlockName, String updateRepresentImage) {
         validateCycleDetails(cycle, cycleDetails);
 
-        if (hasChanges(updateTitle, updateContents, updateCycleDetails, updateEndDate,
+        if (hasChanges(updateTitle, updateContents, updateCycle, updateCycleDetails, updateEndDate,
                 updateBlockName)) {
             this.title = updateTitle;
             this.contents = updateContents;
+            this.cycle = updateCycle;
             this.cycleDetails = updateCycleDetails;
             this.endDate = updateEndDate;
             this.blockName = updateBlockName;
@@ -131,10 +133,12 @@ public class Challenge extends BaseEntity {
         }
     }
 
-    private boolean hasChanges(String updateTitle, String updateContents, List<CycleDetail> updateCycleDetails,
+    private boolean hasChanges(String updateTitle, String updateContents, Cycle updateCycle,
+                               List<CycleDetail> updateCycleDetails,
                                LocalDate updateEndDate, String blockName) {
         return !this.title.equals(updateTitle) ||
                 !this.contents.equals(updateContents) ||
+                !this.cycle.equals(updateCycle) ||
                 !this.cycleDetails.equals(updateCycleDetails) ||
                 !this.endDate.equals(updateEndDate) ||
                 !this.blockName.equals(blockName);

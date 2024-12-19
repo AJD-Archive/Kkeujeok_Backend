@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Block;
 import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
@@ -44,7 +45,6 @@ class BlockRepositoryTest {
     private Block block2;
     private Block block3;
     private Block block4;
-
 
     @BeforeEach
     void setUp() {
@@ -119,10 +119,10 @@ class BlockRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(dashboard.getId(), progress, pageable);
+        Page<BlockInfoResDto> blocks = blockRepository.findForBlockByProgress(dashboard.getId(), progress, pageable);
 
         // then
-        assertThat(blocks.getContent().size()).isEqualTo(2);
+        assertThat(blocks.getTotalElements()).isEqualTo(2);
     }
 
     @DisplayName("블록을 논리 삭제 상태별로 전체 조회합니다.")
@@ -134,10 +134,10 @@ class BlockRepositoryTest {
         block1.statusUpdate();
 
         // when
-        Page<Block> blocks = blockRepository.findByBlockWithProgress(1L, progress, pageable);
+        Page<BlockInfoResDto> blocks = blockRepository.findForBlockByProgress(dashboard.getId(), progress, pageable);
 
         // then
-        assertThat(blocks.getContent().size()).isEqualTo(1);
+        assertThat(blocks.getTotalElements()).isEqualTo(1);
     }
 
     @DisplayName("블록의 마지막 순번을 가져옵니다.")

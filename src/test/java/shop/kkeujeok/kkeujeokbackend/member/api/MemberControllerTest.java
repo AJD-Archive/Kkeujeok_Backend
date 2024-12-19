@@ -1,5 +1,26 @@
 package shop.kkeujeok.kkeujeokbackend.member.api;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
+
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,12 +29,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardPageListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
 import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
-import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -22,30 +43,6 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.MyPageInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.PersonalDashboardsAndChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response.TeamDashboardsAndChallengesResDto;
-
-import java.util.ArrayList;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
-import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
 public class MemberControllerTest extends ControllerTest {
 
@@ -86,7 +83,8 @@ public class MemberControllerTest extends ControllerTest {
                 "nickname",
                 SocialType.GOOGLE,
                 "introduction",
-                1L);
+                1L,
+                "#1234");
 
         when(myPageService.findMyProfileByEmail(anyString())).thenReturn(myPageInfoResDto);
 
@@ -110,7 +108,8 @@ public class MemberControllerTest extends ControllerTest {
                                 fieldWithPath("data.nickName").description("회원 닉네임"),
                                 fieldWithPath("data.socialType").description("회원 소셜 타입"),
                                 fieldWithPath("data.introduction").description("회원 소개"),
-                                fieldWithPath("data.memberId").description("회원 ID")
+                                fieldWithPath("data.memberId").description("회원 ID"),
+                                fieldWithPath("data.tag").description("고유 번호 ex) #1234")
                         )
                 ))
                 .andExpect(status().isOk())
@@ -153,13 +152,20 @@ public class MemberControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.personalDashboardList.personalDashboardInfoResDto").description("개인 대시보드 정보 목록"),
-                                fieldWithPath("data.personalDashboardList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
-                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalPages").description("총 페이지 수"),
-                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalItems").description("총 항목 수"),
-                                fieldWithPath("data.teamDashboardList.teamDashboardInfoResDto").description("팀 대시보드 정보 목록"),
-                                fieldWithPath("data.teamDashboardList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
-                                fieldWithPath("data.teamDashboardList.pageInfoResDto.totalPages").description("총 페이지 수"),
+                                fieldWithPath("data.personalDashboardList.personalDashboardInfoResDto").description(
+                                        "개인 대시보드 정보 목록"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.currentPage").description(
+                                        "현재 페이지 번호"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalPages").description(
+                                        "총 페이지 수"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalItems").description(
+                                        "총 항목 수"),
+                                fieldWithPath("data.teamDashboardList.teamDashboardInfoResDto").description(
+                                        "팀 대시보드 정보 목록"),
+                                fieldWithPath("data.teamDashboardList.pageInfoResDto.currentPage").description(
+                                        "현재 페이지 번호"),
+                                fieldWithPath("data.teamDashboardList.pageInfoResDto.totalPages").description(
+                                        "총 페이지 수"),
                                 fieldWithPath("data.teamDashboardList.pageInfoResDto.totalItems").description("총 항목 수"),
                                 fieldWithPath("data.challengeList.challengeInfoResDto").description("챌린지 정보 목록"),
                                 fieldWithPath("data.challengeList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
@@ -227,7 +233,8 @@ public class MemberControllerTest extends ControllerTest {
                 "친구닉네임",
                 SocialType.GOOGLE,
                 "친구소개",
-                2L
+                2L,
+                "#1234"
         );
 
         when(myPageService.findFriendProfile(friendId)).thenReturn(friendProfileDto);
@@ -248,7 +255,8 @@ public class MemberControllerTest extends ControllerTest {
                                 fieldWithPath("data.nickName").description("친구 닉네임"),
                                 fieldWithPath("data.socialType").description("친구 소셜 타입"),
                                 fieldWithPath("data.introduction").description("친구 소개"),
-                                fieldWithPath("data.memberId").description("친구 ID")
+                                fieldWithPath("data.memberId").description("친구 ID"),
+                                fieldWithPath("data.tag").description("고유 번호 ex) #1234")
                         )
                 ))
                 .andExpect(status().isOk())
@@ -299,10 +307,14 @@ public class MemberControllerTest extends ControllerTest {
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
                                 fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data.personalDashboardList.personalDashboardInfoResDto").description("개인 대시보드 정보 목록"),
-                                fieldWithPath("data.personalDashboardList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
-                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalPages").description("총 페이지 수"),
-                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalItems").description("총 항목 수"),
+                                fieldWithPath("data.personalDashboardList.personalDashboardInfoResDto").description(
+                                        "개인 대시보드 정보 목록"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.currentPage").description(
+                                        "현재 페이지 번호"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalPages").description(
+                                        "총 페이지 수"),
+                                fieldWithPath("data.personalDashboardList.pageInfoResDto.totalItems").description(
+                                        "총 항목 수"),
                                 fieldWithPath("data.challengeList.challengeInfoResDto").description("챌린지 정보 목록"),
                                 fieldWithPath("data.challengeList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.challengeList.pageInfoResDto.totalPages").description("총 페이지 수"),
