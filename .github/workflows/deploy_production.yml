@@ -30,7 +30,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Set up application.yml
-      run: echo "${{ secrets.PRODUCTION_APPLICATION }}" > ./src/main/resources/application-prod.yml
+      run: echo "${{ secrets.PRODUCTION_APPLICATION }}" > ./src/main/resources/application.yml
 
     - name: Build with Gradle
       run: ./gradlew build -x test
