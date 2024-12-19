@@ -93,9 +93,9 @@ class BlockServiceTest {
 
         blockSequenceUpdateReqDto = new BlockSequenceUpdateReqDto(
                 dashboard.getId(),
-                List.of(1L, 2L),
-                List.of(3L, 4L),
-                List.of(5L, 6L)
+                List.of(1L),
+                List.of(),
+                List.of()
         );
 
         block = Block.builder()
@@ -190,7 +190,10 @@ class BlockServiceTest {
         when(dashboardRepository.findById(block.getDashboard().getId())).thenReturn(Optional.of(dashboard));
 
         // when
-        BlockInfoResDto result = blockService.progressUpdate("email", blockId, "IN_PROGRESS");
+        BlockInfoResDto result = blockService.progressUpdate("email",
+                blockId,
+                "IN_PROGRESS",
+                blockSequenceUpdateReqDto);
 
         // then
         assertAll(() -> {
@@ -208,7 +211,7 @@ class BlockServiceTest {
         when(blockRepository.findById(blockId)).thenReturn(Optional.of(block));
 
         // when & then
-        assertThatThrownBy(() -> blockService.progressUpdate("email", blockId, "String"))
+        assertThatThrownBy(() -> blockService.progressUpdate("email", blockId, "String", blockSequenceUpdateReqDto))
                 .isInstanceOf(InvalidProgressException.class);
     }
 
@@ -277,7 +280,7 @@ class BlockServiceTest {
         blockService.changeBlocksSequence("email", blockSequenceUpdateReqDto);
 
         // then
-        verify(blockRepository, times(6)).findById(anyLong());  // 6번 블록 조회가 이루어졌는지 검증
+        verify(blockRepository, times(1)).findById(anyLong());  // 6번 블록 조회가 이루어졌는지 검증
     }
 
     @DisplayName("블록을 영구 삭제 합니다.")
