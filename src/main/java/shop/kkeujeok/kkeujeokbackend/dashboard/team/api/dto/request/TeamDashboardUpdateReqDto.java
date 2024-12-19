@@ -5,7 +5,7 @@ import java.util.List;
 public record TeamDashboardUpdateReqDto(
         String title,
         String description,
-        List<String> invitedEmails
-
+        List<String> invitedEmails,
+        List<String> invitedNicknamesAndTags
 ) {
 }

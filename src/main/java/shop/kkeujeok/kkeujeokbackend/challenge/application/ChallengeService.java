@@ -83,8 +83,10 @@ public class ChallengeService {
             imageUrl = s3Service.uploadChallengeImage(representImage);
         }
 
-        challenge.update(challengeSaveReqDto.title(),
+        challenge.update(
+                challengeSaveReqDto.title(),
                 challengeSaveReqDto.contents(),
+                challengeSaveReqDto.cycle(),
                 challengeSaveReqDto.cycleDetails(),
                 challengeSaveReqDto.endDate(),
                 challengeSaveReqDto.blockName(),

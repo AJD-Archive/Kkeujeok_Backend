@@ -92,8 +92,17 @@ public class DashboardCustomRepositoryImpl implements DashboardCustomRepository 
 
         List<TeamDashboard> dashboards = queryFactory
                 .selectFrom(teamDashboard)
-                .where(teamDashboard._super.member.eq(member)
-                        .and(teamDashboard._super.status.eq(Status.ACTIVE)))
+                .where(
+                        teamDashboard._super.member.eq(member)
+                                .or(
+                                        teamDashboard.id.in(
+                                                JPAExpressions.select(teamDashboardMemberMapping.teamDashboard.id)
+                                                        .from(teamDashboardMemberMapping)
+                                                        .where(teamDashboardMemberMapping.member.id.eq(member.getId()))
+                                        )
+                                )
+                                .and(teamDashboard._super.status.eq(Status.ACTIVE))
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

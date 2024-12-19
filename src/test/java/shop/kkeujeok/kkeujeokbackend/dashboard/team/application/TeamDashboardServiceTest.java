@@ -3,7 +3,6 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.team.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
@@ -72,9 +71,11 @@ class TeamDashboardServiceTest {
 
         lenient().when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(member));
 
-        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", List.of("joinEmail"));
-        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription",
-                List.of("joinEmail"));
+        List<String> emails = List.of("joinEmail");
+        List<String> nicknamesAndTags = List.of("joinNickname#1234");
+        teamDashboardSaveReqDto = new TeamDashboardSaveReqDto("title", "description", emails, nicknamesAndTags);
+        teamDashboardUpdateReqDto = new TeamDashboardUpdateReqDto("updateTitle", "updateDescription", emails,
+                nicknamesAndTags);
 
         teamDashboard = TeamDashboard.builder()
                 .title(teamDashboardSaveReqDto.title())
