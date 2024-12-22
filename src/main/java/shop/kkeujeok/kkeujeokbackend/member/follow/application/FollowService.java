@@ -69,8 +69,8 @@ public class FollowService {
         Member fromMember = followRepository.findById(followId).orElseThrow(AlreadyFriendsException::new)
                 .getFromMember();
 
-        String followAcceptMessage = String.format(FOLLOW_ACCEPT_MESSAGE_TEMPLATE, fromMember.getNickname(),
-                toMember.getNickname());
+        String followAcceptMessage = String.format(FOLLOW_ACCEPT_MESSAGE_TEMPLATE, toMember.getNickname(),
+                fromMember.getNickname());
         notificationService.sendNotification(fromMember, followAcceptMessage);
     }
 
