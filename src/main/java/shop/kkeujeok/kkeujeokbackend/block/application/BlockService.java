@@ -102,13 +102,14 @@ public class BlockService {
 
     // 블록 상태 업데이트 (Progress)
     @Transactional
-    public BlockInfoResDto progressUpdate(String email, Long blockId, String progressString) {
+    public BlockInfoResDto progressUpdate(String email, Long blockId, String progressString,
+                                          BlockSequenceUpdateReqDto blockSequenceUpdateReqDto) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Block block = blockRepository.findById(blockId).orElseThrow(BlockNotFoundException::new);
 
         Progress progress = parseProgress(progressString);
 
-        Dashboard dashboard = dashboardRepository.findById(block.getDashboard().getId())
+        Dashboard dashboard = dashboardRepository.findById(blockSequenceUpdateReqDto.dashboardId())
                 .orElseThrow(DashboardNotFoundException::new);
 
         validateDashboardAccess(dashboard, member);
@@ -116,6 +117,12 @@ public class BlockService {
         block.progressUpdate(progress);
 
         updateChallengeCompletedMemberByProgress(block, member, progress);
+
+        updateBlockSequence(member, blockSequenceUpdateReqDto.notStartedList(), dashboard.getId(),
+                Progress.NOT_STARTED);
+        updateBlockSequence(member, blockSequenceUpdateReqDto.inProgressList(), dashboard.getId(),
+                Progress.IN_PROGRESS);
+        updateBlockSequence(member, blockSequenceUpdateReqDto.completedList(), dashboard.getId(), Progress.COMPLETED);
 
         return BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
     }

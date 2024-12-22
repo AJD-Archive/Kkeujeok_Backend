@@ -44,8 +44,11 @@ public class BlockController {
     @PatchMapping("/{blockId}/progress")
     public RspTemplate<BlockInfoResDto> progressUpdate(@CurrentUserEmail String email,
                                                        @PathVariable(name = "blockId") Long blockId,
-                                                       @RequestParam(name = "progress") String progress) {
-        return new RspTemplate<>(HttpStatus.OK, "블록 상태 수정", blockService.progressUpdate(email, blockId, progress));
+                                                       @RequestParam(name = "progress") String progress,
+                                                       @RequestBody BlockSequenceUpdateReqDto blockSequenceUpdateReqDto) {
+        return new RspTemplate<>(HttpStatus.OK,
+                "블록 상태 수정",
+                blockService.progressUpdate(email, blockId, progress, blockSequenceUpdateReqDto));
     }
 
     @GetMapping("")

@@ -219,12 +219,13 @@ class BlockControllerTest extends ControllerTest {
         String progressString = "IN_PROGRESS";
         BlockInfoResDto response = BlockInfoResDto.from(block, DDayCalculator.calculate(block.getDeadLine()));
 
-        given(blockService.progressUpdate(anyString(), anyLong(), anyString())).willReturn(response);
+        given(blockService.progressUpdate(anyString(), anyLong(), anyString(), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(patch(String.format("/api/blocks/{blockId}/progress?progress=%s", progressString), blockId)
                         .header("Authorization", "Bearer valid-token")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(blockSequenceUpdateReqDto)))
                 .andDo(print())
                 .andDo(document("block/progress/update",
                         preprocessRequest(prettyPrint()),
@@ -235,6 +236,12 @@ class BlockControllerTest extends ControllerTest {
                         queryParameters(
                                 parameterWithName("progress")
                                         .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
+                        ),
+                        requestFields(
+                                fieldWithPath("dashboardId").description("대시보드 ID"),
+                                fieldWithPath("notStartedList").description("시작 전 블록 아이디 리스트"),
+                                fieldWithPath("inProgressList").description("진행 중 블록 아이디 리스트"),
+                                fieldWithPath("completedList").description("완료 블록 아이디 리스트")
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
@@ -263,13 +270,14 @@ class BlockControllerTest extends ControllerTest {
         Long blockId = 1L;
         String progressString = "STATUS_PROGRESS";
 
-        given(blockService.progressUpdate(anyString(), anyLong(), anyString())).willThrow(
+        given(blockService.progressUpdate(anyString(), anyLong(), anyString(), any())).willThrow(
                 new InvalidProgressException());
 
         // when & then
         mockMvc.perform(patch(String.format("/api/blocks/{blockId}/progress?progress=%s", progressString), blockId)
                         .header("Authorization", "Bearer valid-token")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(blockSequenceUpdateReqDto)))
                 .andDo(print())
                 .andDo(document("block/progress/update/failure",
                         preprocessRequest(prettyPrint()),
@@ -280,6 +288,12 @@ class BlockControllerTest extends ControllerTest {
                         queryParameters(
                                 parameterWithName("progress")
                                         .description("블록 상태 문자열(NOT_STARTED, IN_PROGRESS, COMPLETED)")
+                        ),
+                        requestFields(
+                                fieldWithPath("dashboardId").description("대시보드 ID"),
+                                fieldWithPath("notStartedList").description("시작 전 블록 아이디 리스트"),
+                                fieldWithPath("inProgressList").description("진행 중 블록 아이디 리스트"),
+                                fieldWithPath("completedList").description("완료 블록 아이디 리스트")
                         )
                 ))
                 .andExpect(status().isBadRequest());
