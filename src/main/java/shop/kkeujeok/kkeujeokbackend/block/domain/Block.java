@@ -5,8 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +22,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_dashboard_progress_status", columnList = "dashboard_id, progress, status"))
 public class Block extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
@@ -105,5 +108,5 @@ public class Block extends BaseEntity {
     public void sequenceUpdate(int sequence) {
         this.sequence = sequence;
     }
-    
+
 }
