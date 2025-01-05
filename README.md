@@ -4,6 +4,7 @@
 
 <div align="center">
 
+### [🌕 끄적끄적 서비스 소개](https://aljadi.notion.site/374f9abf7679460bab1f6ca93f21946f?pvs=74)
 ### [➡️ 끄적끄적 하러 가기](https://kkeujeok-kkeujeok.vercel.app)
 
 </div>
