@@ -1,4 +1,4 @@
-package shop.kkeujeok.kkeujeokbackend.amdin.api.response;
+package shop.kkeujeok.kkeujeokbackend.admin.api.response;
 
 import lombok.Builder;
 

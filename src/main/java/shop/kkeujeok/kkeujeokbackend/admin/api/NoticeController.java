@@ -1,12 +1,12 @@
-package shop.kkeujeok.kkeujeokbackend.amdin.api;
+package shop.kkeujeok.kkeujeokbackend.admin.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import shop.kkeujeok.kkeujeokbackend.amdin.api.response.NoticeListResDto;
-import shop.kkeujeok.kkeujeokbackend.amdin.application.NoticeService;
+import shop.kkeujeok.kkeujeokbackend.admin.api.response.NoticeListResDto;
+import shop.kkeujeok.kkeujeokbackend.admin.application.NoticeService;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 
 @RestController

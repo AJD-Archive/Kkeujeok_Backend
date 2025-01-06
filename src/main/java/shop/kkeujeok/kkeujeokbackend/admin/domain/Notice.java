@@ -1,4 +1,4 @@
-package shop.kkeujeok.kkeujeokbackend.amdin.domain;
+package shop.kkeujeok.kkeujeokbackend.admin.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,5 +26,5 @@ public class Notice extends BaseEntity {
         this.title = title;
         this.contents = contents;
     }
-    
+
 }

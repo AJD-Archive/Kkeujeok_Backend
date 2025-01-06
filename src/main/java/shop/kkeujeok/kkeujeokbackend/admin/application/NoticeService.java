@@ -1,13 +1,13 @@
-package shop.kkeujeok.kkeujeokbackend.amdin.application;
+package shop.kkeujeok.kkeujeokbackend.admin.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.kkeujeok.kkeujeokbackend.amdin.api.response.NoticeInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.amdin.api.response.NoticeListResDto;
-import shop.kkeujeok.kkeujeokbackend.amdin.domain.Notice;
-import shop.kkeujeok.kkeujeokbackend.amdin.domain.repository.NoticeRepository;
+import shop.kkeujeok.kkeujeokbackend.admin.api.response.NoticeInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.admin.api.response.NoticeListResDto;
+import shop.kkeujeok.kkeujeokbackend.admin.domain.Notice;
+import shop.kkeujeok.kkeujeokbackend.admin.domain.repository.NoticeRepository;
 
 @Service
 @RequiredArgsConstructor
