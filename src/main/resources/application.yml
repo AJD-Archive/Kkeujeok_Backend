@@ -36,8 +36,8 @@ jwt:
 token:
   expire:
     time:
-      access : ${token.expire.time.access}
-      refresh : ${token.expire.time.refresh}
+      access: ${token.expire.time.access}
+      refresh: ${token.expire.time.refresh}
 
 google:
   client:
@@ -50,3 +50,11 @@ oauth:
   kakao:
     rest-api-key: ${oauth.kakao.rest-api-key}
     redirect-url: ${oauth.kakao.redirect-url}
+
+sse:
+  timeout: ${sse.timeout}
+
+kafka:
+  topic-name: ${kafka.topic-name}
+  group-id: ${kafka.group-id}
+  bootstrap-servers: ${kafka.bootstrap-servers}
