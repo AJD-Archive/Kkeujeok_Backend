@@ -38,7 +38,7 @@ public class NotificationService {
 
         Notification savedNotification = notificationRepository.save(notification);
 
-        sseEmitterManager.sendNotification(member.getId(), savedNotification.getMessage());
+        sseEmitterManager.send(member.getId(), savedNotification.getMessage());
     }
 
     @Transactional(readOnly = true)
@@ -59,16 +59,6 @@ public class NotificationService {
 
         notifications.forEach(Notification::markAsRead);
     }
-
-
-    /*@Transactional
-    public NotificationInfoResDto findByNotificationId(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(NotificationNotFoundException::new);
-        notification.markAsRead();
-
-        return NotificationInfoResDto.from(notification);
-    }*/
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
