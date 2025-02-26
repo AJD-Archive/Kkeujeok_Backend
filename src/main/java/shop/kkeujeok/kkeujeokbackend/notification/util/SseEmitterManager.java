@@ -1,42 +1,85 @@
 package shop.kkeujeok.kkeujeokbackend.notification.util;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import shop.kkeujeok.kkeujeokbackend.notification.domain.repository.EmitterRepository;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SseEmitterManager {
-    private static final String EMITTER_NAME = "notification";
-    private static final String DUMMY_MESSAGE = "연결 성공";
 
-    private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private static final String DUMMY_MESSAGE = "연결 성공";
+    private static final String SERVER_ID = UUID.randomUUID().toString();
+
+    @Value("${sse.timeout}")
+    private String defaultTimeout;
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    private final EmitterRepository emitterRepository;
 
     public SseEmitter createEmitter(Long memberId) {
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-        emitters.put(memberId, emitter);
+        String emitterId = String.valueOf(memberId);
+        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(Long.parseLong(defaultTimeout)));
 
-        emitter.onCompletion(() -> emitters.remove(memberId));
-        emitter.onTimeout(() -> emitters.remove(memberId));
-        emitter.onError((e) -> emitters.remove(memberId));
+        redisTemplate.opsForHash().put("sse_connections", emitterId, SERVER_ID);
 
-        sendNotification(memberId, DUMMY_MESSAGE);
+        registerEmitterCallbacks(emitter, emitterId);
+
+        sendNotification(emitter, emitterId, DUMMY_MESSAGE);
 
         return emitter;
     }
 
-    public void sendNotification(Long memberId, String message) {
-        SseEmitter emitter = emitters.get(memberId);
+    private void registerEmitterCallbacks(SseEmitter emitter, String emitterId) {
+        emitter.onCompletion(() -> {
+            log.info("비동기 요청 완료");
+            removeEmitter(emitterId);
+        });
 
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .data(message));
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-            }
+        emitter.onTimeout(() -> {
+            log.info("시간 초과");
+            emitter.complete();
+            removeEmitter(emitterId);
+        });
+
+        emitter.onError((e) -> {
+            log.error("Emitter 에러 발생", e);
+            removeEmitter(emitterId);
+        });
+    }
+
+    public void send(Long targetMemberId, String message) {
+        String emitterId = String.valueOf(targetMemberId);
+        String serverId = (String) redisTemplate.opsForHash().get("sse_connections", emitterId);
+
+        if (serverId != null) {
+            String data = emitterId + "|" + message;
+            kafkaTemplate.send("sse_notifications", serverId, data);
         }
     }
+
+    public void sendNotification(SseEmitter emitter, String emitterId, Object data) {
+        try {
+            emitter.send(SseEmitter.event()
+                    .id(emitterId)
+                    .data(data));
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+    }
+
+    public void removeEmitter(String emitterId) {
+        emitterRepository.deleteById(emitterId);
+        redisTemplate.opsForHash().delete("sse_connections", emitterId);
+    }
+
 }
