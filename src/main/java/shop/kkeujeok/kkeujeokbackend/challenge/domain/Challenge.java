@@ -69,17 +69,9 @@ public class Challenge extends BaseEntity {
     private Set<ChallengeMemberMapping> participants = new HashSet<>();
 
     @Builder
-    private Challenge(Status status,
-                      String title,
-                      String contents,
-                      Category category,
-                      Cycle cycle,
-                      List<CycleDetail> cycleDetails,
-                      LocalDate startDate,
-                      LocalDate endDate,
-                      String representImage,
-                      Member member,
-                      String blockName) {
+    private Challenge(Status status, String title, String contents, Category category, Cycle cycle,
+                      List<CycleDetail> cycleDetails, LocalDate startDate, LocalDate endDate, String representImage,
+                      Member member, String blockName) {
         validateCycleDetails(cycle, cycleDetails);
 
         this.status = status;
@@ -96,19 +88,16 @@ public class Challenge extends BaseEntity {
     }
 
     public void update(String updateTitle, String updateContents, Cycle updateCycle,
-                       List<CycleDetail> updateCycleDetails,
-                       LocalDate updateEndDate, String updateBlockName, String updateRepresentImage) {
+                       List<CycleDetail> updateCycleDetails, LocalDate updateEndDate, String updateBlockName,
+                       String updateRepresentImage) {
         validateCycleDetails(cycle, cycleDetails);
 
-        if (hasChanges(updateTitle, updateContents, updateCycle, updateCycleDetails, updateEndDate,
-                updateBlockName)) {
-            this.title = updateTitle;
-            this.contents = updateContents;
-            this.cycle = updateCycle;
-            this.cycleDetails = updateCycleDetails;
-            this.endDate = updateEndDate;
-            this.blockName = updateBlockName;
-        }
+        this.title = updateTitle;
+        this.contents = updateContents;
+        this.cycle = updateCycle;
+        this.cycleDetails = updateCycleDetails;
+        this.endDate = updateEndDate;
+        this.blockName = updateBlockName;
         this.representImage = updateRepresentImage;
     }
 
@@ -133,17 +122,6 @@ public class Challenge extends BaseEntity {
         }
     }
 
-    private boolean hasChanges(String updateTitle, String updateContents, Cycle updateCycle,
-                               List<CycleDetail> updateCycleDetails,
-                               LocalDate updateEndDate, String blockName) {
-        return !this.title.equals(updateTitle) ||
-                !this.contents.equals(updateContents) ||
-                !this.cycle.equals(updateCycle) ||
-                !this.cycleDetails.equals(updateCycleDetails) ||
-                !this.endDate.equals(updateEndDate) ||
-                !this.blockName.equals(blockName);
-    }
-
     public void updateStatus() {
         this.status = (this.status == Status.ACTIVE) ? Status.DELETED : Status.ACTIVE;
     }
@@ -165,9 +143,7 @@ public class Challenge extends BaseEntity {
     }
 
     private ChallengeMemberMapping findParticipantByMember(Member member) {
-        return this.participants.stream()
-                .filter(p -> p.getMember().equals(member))
-                .findFirst()
+        return this.participants.stream().filter(p -> p.getMember().equals(member)).findFirst()
                 .orElseThrow(MemberNotFoundException::new);
     }
 
