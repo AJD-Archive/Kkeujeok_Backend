@@ -38,3 +38,5 @@ src/docs
 
 ### VS Code ###
 .vscode/
+src/test/resources/application-test.yml
+docker-compose.yml
