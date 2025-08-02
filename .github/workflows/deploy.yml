@@ -29,6 +29,9 @@ jobs:
 
       - name: Set up application-prod.yml
         run: echo "${{ secrets.DEV_APPLICATION }}" > ./src/main/resources/application-prod.yml
+        
+      - name: Set up application-test.yml
+        run: echo "${{ secrets.TEST_APPLICATION }}" > ./src/test/resources/application-test.yml
 
       - name: Build with Gradle
         run: ./gradlew build
