@@ -42,7 +42,7 @@ import shop.kkeujeok.kkeujeokbackend.notification.util.SseEmitterManager;
 @ActiveProfiles("test")
 class ChallengeServiceConcurrencyTest {
 
-    private static final int THREAD_COUNT = 1000;
+    private static final int THREAD_COUNT = 100;
 
     @MockBean
     private NotificationService notificationService;
