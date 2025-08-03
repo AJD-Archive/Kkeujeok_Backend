@@ -24,7 +24,6 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.ChallengeRepository;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.repository.challengeMemberMapping.ChallengeMemberMappingRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeAccessDeniedException;
 import shop.kkeujeok.kkeujeokbackend.challenge.exception.ChallengeNotFoundException;
 import shop.kkeujeok.kkeujeokbackend.dashboard.domain.Dashboard;
@@ -53,7 +52,6 @@ public class ChallengeService {
     private final BlockRepository blockRepository;
     private final NotificationService notificationService;
     private final S3Service s3Service;
-    private final ChallengeMemberMappingRepository challengeMemberMappingRepository;
 
     @Transactional
     public ChallengeInfoResDto save(String email, ChallengeSaveReqDto challengeSaveReqDto,
@@ -97,13 +95,12 @@ public class ChallengeService {
 
     @Transactional(readOnly = true)
     public ChallengeListResDto findAllChallenges(Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAllChallenges(pageable);
+        Page<ChallengeInfoResDto> page = challengeRepository.findAllChallenges(pageable);
 
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .toList();
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
+        return ChallengeListResDto.of(
+                page.getContent(),
+                PageInfoResDto.from(page)
+        );
     }
 
     @Transactional(readOnly = true)
@@ -195,15 +192,12 @@ public class ChallengeService {
 
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengeForMemberId(String email, Pageable pageable) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(MemberNotFoundException::new);
 
-        Page<Challenge> challenges = challengeRepository.findChallengesByMemberInMapping(member, pageable);
+        Page<ChallengeInfoResDto> challenges = challengeRepository.findChallengesByMemberInMapping(member, pageable);
 
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .collect(Collectors.toList());
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
+        return ChallengeListResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
     }
 
     @Transactional(readOnly = true)
