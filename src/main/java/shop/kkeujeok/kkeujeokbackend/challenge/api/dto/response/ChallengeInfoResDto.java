@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,8 @@ public record ChallengeInfoResDto(
         int participantCount,
         boolean isParticipant,
         boolean isAuthor,
-        Set<ChallengeCompletedMemberInfoResDto> completedMembers
+        Set<ChallengeCompletedMemberInfoResDto> completedMembers,
+        LocalDateTime createdAt
 ) {
     public static ChallengeInfoResDto from(Challenge challenge) {
         return ChallengeInfoResDto.builder()
@@ -49,6 +51,7 @@ public record ChallengeInfoResDto(
                 .isAuthor(true)
                 .isParticipant(false)
                 .completedMembers(Collections.emptySet())
+                .createdAt(challenge.getCreatedAt())
                 .build();
     }
 
@@ -72,6 +75,7 @@ public record ChallengeInfoResDto(
                 .isParticipant(isParticipant)
                 .isAuthor(isAuthor)
                 .completedMembers(completedMembers)
+                .createdAt(challenge.getCreatedAt())
                 .build();
     }
 }
