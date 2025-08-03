@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
@@ -133,8 +132,8 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     }
 
     @Override
-    public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
-                                                              Pageable pageable) {
+    public Page<ChallengeInfoResDto> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                                        Pageable pageable) {
         String keyword = challengeSearchReqDto.keyWord();
         String category = challengeSearchReqDto.category();
 
@@ -156,14 +155,35 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
                         .fetchOne()
         ).orElse(0L);
 
-        List<Challenge> challenges = queryFactory
-                .selectFrom(challenge)
+        List<ChallengeInfoResDto> results = queryFactory
+                .select(Projections.constructor(
+                        ChallengeInfoResDto.class,
+                        challenge.id,
+                        challenge.member.id,
+                        challenge.title,
+                        challenge.contents,
+                        challenge.category,
+                        challenge.cycle,
+                        challenge.cycleDetails,
+                        challenge.startDate,
+                        challenge.endDate,
+                        challenge.representImage,
+                        challenge.member.nickname,
+                        challenge.member.picture,
+                        challenge.blockName,
+                        challenge.participants.size(),
+                        Expressions.constant(false), // isParticipant
+                        Expressions.constant(false), // isAuthor
+                        Expressions.constant(Collections.emptySet()),
+                        challenge.createdAt
+                ))
+                .from(challenge)
                 .where(predicate)
                 .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(challenges, pageable, total);
+        return new PageImpl<>(results, pageable, total);
     }
 }

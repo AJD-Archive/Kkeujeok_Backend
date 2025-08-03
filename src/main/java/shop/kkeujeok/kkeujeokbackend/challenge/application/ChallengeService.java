@@ -2,7 +2,6 @@ package shop.kkeujeok.kkeujeokbackend.challenge.application;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -203,14 +202,10 @@ public class ChallengeService {
     @Transactional(readOnly = true)
     public ChallengeListResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
                                                                   Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findChallengesByCategoryAndKeyword(challengeSearchReqDto,
-                pageable);
+        Page<ChallengeInfoResDto> challenges = challengeRepository.findChallengesByCategoryAndKeyword(
+                challengeSearchReqDto, pageable);
 
-        List<ChallengeInfoResDto> challengeInfoResDtoList = challenges.stream()
-                .map(ChallengeInfoResDto::from)
-                .collect(Collectors.toList());
-
-        return ChallengeListResDto.of(challengeInfoResDtoList, PageInfoResDto.from(challenges));
+        return ChallengeListResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
     }
 
     @Transactional
