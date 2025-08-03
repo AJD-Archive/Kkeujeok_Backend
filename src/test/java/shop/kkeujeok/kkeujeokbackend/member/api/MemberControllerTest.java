@@ -138,7 +138,7 @@ public class MemberControllerTest extends ControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andDo(print())
-                .andDo(document("member/team-challenges",
+                .andDo(document("member/team-challengeInfoResDto",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -171,6 +171,7 @@ public class MemberControllerTest extends ControllerTest {
                                 fieldWithPath("data.challengeList.pageInfoResDto.currentPage").description("현재 페이지 번호"),
                                 fieldWithPath("data.challengeList.pageInfoResDto.totalPages").description("총 페이지 수"),
                                 fieldWithPath("data.challengeList.pageInfoResDto.totalItems").description("총 항목 수")
+
                         )
                 ))
                 .andExpect(status().isOk())

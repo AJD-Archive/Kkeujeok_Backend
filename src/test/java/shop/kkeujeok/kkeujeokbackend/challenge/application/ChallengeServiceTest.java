@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +63,6 @@ class ChallengeServiceTest {
     private PersonalDashboard personalDashboard;
     private Block block;
     private PersonalDashboardSaveReqDto personalDashboardSaveReqDto;
-
 
     @Mock
     private ChallengeRepository challengeRepository;
@@ -291,11 +291,33 @@ class ChallengeServiceTest {
     }
 
     @Test
-    @DisplayName("모든챌린지를 조회할 수 있다")
+    @DisplayName("모든 챌린지를 조회할 수 있다")
     void 모든_챌린지를_조회할_수_있다() {
         // given
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Challenge> page = new PageImpl<>(List.of(challenge), PageRequest.of(0, 10), 1);
+
+        ChallengeInfoResDto dto = ChallengeInfoResDto.builder()
+                .challengeId(1L)
+                .authorId(1L)
+                .title("테스트 챌린지")
+                .contents("내용")
+                .category(Category.MENTAL_WELLNESS)
+                .cycle(Cycle.DAILY)
+                .cycleDetails(List.of())
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(7))
+                .representImage("image.png")
+                .authorName("작성자")
+                .authorProfileImage("profile.png")
+                .blockName("block")
+                .participantCount(0)
+                .isParticipant(false)
+                .isAuthor(true)
+                .completedMembers(Collections.emptySet())
+                .build();
+
+        Page<ChallengeInfoResDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+
         when(challengeRepository.findAllChallenges(any(Pageable.class)))
                 .thenReturn(page);
 
@@ -313,24 +335,47 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("챌린지를 카테고리 별로 검색할 수 있다")
     void 챌린지를_카테고리_별로_검색할_수_있다() {
-        //given
+        // given
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Challenge> page = new PageImpl<>(List.of(challenge), pageable, 1);
         ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from("1일", "CREATIVITY_AND_ARTS");
 
+        ChallengeInfoResDto dto = ChallengeInfoResDto.builder()
+                .challengeId(1L)
+                .authorId(1L)
+                .title("테스트 챌린지")
+                .contents("내용")
+                .category(Category.CREATIVITY_AND_ARTS)
+                .cycle(Cycle.DAILY)
+                .cycleDetails(List.of())
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(7))
+                .representImage("image.png")
+                .authorName("작성자")
+                .authorProfileImage("profile.png")
+                .blockName("BlockA")
+                .participantCount(5)
+                .isParticipant(false)
+                .isAuthor(false)
+                .completedMembers(Collections.emptySet())
+                .build();
+
+        Page<ChallengeInfoResDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+
         when(challengeRepository.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
-                any(PageRequest.class)))
+                any(Pageable.class)))
                 .thenReturn(page);
 
         // when
         ChallengeListResDto result = challengeService.findChallengesByCategoryAndKeyword(searchReqDto, pageable);
 
         // then
-        assertAll(() -> {
-            assertThat(result.challengeInfoResDto().size()).isEqualTo(1);
-            assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
-            assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
-        });
+        assertAll(
+                () -> assertThat(result.challengeInfoResDto().size()).isEqualTo(1),
+                () -> assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1),
+                () -> assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1),
+                () -> assertThat(result.challengeInfoResDto().get(0).title()).isEqualTo("테스트 챌린지"),
+                () -> assertThat(result.challengeInfoResDto().get(0).category()).isEqualTo(Category.CREATIVITY_AND_ARTS)
+        );
     }
 
     @Test
@@ -404,5 +449,4 @@ class ChallengeServiceTest {
                     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd 23:59")));
         });
     }
-
 }
