@@ -20,11 +20,11 @@ import java.io.IOException;
 public class LoginCheckFilter extends GenericFilterBean {
 
     private static final String[] whiteList = {
-            "*", // 일단 다 열어둠
+//            "*", // 일단 다 열어둠
 //            "/",
-//            "/api/oauth2/callback/**",
-//            "/api/*/token",
-//            "/api/token/access",
+            "/api/oauth2/callback/**",
+            "/api/*/token",
+            "/api/token/access",
     };
 
     private final TokenProvider tokenProvider;
