@@ -19,6 +19,8 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchRe
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto.ChallengeSummary;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.ChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
@@ -93,13 +95,10 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeListResDto findAllChallenges(Pageable pageable) {
-        Page<ChallengeInfoResDto> page = challengeRepository.findAllChallenges(pageable);
+    public ChallengesResDto findAllChallenges(Pageable pageable) {
+        Page<ChallengeSummary> challenges = challengeRepository.findAllChallenges(pageable);
 
-        return ChallengeListResDto.of(
-                page.getContent(),
-                PageInfoResDto.from(page)
-        );
+        return ChallengesResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
     }
 
     @Transactional(readOnly = true)

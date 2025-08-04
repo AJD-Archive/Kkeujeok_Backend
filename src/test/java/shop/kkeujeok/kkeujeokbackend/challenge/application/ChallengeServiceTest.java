@@ -10,6 +10,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqD
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
@@ -296,39 +298,30 @@ class ChallengeServiceTest {
         // given
         Pageable pageable = PageRequest.of(0, 10);
 
-        ChallengeInfoResDto dto = ChallengeInfoResDto.builder()
+        ChallengesResDto.ChallengeSummary summary = ChallengesResDto.ChallengeSummary.builder()
                 .challengeId(1L)
-                .authorId(1L)
+                .representImage("image.png")
                 .title("테스트 챌린지")
-                .contents("내용")
-                .category(Category.MENTAL_WELLNESS)
                 .cycle(Cycle.DAILY)
                 .cycleDetails(List.of())
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(7))
-                .representImage("image.png")
-                .authorName("작성자")
-                .authorProfileImage("profile.png")
-                .blockName("block")
-                .participantCount(0)
-                .isParticipant(false)
-                .isAuthor(true)
-                .completedMembers(Collections.emptySet())
+                .createdAt(LocalDateTime.now())
                 .build();
 
-        Page<ChallengeInfoResDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+        List<ChallengesResDto.ChallengeSummary> summaries = List.of(summary);
+        Page<ChallengesResDto.ChallengeSummary> page = new PageImpl<>(summaries, pageable, 1);
 
         when(challengeRepository.findAllChallenges(any(Pageable.class)))
                 .thenReturn(page);
 
         // when
-        ChallengeListResDto result = challengeService.findAllChallenges(pageable);
+        ChallengesResDto result = challengeService.findAllChallenges(pageable);
 
         // then
         assertAll(() -> {
-            assertThat(result.challengeInfoResDto().size()).isEqualTo(1);
+            assertThat(result.challenges().size()).isEqualTo(1);
             assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
             assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
+            assertThat(result.challenges().get(0).title()).isEqualTo("테스트 챌린지");
         });
     }
 
