@@ -12,6 +12,6 @@ public interface ChallengeCustomRepository {
 
     Page<ChallengeInfoResDto> findChallengesByMemberInMapping(Member member, Pageable pageable);
 
-    Page<ChallengeInfoResDto> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
-                                                                 Pageable pageable);
+    Page<ChallengeSummary> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                              Pageable pageable);
 }

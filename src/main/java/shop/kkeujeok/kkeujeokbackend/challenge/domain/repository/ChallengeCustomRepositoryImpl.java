@@ -113,8 +113,8 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     }
 
     @Override
-    public Page<ChallengeInfoResDto> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
-                                                                        Pageable pageable) {
+    public Page<ChallengeSummary> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                                     Pageable pageable) {
         String keyword = challengeSearchReqDto.keyWord();
         String category = challengeSearchReqDto.category();
 
@@ -136,26 +136,14 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
                         .fetchOne()
         ).orElse(0L);
 
-        List<ChallengeInfoResDto> results = queryFactory
+        List<ChallengeSummary> results = queryFactory
                 .select(Projections.constructor(
-                        ChallengeInfoResDto.class,
+                        ChallengeSummary.class,
                         challenge.id,
-                        challenge.member.id,
+                        challenge.representImage,
                         challenge.title,
-                        challenge.contents,
-                        challenge.category,
                         challenge.cycle,
                         challenge.cycleDetails,
-                        challenge.startDate,
-                        challenge.endDate,
-                        challenge.representImage,
-                        challenge.member.nickname,
-                        challenge.member.picture,
-                        challenge.blockName,
-                        challenge.participants.size(),
-                        Expressions.constant(false), // isParticipant
-                        Expressions.constant(false), // isAuthor
-                        Expressions.constant(Collections.emptySet()),
                         challenge.createdAt
                 ))
                 .from(challenge)

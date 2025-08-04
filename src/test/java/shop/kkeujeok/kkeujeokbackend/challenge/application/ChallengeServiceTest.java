@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,8 +33,8 @@ import shop.kkeujeok.kkeujeokbackend.block.domain.repository.BlockRepository;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto.ChallengeSummary;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
@@ -332,42 +331,31 @@ class ChallengeServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         ChallengeSearchReqDto searchReqDto = ChallengeSearchReqDto.from("1일", "CREATIVITY_AND_ARTS");
 
-        ChallengeInfoResDto dto = ChallengeInfoResDto.builder()
+        ChallengeSummary summary = ChallengeSummary.builder()
                 .challengeId(1L)
-                .authorId(1L)
+                .representImage("image.png")
                 .title("테스트 챌린지")
-                .contents("내용")
-                .category(Category.CREATIVITY_AND_ARTS)
                 .cycle(Cycle.DAILY)
                 .cycleDetails(List.of())
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(7))
-                .representImage("image.png")
-                .authorName("작성자")
-                .authorProfileImage("profile.png")
-                .blockName("BlockA")
-                .participantCount(5)
-                .isParticipant(false)
-                .isAuthor(false)
-                .completedMembers(Collections.emptySet())
+                .createdAt(LocalDateTime.now())
                 .build();
 
-        Page<ChallengeInfoResDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+        Page<ChallengeSummary> page = new PageImpl<>(List.of(summary), pageable, 1);
 
         when(challengeRepository.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
                 any(Pageable.class)))
                 .thenReturn(page);
 
         // when
-        ChallengeListResDto result = challengeService.findChallengesByCategoryAndKeyword(searchReqDto, pageable);
+        ChallengesResDto result = challengeService.findChallengesByCategoryAndKeyword(searchReqDto, pageable);
 
         // then
         assertAll(
-                () -> assertThat(result.challengeInfoResDto().size()).isEqualTo(1),
+                () -> assertThat(result.challenges().size()).isEqualTo(1),
                 () -> assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1),
                 () -> assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1),
-                () -> assertThat(result.challengeInfoResDto().get(0).title()).isEqualTo("테스트 챌린지"),
-                () -> assertThat(result.challengeInfoResDto().get(0).category()).isEqualTo(Category.CREATIVITY_AND_ARTS)
+                () -> assertThat(result.challenges().get(0).title()).isEqualTo("테스트 챌린지"),
+                () -> assertThat(result.challenges().get(0).cycle()).isEqualTo(Cycle.DAILY)
         );
     }
 

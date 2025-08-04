@@ -199,12 +199,12 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeListResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
-                                                                  Pageable pageable) {
-        Page<ChallengeInfoResDto> challenges = challengeRepository.findChallengesByCategoryAndKeyword(
+    public ChallengesResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                               Pageable pageable) {
+        Page<ChallengeSummary> challenges = challengeRepository.findChallengesByCategoryAndKeyword(
                 challengeSearchReqDto, pageable);
 
-        return ChallengeListResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
+        return ChallengesResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
     }
 
     @Transactional

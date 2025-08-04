@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
@@ -79,7 +78,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/search")
-    public RspTemplate<ChallengeListResDto> findChallengesByCategoryAndKeyword(
+    public RspTemplate<ChallengesResDto> findChallengesByCategoryAndKeyword(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0", name = "page") int page,
