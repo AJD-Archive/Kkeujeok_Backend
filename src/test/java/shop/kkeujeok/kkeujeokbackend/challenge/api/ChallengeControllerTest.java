@@ -269,7 +269,6 @@ class ChallengeControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     @DisplayName("챌린지 전체 조회에 성공하면 상태코드 200 반환")
     void 챌린지_전체_조회에_성공하면_상태코드_200_반환() throws Exception {
@@ -318,12 +317,13 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
 
-                                        fieldWithPath("data.challenges[].challengeId").description("챌린지 ID"),
-                                        fieldWithPath("data.challenges[].representImage").description("대표 이미지"),
-                                        fieldWithPath("data.challenges[].title").description("챌린지 제목"),
-                                        fieldWithPath("data.challenges[].cycle").description("챌린지 주기"),
-                                        fieldWithPath("data.challenges[].cycleDetails[]").description("주기 상세 정보"),
-                                        fieldWithPath("data.challenges[].createdAt").description("생성 일시"),
+                                        fieldWithPath("data.challengeSummaries[].challengeId").description("챌린지 ID"),
+                                        fieldWithPath("data.challengeSummaries[].representImage").description("대표 이미지"),
+                                        fieldWithPath("data.challengeSummaries[].title").description("챌린지 제목"),
+                                        fieldWithPath("data.challengeSummaries[].cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.challengeSummaries[].cycleDetails[]").description(
+                                                "주기 상세 정보"),
+                                        fieldWithPath("data.challengeSummaries[].createdAt").description("생성 일시"),
 
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
@@ -353,6 +353,7 @@ class ChallengeControllerTest extends ControllerTest {
                 challengePage.getContent(),
                 PageInfoResDto.from(challengePage)
         );
+
         given(challengeService.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
                 any(PageRequest.class)))
                 .willReturn(response);
@@ -381,12 +382,14 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
 
-                                        fieldWithPath("data.challenges[].challengeId").description("챌린지 ID"),
-                                        fieldWithPath("data.challenges[].representImage").description("대표 이미지 URL"),
-                                        fieldWithPath("data.challenges[].title").description("챌린지 제목"),
-                                        fieldWithPath("data.challenges[].cycle").description("챌린지 주기"),
-                                        fieldWithPath("data.challenges[].cycleDetails[]").description("주기 상세 정보"),
-                                        fieldWithPath("data.challenges[].createdAt").description("생성일"),
+                                        fieldWithPath("data.challengeSummaries[].challengeId").description("챌린지 ID"),
+                                        fieldWithPath("data.challengeSummaries[].representImage").description(
+                                                "대표 이미지 URL"),
+                                        fieldWithPath("data.challengeSummaries[].title").description("챌린지 제목"),
+                                        fieldWithPath("data.challengeSummaries[].cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.challengeSummaries[].cycleDetails[]").description(
+                                                "주기 상세 정보"),
+                                        fieldWithPath("data.challengeSummaries[].createdAt").description("생성일"),
 
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),

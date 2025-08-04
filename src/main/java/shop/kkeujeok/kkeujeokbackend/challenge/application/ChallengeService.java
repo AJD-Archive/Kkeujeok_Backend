@@ -96,9 +96,9 @@ public class ChallengeService {
 
     @Transactional(readOnly = true)
     public ChallengesResDto findAllChallenges(Pageable pageable) {
-        Page<ChallengeSummary> challenges = challengeRepository.findAllChallenges(pageable);
+        Page<ChallengeSummary> challengeSummaries = challengeRepository.findAllChallenges(pageable);
 
-        return ChallengesResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
+        return ChallengesResDto.of(challengeSummaries.getContent(), PageInfoResDto.from(challengeSummaries));
     }
 
     @Transactional(readOnly = true)
@@ -201,10 +201,10 @@ public class ChallengeService {
     @Transactional(readOnly = true)
     public ChallengesResDto findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
                                                                Pageable pageable) {
-        Page<ChallengeSummary> challenges = challengeRepository.findChallengesByCategoryAndKeyword(
+        Page<ChallengeSummary> challengeSummaries = challengeRepository.findChallengesByCategoryAndKeyword(
                 challengeSearchReqDto, pageable);
 
-        return ChallengesResDto.of(challenges.getContent(), PageInfoResDto.from(challenges));
+        return ChallengesResDto.of(challengeSummaries.getContent(), PageInfoResDto.from(challengeSummaries));
     }
 
     @Transactional

@@ -317,10 +317,10 @@ class ChallengeServiceTest {
 
         // then
         assertAll(() -> {
-            assertThat(result.challenges().size()).isEqualTo(1);
+            assertThat(result.challengeSummaries().size()).isEqualTo(1);
             assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1);
             assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1);
-            assertThat(result.challenges().get(0).title()).isEqualTo("테스트 챌린지");
+            assertThat(result.challengeSummaries().get(0).title()).isEqualTo("테스트 챌린지");
         });
     }
 
@@ -351,11 +351,11 @@ class ChallengeServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(result.challenges().size()).isEqualTo(1),
+                () -> assertThat(result.challengeSummaries().size()).isEqualTo(1),
                 () -> assertThat(result.pageInfoResDto().totalPages()).isEqualTo(1),
                 () -> assertThat(result.pageInfoResDto().totalItems()).isEqualTo(1),
-                () -> assertThat(result.challenges().get(0).title()).isEqualTo("테스트 챌린지"),
-                () -> assertThat(result.challenges().get(0).cycle()).isEqualTo(Cycle.DAILY)
+                () -> assertThat(result.challengeSummaries().get(0).title()).isEqualTo("테스트 챌린지"),
+                () -> assertThat(result.challengeSummaries().get(0).cycle()).isEqualTo(Cycle.DAILY)
         );
     }
 

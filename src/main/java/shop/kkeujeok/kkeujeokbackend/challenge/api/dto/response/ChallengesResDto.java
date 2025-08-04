@@ -9,11 +9,11 @@ import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 
 public record ChallengesResDto(
-        List<ChallengeSummary> challenges,
+        List<ChallengeSummary> challengeSummaries,
         PageInfoResDto pageInfoResDto
 ) {
-    public static ChallengesResDto of(List<ChallengeSummary> challenges, PageInfoResDto pageInfo) {
-        return new ChallengesResDto(challenges, pageInfo);
+    public static ChallengesResDto of(List<ChallengeSummary> challengeSummaries, PageInfoResDto pageInfo) {
+        return new ChallengesResDto(challengeSummaries, pageInfo);
     }
 
     @Builder
