@@ -40,3 +40,9 @@ src/docs
 .vscode/
 src/test/resources/application-test.yml
 docker-compose.yml
+
+### k6 ###
+k6/**
+node_modules/**
+package-lock.json
+package.json
