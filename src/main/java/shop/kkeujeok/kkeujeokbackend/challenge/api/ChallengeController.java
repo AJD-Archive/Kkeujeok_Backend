@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
@@ -47,8 +47,8 @@ public class ChallengeController {
     }
 
     @GetMapping
-    public RspTemplate<ChallengeListResDto> findAllChallenges(@RequestParam(defaultValue = "0", name = "page") int page,
-                                                              @RequestParam(defaultValue = "10", name = "size") int size) {
+    public RspTemplate<ChallengesResDto> findAllChallenges(@RequestParam(defaultValue = "0", name = "page") int page,
+                                                           @RequestParam(defaultValue = "10", name = "size") int size) {
         return new RspTemplate<>(HttpStatus.OK,
                 "챌린지 전체 조회 성공",
                 challengeService.findAllChallenges(PageRequest.of(page, size)));
@@ -78,7 +78,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/search")
-    public RspTemplate<ChallengeListResDto> findChallengesByCategoryAndKeyword(
+    public RspTemplate<ChallengesResDto> findChallengesByCategoryAndKeyword(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0", name = "page") int page,
