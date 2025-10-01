@@ -19,6 +19,7 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchRe
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.application.ChallengeService;
+import shop.kkeujeok.kkeujeokbackend.challenge.application.util.ChallengeBlockStatusUpdateScheduler;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 
@@ -28,6 +29,7 @@ import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 public class ChallengeController {
 
     private final ChallengeService challengeService;
+    private final ChallengeBlockStatusUpdateScheduler challengeBlockStatusUpdateScheduler;
 
     @PostMapping
     public RspTemplate<ChallengeInfoResDto> save(@CurrentUserEmail String email,
@@ -96,6 +98,12 @@ public class ChallengeController {
                                                    @PathVariable(name = "challengeId") Long challengeId) {
         challengeService.withdrawFromChallenge(email, challengeId);
         return new RspTemplate<>(HttpStatus.OK, "챌린지 탈퇴 성공");
+    }
+
+    @PostMapping("/test")
+    public RspTemplate<Void> test() {
+        challengeBlockStatusUpdateScheduler.createNewChallengeBlocks();
+        return new RspTemplate<>(HttpStatus.OK, "챌린지 블록 상태 업데이트 테스트 성공");
     }
 
 }

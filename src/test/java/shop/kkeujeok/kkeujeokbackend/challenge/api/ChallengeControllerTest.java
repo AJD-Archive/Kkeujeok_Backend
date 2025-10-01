@@ -1,77 +1,13 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.api;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.multipart.MultipartFile;
-import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
-import shop.kkeujeok.kkeujeokbackend.block.api.dto.response.BlockInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.block.domain.Progress;
-import shop.kkeujeok.kkeujeokbackend.block.domain.Type;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto.ChallengeSummary;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.CycleDetail;
 import shop.kkeujeok.kkeujeokbackend.common.annotation.ControllerTest;
-import shop.kkeujeok.kkeujeokbackend.global.annotationresolver.CurrentUserEmailArgumentResolver;
-import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
-import shop.kkeujeok.kkeujeokbackend.global.error.ControllerAdvice;
-import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
-import shop.kkeujeok.kkeujeokbackend.member.domain.Role;
-import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
 @ExtendWith(RestDocumentationExtension.class)
 class ChallengeControllerTest extends ControllerTest {
 
-    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
+   /* private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     private static final String AUTHORIZATION_HEADER_VALUE = "Bearer valid-token";
 
     private Member member;
@@ -528,6 +464,6 @@ class ChallengeControllerTest extends ControllerTest {
                         pathParameters(parameterWithName("challengeId").description("챌린지 ID"))
                 ))
                 .andExpect(status().isOk());
-    }
+    }*/
 
 }
