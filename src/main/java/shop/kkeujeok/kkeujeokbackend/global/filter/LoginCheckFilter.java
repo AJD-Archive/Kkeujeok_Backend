@@ -6,14 +6,13 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.GenericFilterBean;
 import shop.kkeujeok.kkeujeokbackend.global.filter.exceptiton.AuthenticationException;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
-
-import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class LoginCheckFilter extends GenericFilterBean {
             "/api/oauth2/callback/**",
             "/api/*/token",
             "/api/token/access",
+            "/docs/**"
     };
 
     private final TokenProvider tokenProvider;
