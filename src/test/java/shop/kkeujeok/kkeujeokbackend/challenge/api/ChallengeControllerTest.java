@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static shop.kkeujeok.kkeujeokbackend.global.restdocs.RestDocsHandler.responseFields;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +53,8 @@ import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqD
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeCompletedMemberInfoResDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
-import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto.ChallengeSummary;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Cycle;
@@ -195,7 +197,8 @@ class ChallengeControllerTest extends ControllerTest {
                                         fieldWithPath("data.participantCount").description("참여자 수"),
                                         fieldWithPath("data.isParticipant").description("참여 여부"),
                                         fieldWithPath("data.isAuthor").description("작성자 여부"),
-                                        fieldWithPath("data.completedMembers[]").description("완료한 회원 목록")
+                                        fieldWithPath("data.completedMembers[]").description("완료한 회원 목록"),
+                                        fieldWithPath("data.createdAt").description("챌린지 생성일")
                                 )
                         )
                 )
@@ -259,22 +262,37 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.participantCount").description("참여자 수"),
                                 fieldWithPath("data.isParticipant").description("참여 여부"),
                                 fieldWithPath("data.isAuthor").description("작성자 여부"),
-                                fieldWithPath("data.completedMembers[]").description("완료한 회원 목록")
+                                fieldWithPath("data.completedMembers[]").description("완료한 회원 목록"),
+                                fieldWithPath("data.createdAt").description("챌린지 생성일")
                         ))
                 )
                 .andExpect(status().isOk());
     }
 
-
     @Test
     @DisplayName("챌린지 전체 조회에 성공하면 상태코드 200 반환")
     void 챌린지_전체_조회에_성공하면_상태코드_200_반환() throws Exception {
         // given
-        ChallengeInfoResDto challengeInfoResDto = ChallengeInfoResDto.from(challenge);
-        Page<Challenge> challengePage = new PageImpl<>(List.of(challenge),
-                PageRequest.of(0, 10), 1);
-        ChallengeListResDto response = ChallengeListResDto.of(List.of(challengeInfoResDto),
-                PageInfoResDto.from(challengePage));
+        ChallengesResDto.ChallengeSummary challengeSummary = ChallengesResDto.ChallengeSummary.builder()
+                .challengeId(1L)
+                .representImage("represent.png")
+                .title("테스트 챌린지")
+                .cycle(Cycle.DAILY)
+                .cycleDetails(List.of())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        Page<ChallengesResDto.ChallengeSummary> challengePage = new PageImpl<>(
+                List.of(challengeSummary),
+                PageRequest.of(0, 10),
+                1
+        );
+
+        ChallengesResDto response = ChallengesResDto.of(
+                challengePage.getContent(),
+                PageInfoResDto.from(challengePage)
+        );
+
         given(challengeService.findAllChallenges(any(PageRequest.class)))
                 .willReturn(response);
 
@@ -284,7 +302,8 @@ class ChallengeControllerTest extends ControllerTest {
                                 .param("page", "0")
                                 .param("size", "10")
                                 .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andDo(
                         document("challenge/findAll",
@@ -297,45 +316,44 @@ class ChallengeControllerTest extends ControllerTest {
                                 responseFields(
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
-                                        fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
-                                        fieldWithPath("data.challengeInfoResDto[].authorId").description("챌린지 작성자"),
-                                        fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
-                                        fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
-                                        fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
-                                        fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
-                                        fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description(
-                                                "주기 상세정보"),
-                                        fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
-                                        fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
-                                        fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
-                                        fieldWithPath("data.challengeInfoResDto[].authorName").description(
-                                                "챌린지 작성자 이름"),
-                                        fieldWithPath("data.challengeInfoResDto[].authorProfileImage").description(
-                                                "챌린지 작성자 프로필 이미지"),
-                                        fieldWithPath("data.challengeInfoResDto[].participantCount").description(
-                                                "참여자 수"),
-                                        fieldWithPath("data.challengeInfoResDto[].isParticipant").description("참여 여부"),
-                                        fieldWithPath("data.challengeInfoResDto[].isAuthor").description("작성자 여부"),
-                                        fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
-                                        fieldWithPath("data.challengeInfoResDto[].completedMembers[]").description(
-                                                "완료한 회원 목록"),
+
+                                        fieldWithPath("data.challengeSummaries[].challengeId").description("챌린지 ID"),
+                                        fieldWithPath("data.challengeSummaries[].representImage").description("대표 이미지"),
+                                        fieldWithPath("data.challengeSummaries[].title").description("챌린지 제목"),
+                                        fieldWithPath("data.challengeSummaries[].cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.challengeSummaries[].cycleDetails[]").description(
+                                                "주기 상세 정보"),
+                                        fieldWithPath("data.challengeSummaries[].createdAt").description("생성 일시"),
+
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
-                                        fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                        fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
+                                        fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지 수"),
+                                        fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템 수")
                                 )
                         )
-                ).andExpect(status().isOk());
+                )
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("카테고리 별 검색에 성공하면 상태코드 200 반환")
     void 카테고리_별_검색에_성공하면_상태코드_200_반환() throws Exception {
         // given
-        ChallengeInfoResDto challengeInfoResDto = ChallengeInfoResDto.from(challenge);
-        Page<Challenge> challengePage = new PageImpl<>(List.of(challenge),
-                PageRequest.of(0, 10), 1);
-        ChallengeListResDto response = ChallengeListResDto.of(List.of(challengeInfoResDto),
-                PageInfoResDto.from(challengePage));
+        ChallengeSummary summary = ChallengeSummary.builder()
+                .challengeId(1L)
+                .representImage("image.png")
+                .title("테스트 챌린지")
+                .cycle(Cycle.DAILY)
+                .cycleDetails(List.of())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        Page<ChallengeSummary> challengePage = new PageImpl<>(List.of(summary), PageRequest.of(0, 10), 1);
+
+        ChallengesResDto response = ChallengesResDto.of(
+                challengePage.getContent(),
+                PageInfoResDto.from(challengePage)
+        );
+
         given(challengeService.findChallengesByCategoryAndKeyword(any(ChallengeSearchReqDto.class),
                 any(PageRequest.class)))
                 .willReturn(response);
@@ -343,8 +361,8 @@ class ChallengeControllerTest extends ControllerTest {
         // when & then
         mockMvc.perform(
                         get("/api/challenges/search")
-                                .param("category", challengeSearchReqDto.category())
-                                .param("keyword", challengeSearchReqDto.keyWord())
+                                .param("category", "CREATIVITY_AND_ARTS")
+                                .param("keyword", "1일")
                                 .param("page", "0")
                                 .param("size", "10")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -363,37 +381,24 @@ class ChallengeControllerTest extends ControllerTest {
                                 responseFields(
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
-                                        fieldWithPath("data.challengeInfoResDto[].challengeId").description("챌린지 id"),
-                                        fieldWithPath("data.challengeInfoResDto[].authorId").description("챌린지 작성자"),
-                                        fieldWithPath("data.challengeInfoResDto[].title").description("챌린지 제목"),
-                                        fieldWithPath("data.challengeInfoResDto[].contents").description("챌린지 내용"),
-                                        fieldWithPath("data.challengeInfoResDto[].category").description("챌린지 카테고리"),
-                                        fieldWithPath("data.challengeInfoResDto[].cycle").description("챌린지 주기"),
-                                        fieldWithPath("data.challengeInfoResDto[].cycleDetails[]").description(
-                                                "주기 상세정보"),
-                                        fieldWithPath("data.challengeInfoResDto[].startDate").description("시작 날짜"),
-                                        fieldWithPath("data.challengeInfoResDto[].endDate").description("종료 날짜"),
-                                        fieldWithPath("data.challengeInfoResDto[].representImage").description("대표 사진"),
-                                        fieldWithPath("data.challengeInfoResDto[].authorName").description(
-                                                "챌린지 작성자 이름"),
-                                        fieldWithPath("data.challengeInfoResDto[].authorProfileImage")
-                                                .description("챌린지 작성자 프로필 이미지"),
-                                        fieldWithPath("data.challengeInfoResDto[].blockName").description("블록 이름"),
-                                        fieldWithPath("data.challengeInfoResDto[].participantCount").description(
-                                                "참여자 수"),
-                                        fieldWithPath("data.challengeInfoResDto[].isParticipant").description("참여 여부"),
-                                        fieldWithPath("data.challengeInfoResDto[].isAuthor").description("작성자 여부"),
-                                        fieldWithPath("data.challengeInfoResDto[].completedMembers[]").description(
-                                                "완료한 회원 목록"),
+
+                                        fieldWithPath("data.challengeSummaries[].challengeId").description("챌린지 ID"),
+                                        fieldWithPath("data.challengeSummaries[].representImage").description(
+                                                "대표 이미지 URL"),
+                                        fieldWithPath("data.challengeSummaries[].title").description("챌린지 제목"),
+                                        fieldWithPath("data.challengeSummaries[].cycle").description("챌린지 주기"),
+                                        fieldWithPath("data.challengeSummaries[].cycleDetails[]").description(
+                                                "주기 상세 정보"),
+                                        fieldWithPath("data.challengeSummaries[].createdAt").description("생성일"),
+
                                         fieldWithPath("data.pageInfoResDto.currentPage").description("현재 페이지"),
                                         fieldWithPath("data.pageInfoResDto.totalPages").description("전체 페이지"),
-                                        fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템")
+                                        fieldWithPath("data.pageInfoResDto.totalItems").description("전체 아이템 수")
                                 )
                         )
                 )
                 .andExpect(status().isOk());
     }
-
 
     @Test
     @DisplayName("챌린지 상세 정보 조회에 성공하면 상태코드 200 반환")
@@ -436,7 +441,8 @@ class ChallengeControllerTest extends ControllerTest {
                                 fieldWithPath("data.participantCount").description("참여자 수"),
                                 fieldWithPath("data.isParticipant").description("참여 여부"),
                                 fieldWithPath("data.isAuthor").description("작성자 여부"),
-                                fieldWithPath("data.completedMembers[]").description("완료한 회원 목록")
+                                fieldWithPath("data.completedMembers[]").description("완료한 회원 목록"),
+                                fieldWithPath("data.createdAt").description("챌린지 생성일")
                         ))
                 )
                 .andExpect(status().isOk());

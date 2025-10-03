@@ -27,7 +27,6 @@ out/
 !**/src/test/**/out/
 
 src/**/application-prod.yml
-src/docs
 
 ### NetBeans ###
 /nbproject/private/
@@ -38,3 +37,11 @@ src/docs
 
 ### VS Code ###
 .vscode/
+src/test/resources/application-test.yml
+docker-compose.yml
+
+### k6 ###
+k6/**
+node_modules/**
+package-lock.json
+package.json

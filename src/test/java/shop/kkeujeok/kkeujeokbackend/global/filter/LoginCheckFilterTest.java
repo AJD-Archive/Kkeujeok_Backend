@@ -67,7 +67,7 @@ public class LoginCheckFilterTest {
     @Test
     public void 화이트_리스트를_열어_두면_필터가_생략된다() throws IOException, ServletException {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRequestURI("/");
+        request.setRequestURI("/api/token/access");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain filterChain = new MockFilterChain();
 

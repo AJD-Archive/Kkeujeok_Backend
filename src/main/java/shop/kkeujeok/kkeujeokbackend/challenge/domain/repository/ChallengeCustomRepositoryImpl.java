@@ -3,8 +3,11 @@ package shop.kkeujeok.kkeujeokbackend.challenge.domain.repository;
 import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallenge.challenge;
 import static shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallengeMemberMapping.challengeMemberMapping;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +17,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengesResDto.ChallengeSummary;
 import shop.kkeujeok.kkeujeokbackend.challenge.domain.Category;
-import shop.kkeujeok.kkeujeokbackend.challenge.domain.Challenge;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallenge;
+import shop.kkeujeok.kkeujeokbackend.challenge.domain.QChallengeMemberMapping;
 import shop.kkeujeok.kkeujeokbackend.global.entity.Status;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
+import shop.kkeujeok.kkeujeokbackend.member.domain.QMember;
 
 @Repository
 @Transactional(readOnly = true)
@@ -27,7 +34,7 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Challenge> findAllChallenges(Pageable pageable) {
+    public Page<ChallengeSummary> findAllChallenges(Pageable pageable) {
         long total = Optional.ofNullable(
                 queryFactory
                         .select(challenge.count())
@@ -36,41 +43,78 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
                         .fetchOne()
         ).orElse(0L);
 
-        List<Challenge> challenges = queryFactory
-                .selectFrom(challenge)
+        List<ChallengeSummary> challengeSummaries = queryFactory
+                .select(Projections.constructor(
+                        ChallengeSummary.class,
+                        challenge.id,
+                        challenge.representImage,
+                        challenge.title,
+                        challenge.cycle,
+                        challenge.cycleDetails,
+                        challenge.createdAt
+                ))
+                .from(challenge)
                 .where(challenge.status.eq(Status.ACTIVE))
                 .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(challenges, pageable, total);
+        return new PageImpl<>(challengeSummaries, pageable, total);
     }
 
     @Override
-    public Page<Challenge> findChallengesByMemberInMapping(Member member, Pageable pageable) {
-        long total = queryFactory
-                .selectFrom(challengeMemberMapping)
-                .where(challengeMemberMapping.member.eq(member))
-                .stream()
-                .count();
+    public Page<ChallengeInfoResDto> findChallengesByMemberInMapping(Member member, Pageable pageable) {
+        QChallenge challenge = QChallenge.challenge;
+        QChallengeMemberMapping mapping = challengeMemberMapping;
+        QMember m = QMember.member;
 
-        List<Challenge> challenges = queryFactory
-                .select(challengeMemberMapping.challenge)
-                .from(challengeMemberMapping)
-                .where(challengeMemberMapping.member.eq(member)
-                        .and(challengeMemberMapping.challenge.status.eq(Status.ACTIVE)))
+        long total = Optional.ofNullable(
+                queryFactory
+                        .select(challenge.count())
+                        .from(challenge)
+                        .where(challenge.status.eq(Status.ACTIVE))
+                        .fetchOne()
+        ).orElse(0L);
+
+        List<ChallengeInfoResDto> results = queryFactory
+                .select(Projections.constructor(
+                        ChallengeInfoResDto.class,
+                        challenge.id,
+                        m.id,
+                        challenge.title,
+                        challenge.contents,
+                        challenge.category,
+                        challenge.cycle,
+                        challenge.cycleDetails,
+                        challenge.startDate,
+                        challenge.endDate,
+                        challenge.representImage,
+                        m.nickname,
+                        m.picture,
+                        challenge.blockName,
+                        challenge.participants.size(),
+                        Expressions.constant(true),
+                        Expressions.constant(false),
+                        Expressions.constant(Collections.emptySet()),
+                        challenge.createdAt
+                ))
+                .from(mapping)
+                .join(mapping.challenge, challenge)
+                .join(challenge.member, m)
+                .where(mapping.member.eq(member)
+                        .and(challenge.status.eq(Status.ACTIVE)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .distinct()
                 .fetch();
 
-        return new PageImpl<>(challenges, pageable, total);
+        return new PageImpl<>(results, pageable, total);
     }
 
-
     @Override
-    public Page<Challenge> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
-                                                              Pageable pageable) {
+    public Page<ChallengeSummary> findChallengesByCategoryAndKeyword(ChallengeSearchReqDto challengeSearchReqDto,
+                                                                     Pageable pageable) {
         String keyword = challengeSearchReqDto.keyWord();
         String category = challengeSearchReqDto.category();
 
@@ -92,14 +136,23 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
                         .fetchOne()
         ).orElse(0L);
 
-        List<Challenge> challenges = queryFactory
-                .selectFrom(challenge)
+        List<ChallengeSummary> results = queryFactory
+                .select(Projections.constructor(
+                        ChallengeSummary.class,
+                        challenge.id,
+                        challenge.representImage,
+                        challenge.title,
+                        challenge.cycle,
+                        challenge.cycleDetails,
+                        challenge.createdAt
+                ))
+                .from(challenge)
                 .where(predicate)
                 .orderBy(challenge.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(challenges, pageable, total);
+        return new PageImpl<>(results, pageable, total);
     }
 }
