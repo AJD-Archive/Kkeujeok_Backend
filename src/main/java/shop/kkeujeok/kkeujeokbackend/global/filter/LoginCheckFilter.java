@@ -19,12 +19,11 @@ import shop.kkeujeok.kkeujeokbackend.global.jwt.TokenProvider;
 public class LoginCheckFilter extends GenericFilterBean {
 
     private static final String[] whiteList = {
-//            "*", // 일단 다 열어둠
-//            "/",
             "/api/oauth2/callback/**",
             "/api/*/token",
             "/api/token/access",
-            "/docs/**"
+            "/docs/**",
+            "/actuator/prometheus"
     };
 
     private final TokenProvider tokenProvider;
@@ -66,4 +65,5 @@ public class LoginCheckFilter extends GenericFilterBean {
         }
         return null;
     }
+
 }
