@@ -59,26 +59,89 @@ jobs:
           username: ${{ env.EC2_SSH_USER }}
           key: ${{ env.PRIVATE_KEY }}
           script: |
+            # 1. 현재 BLUE가 돌고 있는지 확인
             CURRENT_RUNNING=$(sudo docker ps --filter "name=${{ env.CONTAINER_NAME_BLUE }}" --format "{{.Names}}")
-            
+
+            # 2. 헬스체크 함수 정의
+            wait_for_healthy() {
+              local PORT=$1
+              local MAX_WAIT=120
+              local WAITED=0
+
+              echo "Waiting for service on port ${PORT} to become healthy..."
+
+              while [ $WAITED -lt $MAX_WAIT ]; do
+                # 필요하면 / 대신 /actuator/health 등으로 변경 가능
+                CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${PORT}/" || echo "000")
+                echo "  health check -> status ${CODE} (waited: ${WAITED}s)"
+
+                # 2xx~4xx 응답이면 '살아있다'고 간주 (401도 OK)
+                if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 500 ]; then
+                  echo "Service on port ${PORT} is healthy."
+                  return 0
+                fi
+
+                sleep 2
+                WAITED=$((WAITED + 2))
+              done
+
+              echo "Service on port ${PORT} did not become healthy within ${MAX_WAIT} seconds."
+              return 1
+            }
+
+            SERVICE_URL_CONF="/etc/nginx/conf.d/service-url.inc"
+
             if [ "$CURRENT_RUNNING" == "${{ env.CONTAINER_NAME_BLUE }}" ]; then
-              sudo docker-compose pull app-prod-green
-              sudo docker-compose up -d app-prod-green
-            
-              sleep 30
-            
-              sudo docker-compose stop app-prod-blue
-              sudo docker-compose rm -f app-prod-blue
+              echo "Blue is currently running. Deploying Green..."
+
+              TARGET_PORT=${{ env.GREEN_PORT }}
+              TARGET_SERVICE="app-prod-green"
+              OLD_SERVICE="app-prod-blue"
+
+              # 3. 새 컨테이너(Green) 실행
+              sudo docker-compose pull ${TARGET_SERVICE}
+              sudo docker-compose up -d ${TARGET_SERVICE}
+
+              # 4. 새 컨테이너 헬스체크
+              wait_for_healthy ${TARGET_PORT} || exit 1
+
+              # 5. Nginx가 바라보는 포트를 BLUE_PORT -> GREEN_PORT로 변경
+              echo "Switching Nginx traffic to Green (port ${TARGET_PORT})..."
+              sudo sed -i "s/${{ env.BLUE_PORT }}/${{ env.GREEN_PORT }}/g" ${SERVICE_URL_CONF}
+
+              # 6. Nginx 리로드 (트래픽 스위칭)
+              sudo systemctl reload nginx
+
+              # 7. 구 컨테이너(Blue) 종료
+              echo "Stopping old Blue container..."
+              sudo docker-compose stop ${OLD_SERVICE}
+              sudo docker-compose rm -f ${OLD_SERVICE}
               sudo docker image prune -f
+
             else
-              sudo docker-compose pull app-prod-blue
-              sudo docker-compose up -d app-prod-blue
-            
-              sleep 30
-            
-              sudo docker-compose stop app-prod-green
-              sudo docker-compose rm -f app-prod-green
+              echo "Green is currently running. Deploying Blue..."
+
+              TARGET_PORT=${{ env.BLUE_PORT }}
+              TARGET_SERVICE="app-prod-blue"
+              OLD_SERVICE="app-prod-green"
+
+              # 3. 새 컨테이너(Blue) 실행
+              sudo docker-compose pull ${TARGET_SERVICE}
+              sudo docker-compose up -d ${TARGET_SERVICE}
+
+              # 4. 새 컨테이너 헬스체크
+              wait_for_healthy ${TARGET_PORT} || exit 1
+
+              # 5. Nginx가 바라보는 포트를 GREEN_PORT -> BLUE_PORT로 변경
+              echo "Switching Nginx traffic to Blue (port ${TARGET_PORT})..."
+              sudo sed -i "s/${{ env.GREEN_PORT }}/${{ env.BLUE_PORT }}/g" ${SERVICE_URL_CONF}
+
+              # 6. Nginx 리로드
+              sudo systemctl reload nginx
+
+              # 7. 이제 구 컨테이너(Green) 종료
+              echo "Stopping old Green container..."
+              sudo docker-compose stop ${OLD_SERVICE}
+              sudo docker-compose rm -f ${OLD_SERVICE}
               sudo docker image prune -f
             fi
-            
-            sudo systemctl reload nginx
