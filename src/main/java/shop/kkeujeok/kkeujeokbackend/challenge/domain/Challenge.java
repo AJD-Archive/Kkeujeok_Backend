@@ -7,9 +7,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +31,11 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 import shop.kkeujeok.kkeujeokbackend.member.exception.MemberNotFoundException;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_challenge_status_created_at", columnList = "status, created_at"),
+        @Index(name = "idx_challenge_member_id", columnList = "member_id"),
+        @Index(name = "idx_challenge_category", columnList = "category")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Challenge extends BaseEntity {
