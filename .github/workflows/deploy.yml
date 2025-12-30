@@ -59,8 +59,8 @@ jobs:
           username: ${{ env.EC2_SSH_USER }}
           key: ${{ env.PRIVATE_KEY }}
           script: |
-            sudo docker-compose stop app-dev
-            sudo docker-compose rm -f app-dev
-            sudo docker-compose pull app-dev
-            sudo docker-compose up -d app-dev  
+            sudo docker compose stop app-dev
+            sudo docker compose rm -f app-dev
+            sudo docker compose pull app-dev
+            sudo docker compose up -d app-dev  
             sudo docker image prune -f
