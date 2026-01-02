@@ -8,7 +8,7 @@ on:
 env:
   DOCKER_IMAGE_NAME: ${{ secrets.PRODUCTION_DOCKER_IMAGE_NAME }}
   EC2_HOST: ${{ secrets.EC2_HOST }}
-  EC2_SSH_USER: ec2-user
+  EC2_SSH_USER: ubuntu
   PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
   CONTAINER_NAME_BLUE: ${{ secrets.CONTAINER_NAME_BLUE }}
   CONTAINER_NAME_GREEN: ${{ secrets.CONTAINER_NAME_GREEN }}
