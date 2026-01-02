@@ -65,7 +65,7 @@ jobs:
             # 2. 헬스체크 함수 정의
             wait_for_healthy() {
               local PORT=$1
-              local MAX_WAIT=120
+              local MAX_WAIT=240
               local WAITED=0
 
               echo "Waiting for service on port ${PORT} to become healthy..."
