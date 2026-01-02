@@ -99,8 +99,8 @@ jobs:
               OLD_SERVICE="app-prod-blue"
 
               # 3. 새 컨테이너(Green) 실행
-              sudo docker-compose pull ${TARGET_SERVICE}
-              sudo docker-compose up -d ${TARGET_SERVICE}
+              sudo docker compose pull ${TARGET_SERVICE}
+              sudo docker compose up -d ${TARGET_SERVICE}
 
               # 4. 새 컨테이너 헬스체크
               wait_for_healthy ${TARGET_PORT} || exit 1
@@ -114,8 +114,8 @@ jobs:
 
               # 7. 구 컨테이너(Blue) 종료
               echo "Stopping old Blue container..."
-              sudo docker-compose stop ${OLD_SERVICE}
-              sudo docker-compose rm -f ${OLD_SERVICE}
+              sudo docker compose stop ${OLD_SERVICE}
+              sudo docker compose rm -f ${OLD_SERVICE}
               sudo docker image prune -f
 
             else
@@ -126,8 +126,8 @@ jobs:
               OLD_SERVICE="app-prod-green"
 
               # 3. 새 컨테이너(Blue) 실행
-              sudo docker-compose pull ${TARGET_SERVICE}
-              sudo docker-compose up -d ${TARGET_SERVICE}
+              sudo docker compose pull ${TARGET_SERVICE}
+              sudo docker compose up -d ${TARGET_SERVICE}
 
               # 4. 새 컨테이너 헬스체크
               wait_for_healthy ${TARGET_PORT} || exit 1
@@ -141,7 +141,7 @@ jobs:
 
               # 7. 이제 구 컨테이너(Green) 종료
               echo "Stopping old Green container..."
-              sudo docker-compose stop ${OLD_SERVICE}
-              sudo docker-compose rm -f ${OLD_SERVICE}
+              sudo docker compose stop ${OLD_SERVICE}
+              sudo docker compose rm -f ${OLD_SERVICE}
               sudo docker image prune -f
             fi
