@@ -118,8 +118,8 @@ class FollowControllerTest extends ControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data").optional().description("응답 데이터. 친구 추가 수락의 경우 null 반환")
+                                fieldWithPath("message").description("응답 메시지")
+                                // fieldWithPath("data").optional().description("응답 데이터. 친구 추가 수락의 경우 null 반환")
                         )
                 ))
                 .andExpect(status().isOk());
@@ -229,8 +229,8 @@ class FollowControllerTest extends ControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("statusCode").description("상태 코드"),
-                                fieldWithPath("message").description("응답 메시지"),
-                                fieldWithPath("data").optional().description("응답 데이터. 친구 추가 수락의 경우 null 반환")
+                                fieldWithPath("message").description("응답 메시지")
+                                // fieldWithPath("data").optional().description("응답 데이터. 친구 추가 수락의 경우 null 반환")
                         )
                 ))
                 .andExpect(status().isOk());
