@@ -1,10 +1,12 @@
 package shop.kkeujeok.kkeujeokbackend.global.template;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 // 응답 템플릿
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RspTemplate<T> {
     int statusCode;
     String message;

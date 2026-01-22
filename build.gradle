@@ -64,6 +64,9 @@ dependencies {
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.1'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:3.0.1'
 
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
     // s3
     implementation 'software.amazon.awssdk:s3:2.20.140'
 

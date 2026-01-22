@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
-import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.FindTeamDocumentReqDto;
+import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.docs.TeamDocumentControllerDocs;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.TeamDocumentReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.request.TeamDocumentUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.teamdoc.api.dto.response.FindTeamDocumentResDto;
@@ -19,7 +18,7 @@ import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/dashboards/team/document")
-public class TeamDocumentController {
+public class TeamDocumentController implements TeamDocumentControllerDocs {
 
     private final TeamDocumentService teamDocumentService;
 
