@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import shop.kkeujeok.kkeujeokbackend.admin.api.docs.NoticeControllerDocs;
 import shop.kkeujeok.kkeujeokbackend.admin.api.response.NoticeListResDto;
 import shop.kkeujeok.kkeujeokbackend.admin.application.NoticeService;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
@@ -12,7 +13,7 @@ import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/notices")
-public class NoticeController {
+public class NoticeController implements NoticeControllerDocs {
 
     private final NoticeService noticeService;
 
