@@ -1,8 +1,10 @@
 package shop.kkeujeok.kkeujeokbackend.challenge.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +14,11 @@ import shop.kkeujeok.kkeujeokbackend.global.entity.BaseEntity;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_challenge_member_mapping_member", columnList = "member_id"),
+        @Index(name = "idx_challenge_member_mapping_challenge", columnList = "challenge_id"),
+        @Index(name = "idx_challenge_member_mapping_composite", columnList = "member_id, challenge_id")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChallengeMemberMapping extends BaseEntity {
