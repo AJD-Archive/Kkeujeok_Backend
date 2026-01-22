@@ -3,14 +3,8 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.docs.PersonalDashboardControllerDocs;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request.PersonalDashboardUpdateReqDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardCategoriesResDto;
@@ -23,11 +17,11 @@ import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/dashboards/personal")
-public class PersonalDashboardController {
+public class PersonalDashboardController implements PersonalDashboardControllerDocs {
 
     private final PersonalDashboardService personalDashboardService;
 
-    @PostMapping("/")
+    @PostMapping()
     public RspTemplate<PersonalDashboardInfoResDto> save(@CurrentUserEmail String email,
                                                          @RequestBody @Valid PersonalDashboardSaveReqDto personalDashboardSaveReqDto) {
         return new RspTemplate<>(HttpStatus.OK,
@@ -44,7 +38,7 @@ public class PersonalDashboardController {
                 personalDashboardService.update(email, dashboardId, personalDashboardUpdateReqDto));
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public RspTemplate<PersonalDashboardListResDto> findForPersonalDashboard(@CurrentUserEmail String email) {
         return new RspTemplate<>(HttpStatus.OK,
                 "개인 대시보드 전체 조회",

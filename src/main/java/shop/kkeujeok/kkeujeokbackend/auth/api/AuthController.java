@@ -1,10 +1,10 @@
 package shop.kkeujeok.kkeujeokbackend.auth.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import shop.kkeujeok.kkeujeokbackend.auth.api.docs.AuthControllerDocs;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.RefreshTokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.request.TokenReqDto;
 import shop.kkeujeok.kkeujeokbackend.auth.api.dto.response.IdTokenResDto;
@@ -15,8 +15,6 @@ import shop.kkeujeok.kkeujeokbackend.auth.application.AuthService;
 import shop.kkeujeok.kkeujeokbackend.auth.application.AuthServiceFactory;
 import shop.kkeujeok.kkeujeokbackend.auth.application.TokenService;
 import shop.kkeujeok.kkeujeokbackend.global.jwt.api.dto.TokenDto;
-import shop.kkeujeok.kkeujeokbackend.global.oauth.GoogleAuthService;
-import shop.kkeujeok.kkeujeokbackend.global.oauth.KakaoAuthService;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 
@@ -24,7 +22,7 @@ import shop.kkeujeok.kkeujeokbackend.member.domain.SocialType;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
 
     private final AuthServiceFactory authServiceFactory;
     private final AuthMemberService memberService;

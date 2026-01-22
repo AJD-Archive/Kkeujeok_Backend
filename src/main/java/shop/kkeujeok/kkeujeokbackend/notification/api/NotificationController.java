@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import shop.kkeujeok.kkeujeokbackend.global.annotation.CurrentUserEmail;
 import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
+import shop.kkeujeok.kkeujeokbackend.notification.api.docs.NotificationControllerDocs;
 import shop.kkeujeok.kkeujeokbackend.notification.api.dto.response.NotificationListResDto;
 import shop.kkeujeok.kkeujeokbackend.notification.application.NotificationService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notifications")
-public class NotificationController {
+public class NotificationController implements NotificationControllerDocs {
 
     private final NotificationService notificationService;
 

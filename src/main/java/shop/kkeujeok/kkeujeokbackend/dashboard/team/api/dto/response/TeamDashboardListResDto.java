@@ -1,12 +1,17 @@
 package shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Builder;
 import shop.kkeujeok.kkeujeokbackend.global.dto.PageInfoResDto;
 
 @Builder
+@Schema(description = "팀 대시보드 목록 응답 DTO")
 public record TeamDashboardListResDto(
+        @Schema(description = "팀 대시보드 정보 리스트")
         List<TeamDashboardInfoResDto> teamDashboardInfoResDto,
+
+        @Schema(description = "페이지 정보")
         PageInfoResDto pageInfoResDto
 ) {
     public static TeamDashboardListResDto of(List<TeamDashboardInfoResDto> teamDashboards,

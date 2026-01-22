@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import shop.kkeujeok.kkeujeokbackend.challenge.api.docs.ChallengeControllerDocs;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSaveReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.reqeust.ChallengeSearchReqDto;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeInfoResDto;
@@ -25,7 +26,7 @@ import shop.kkeujeok.kkeujeokbackend.global.template.RspTemplate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/challenges")
-public class ChallengeController {
+public class ChallengeController implements ChallengeControllerDocs {
 
     private final ChallengeService challengeService;
 
