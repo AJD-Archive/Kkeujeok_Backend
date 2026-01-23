@@ -1,6 +1,7 @@
 package shop.kkeujeok.kkeujeokbackend.member.mypage.api.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import shop.kkeujeok.kkeujeokbackend.challenge.api.dto.response.ChallengeListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.response.PersonalDashboardPageListResDto;
 import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboardListResDto;
@@ -8,12 +9,15 @@ import shop.kkeujeok.kkeujeokbackend.dashboard.team.api.dto.response.TeamDashboa
 @Schema(description = "팀 대시보드 및 챌린지 정보 응답 DTO")
 public record TeamDashboardsAndChallengesResDto(
         @Schema(description = "개인 대시보드 목록")
+        @NotNull(message = "개인 대시보드 목록은 필수입니다.")
         PersonalDashboardPageListResDto personalDashboardList,
 
         @Schema(description = "팀 대시보드 목록")
+        @NotNull(message = "팀 대시보드 목록은 필수입니다.")
         TeamDashboardListResDto teamDashboardList,
 
         @Schema(description = "챌린지 목록")
+        @NotNull(message = "챌린지 목록은 필수입니다.")
         ChallengeListResDto challengeList
 ) {
     public static TeamDashboardsAndChallengesResDto of(PersonalDashboardPageListResDto personalDashboardList,
