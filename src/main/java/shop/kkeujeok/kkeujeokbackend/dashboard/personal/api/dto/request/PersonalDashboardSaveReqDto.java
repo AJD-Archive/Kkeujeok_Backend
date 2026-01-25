@@ -2,6 +2,7 @@ package shop.kkeujeok.kkeujeokbackend.dashboard.personal.api.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import shop.kkeujeok.kkeujeokbackend.dashboard.personal.domain.PersonalDashboard;
 import shop.kkeujeok.kkeujeokbackend.member.domain.Member;
@@ -18,9 +19,11 @@ public record PersonalDashboardSaveReqDto(
         String description,
 
         @Schema(description = "공개 여부", example = "true")
+        @NotNull(message = "공개 여부는 필수입니다.")
         boolean isPublic,
 
         @Schema(description = "카테고리", example = "개발")
+        @NotNull(message = "카테고리는 필수입니다.")
         String category
 ) {
     public PersonalDashboard toEntity(Member member) {
